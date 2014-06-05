@@ -7,7 +7,7 @@
 %\singlespacing
 \onehalfspacing
 
-\title{My Topic}
+\title{Big Data Influence Maximization blah balh}
 \author{Behrouz Derakhshan}
 \date{\today}
 
@@ -32,18 +32,15 @@ Network influence maximization. Something about graphs, about network influcence
 
 
 \section{Introduction}
-In \cite{kempe03} they have studiedmodels by which influce propogates through social networks. They have discussed two diffusion models \\
-Linear Threshold Model (add reference) and Independent Cascade Models(add reference) . Describe the two models briefly. 
-The problem of influence maximization which is finding an initial set that will maximizes the profit( target function) is NP-hard . 
-Formal definition : it asks for a parameter k, to find a k-nod set of maximum influence. They used approximation with a natural greedu hill-climbing strategy which will guarantee a 63 percent of the optimal solution performance (reference) . For the approximation to work te target function should be submodular, they have proved that for both models the target function is indeed submodular.  They have run experiments on co-authorships in physicas theory section of arXiv (www.arxiv.org) . The results show that their greedy algorithm performs better that other methods such as random selection, high-degree or central nodes discussed in book Social Network Analysis by S. Wasserman (find reference) 
-
+What are graphs, social graphs. Influence maximization in social networks. Its application in marketing.  \cite{kempe03} has defined models in which network propagation can be studied. 
+\cite{domingo01} studied how to find the value of a customer in a network and how to use that to influence other customers.
 
 
 
 
 \section{Literature Review}
 
-Let us start by looking at the sections expected to be in a scientific text. Keep in mind that the same expectations go for all kinds of technical writing.
+
 
 \subsection{Graph}
 %\enlargethispage{5mm}
@@ -57,35 +54,27 @@ Let us start by looking at the sections expected to be in a scientific text. Kee
 
 
 \subsection{Influcence Maximization}
+In \cite{kempe03} they have studied models by which influce propogates through social networks. They have discussed two diffusion models \\
+Linear Threshold Model (add reference) and Independent Cascade Models(add reference) . Describe the two models briefly. 
+The problem of influence maximization which is finding an initial set that will maximizes the profit( target function) is NP-hard . 
+Formal definition : it asks for a parameter k, to find a k-nod set of maximum influence. They used approximation with a natural greedu hill-climbing strategy which will guarantee a 63 percent of the optimal solution performance (reference) . For the approximation to work te target function should be submodular, they have proved that for both models the target function is indeed submodular.  They have run experiments on co-authorships in physicas theory section of arXiv (www.arxiv.org) . The results show that their greedy algorithm performs better that other methods such as random selection, high-degree or central nodes discussed in book Social Network Analysis by S. Wasserman (find reference) \\
+\cite{domingo01} discusses the use case of influence maximization in marketing. They first, described how to model a market as a social network, then they applied their method to a collaborative filtering data set (reference MovieLenz project) to extract customer values . Explain how the model the market as social network and how they used a collabrative filtering dataset (Neighbours, Marketing action, movie ratings)
 
-The nature of the matter at hand determines how the topic chapters are disposed.
 
-In order to guide the reader, it is a good idea to start each main chapter with a short paragraph 
-on what the main topic of the chapter is and how it progresses from one sub-chapter to the next.
 
-Texts with only one sub-chapter, or with more than two chapter levels (main and sub-chapters) are a 
-sign of a problem with the disposition of the text. There may be justifiable reasons to use three-level 
-headings in some technical documents, but they are an exception to the rule.
+
+
 
 \subsection{Big Data and hadoop}
 
-%\pagebreak
+
 \subsection{Use cases reasearch and industry}
 
-
-So-called mnemonic references are used for referring to sources; they are constructed as described 
-in the section on the list of references. The page numbers should be added to the reference if it would 
-be too laborious for the reader to find the reference in the source without them. 
-
-References are always placed inside sentences.  This means that e.g. a separate reference at the end of a paragraph would be inappropriate.
-
-The structure of the text must clearly show what the reference relates to.  At the same time, it 
-shows how long a piece of the text that the reference relates to.
 
 
 \section{Big data and Network influence maximization}
 
-TDescription of what I'm going to do, big data/hadoop/mapreduce implementions for network influence
+Description of what I'm going to do, big data/hadoop/mapreduce implementions for network influence
 
 
 \subsection{Tools}
@@ -100,18 +89,21 @@ TDescription of what I'm going to do, big data/hadoop/mapreduce implementions fo
 
 
 \subsection{Algorithm}
+\subsubsection{Algorithm that I'm going to user}
+\subsubsection{Big data implementaiton of the Algorithm}
 
 
 
-\subsection{Other challenges}
+\subsection{Other challenges and open questions}
 
 
 
 \section{Conclusion}
+In conclusion
+\pagebreak
 
 
 
-\nocite{*}
 \bibliographystyle{tktl}
 
 \bibliography{bibliography}
