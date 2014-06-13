@@ -15,14 +15,24 @@
 
 
 \section{Topic Specification}
-Influence maximization in social networks is a topic that has been studied for more than a decade. People always influence each other in context of groups and social networks. The influence can be in form of life style choices, daily habits or purchasing habits among other things. A study by \cite{christ07} showed that obese people can increase the chance of of obesity among their peers. This topic also has an application in marketing, where by identifying influential people in a social network, the benefit can be increased through effective marketing campaigns and relying on the spread of information about the product throughout the network. The key problem here, first tackled by Domingos and Richardson \cite{domingo01}, is to find the set of these influential people. 
-Kempe et al.\cite{kempe03} have defined the problem this way; given a graph of nodes with arc weights (probability of a person influencing his/her neighbor) find an initial set of size $k$ that maximizes the expected size of propagation. They have  proposed two propagation models on how the influence will spread through the network starting with the initial set. Hence the problem is now to solve a optimization problem of finding the best initial set, although it is NP hard but it can be solved using greedy methods in a more efficient manner. In \cite{kempe03} and other similar methods the arc probabilities/influences are always calculated with some trivial models. For example, two widely used methods are uniform link probabilities (all links having the same probability) or the other method in which link probabilities are selected uniformly at random from the set {0.1, 0.01, 0.001}. Using the provided link probabilities and the propagation models, experiments are run on the graph to find the initial set of users which yields the maximum benefit.  \\
-A more advance method therefore has been studied, in which the arc probabilities are learned through mining the past propagation. Saito et al. \cite{saito08} were the first to study how to learn probabilities from past propagation by transforming the problem into a likelihood maximization and applying Expectation Maximization algorithm to solve it. A more direct mining approach has been proposed by \cite{goyal11} which eliminates the need for running simulations on the graph to find the optimal initial set of users. This method, which is the one of the central drivers for the thesis, directly computes the probability of a node being reached from some initial set of users(targeted users) . \\
-With the help of online social networks, extremely big past propagation logs and social graphs can be found, and running the proposed algorithms in the papers mentioned above in their original form on these data sets will suffer scalability issues. Over the past years, big data technologies have received a great deal of attention, and currently many frameworks and methodologies are available for doing computation on extremely large data sets. Hadoop (MapReduce) is one such framework. Writing implementations of algorithms proposed by other researchers or a completely new algorithm in MapReduce will be another focus of this Thesis project. 
+Influence maximization in social networks is a topic that has been studied for more than a decade. People always influence each other in context of groups and social networks. The influence can be in form of life style choices, daily habits or purchasing habits among other things. A study by \cite{christ07} showed that obese people can increase the chance of of obesity among their peers. This topic also has an application in marketing, also know as viral marketing,  where by identifying influential people in a social network, the benefit can be increased through effective marketing campaigns and relying on the spread of information about the product throughout the network. 
 
-\section{Challenges}
-Complexity of the task itself, especially when dealing with large amount of data is one of main the problems that I am trying to solve. 
-According to Bonchi \cite{Bon11} here are some other open areas that worth investigating :
+\section{Related works}
+The key problem in this topic, first tackled by Domingos and Richardson \cite{domingo01}, is to find the set of influential people within a social network. 
+Kempe et al. \cite{kempe03} have defined the problem this way; given a graph of nodes with arc weights (probability of a person influencing his/her neighbor) find an initial set of size $k$ that maximizes the expected size of propagation. They have  proposed two propagation models on how the influence will spread through the network starting with the initial set. Hence transforming it to an optimization problem of finding the best initial set. Although it is a NP hard problem but it can be solved using greedy methods in a more efficient manner. \\
+In \cite{kempe03} and other similar methods the arc probabilities/influences are always calculated with some trivial models. For example, two widely used methods are uniform link probabilities (all links having the same probability) or the other method in which link probabilities are selected uniformly at random from the set {0.1, 0.01, 0.001}. Using the provided link probabilities and the propagation models, experiments are run on the graph to find the initial set of users which yields the maximum benefit.  \\
+A more advance method therefore has been studied, in which the arc probabilities are learned through mining the past propagation. Saito et al. \cite{saito08} were the first to study how to learn probabilities from past propagation by transforming the problem into a likelihood maximization and applying Expectation Maximization algorithm to solve it. A more direct mining approach has been proposed by \cite{goyal11} which eliminates the need for running simulations on the graph to find the optimal initial set of users. \\
+
+
+\section{Scope}
+The main focus of the thesis will be on :
+\begin{itemize}
+\item Comprehensive survey of literature on the topic of influence maximization and viral marketing 
+\item Investigate the scalability issues of the topic
+\item Implementation of current (and new) algorithms using Big Data frameworks  such as Hadoop, Spark, ... .
+\end{itemize}
+
+According to Bonchi \cite{Bon11} here are some other open areas that worth investigating:
 \begin{itemize}
 \item Learning the strength of influence exerted from a user
 \item Temporal dimension (role of time)
@@ -30,8 +40,7 @@ According to Bonchi \cite{Bon11} here are some other open areas that worth inves
 \item User characteristics role and their tendency to buy certain products (for example teenagers are more likely to buy video games than seniors)
 \end{itemize}
 
-\section{Resources}
-Although the thesis work is not going to be part of my job description at the company that I work, Rovio Entertainment has a database of users which I might be able to access for performing experiments on real data sets. {check with Ari}.
+\section{Other Resources}
 Beside from the papers referenced in the previous sections, some other publications such as \cite{domingo02}, \cite{goyal10}, and \cite{cheng13} are among the related resources to the topic .\\
 \pagebreak
 \bibliographystyle{tktl}
