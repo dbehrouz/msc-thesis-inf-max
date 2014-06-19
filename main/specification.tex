@@ -15,15 +15,22 @@
 
 
 \section{Topic Specification}
-Influence maximization in social networks is a topic that has been studied for more than a decade. People always influence each other in context of groups and social networks. The influence can be in form of life style choices, daily habits or purchasing habits among other things. A study by \cite{christ07} showed that obese people can increase the chance of of obesity among their peers. This topic also has an application in marketing, also know as viral marketing,  where by identifying influential people in a social network, the benefit can be increased through effective marketing campaigns and relying on the spread of information about the product throughout the network. 
+Influence maximization in social networks is a topic that has been studied for more than a decade. People always influence each other in context of groups and social networks. The influence can be in form of life style choices, daily habits or purchasing habits among other things. A study by \cite{christ07} showed that obese people can increase the chance of of obesity among their peers. This topic also has an application in marketing, also known as viral marketing,  where by identifying influential people in a social network, the benefit can be increased through effective marketing campaigns and relying on the spread of information about the product throughout the network. 
 
 \section{Related works}
 The key problem in this topic, first tackled by Domingos and Richardson \cite{domingo01}, is to find the set of influential people within a social network. 
-Kempe et al. \cite{kempe03} have defined the problem this way; given a graph of nodes with arc weights (probability of a person influencing his/her neighbor) find an initial set of size $k$ that maximizes the expected size of propagation. They have  proposed two propagation models on how the influence will spread through the network starting with the initial set. Hence transforming it to an optimization problem of finding the best initial set. Although it is a NP hard problem but it can be solved using greedy methods in a more efficient manner. \\
+Kempe et al. \cite{kempe03} have defined the problem this way; given a graph of nodes with arc weights (probability of a person influencing his/her neighbor) find an initial set of size $k$ that maximizes the expected size of propagation. They have  proposed two propagation models on how the influence will spread through the network starting with the initial set. Hence transforming it to an optimization problem of finding the best initial set. Although it is a NP hard problem but it can be solved using greedy methods in a more efficient manner due to the submodularity of objective function. \\
 In \cite{kempe03} and other similar methods the arc probabilities/influences are always calculated with some trivial models. For example, two widely used methods are uniform link probabilities (all links having the same probability) or the other method in which link probabilities are selected uniformly at random from the set {0.1, 0.01, 0.001}. Using the provided link probabilities and the propagation models, experiments are run on the graph to find the initial set of users which yields the maximum benefit.  \\
-A more advance method therefore has been studied, in which the arc probabilities are learned through mining the past propagation. Saito et al. \cite{saito08} were the first to study how to learn probabilities from past propagation by transforming the problem into a likelihood maximization and applying Expectation Maximization algorithm to solve it. A more direct mining approach has been proposed by \cite{goyal11} which eliminates the need for running simulations on the graph to find the optimal initial set of users. \\
-
-
+A more advance method therefore has been studied, in which the arc probabilities are learned through mining the past propagation. Saito et al. \cite{saito08} were the first to study how to learn probabilities from past propagation by transforming the problem into a likelihood maximization and applying Expectation Maximization algorithm to solve it. A more direct mining approach has been proposed by \cite{goyal11} which eliminates the need for running simulations on the graph to find the optimal initial set of users. 
+The topic of scalability is another aspect of influence maximization, with existence of big social networks and web stores, there are many extremely large networks of users available, and earlier methods do not scale to graphs of this size. Mirzasoleiman et al. \cite{mks13} has proposed a MapReduce method for solving submodular function maximization and Wu et al. \cite{WYH13} has defined the problem under certain set of constraint and conditions and proposed a MapReduce solution to solve the problem. However, they have left out some of the common obstacles in influence maximization when it comes to scalability. 
+\\
+According to Bonchi \cite{Bon11} here are some other open areas that worth investigating:
+\begin{itemize}
+\item Learning the strength of influence exerted from a user
+\item Temporal dimension (role of time)
+\item Market competition (role that competing products will play in influence maximization for marketing)
+\item User characteristics role and their tendency to buy certain products (for example teenagers are more likely to buy video games than seniors)
+\end{itemize}
 \section{Scope}
 The main focus of the thesis will be on :
 \begin{itemize}
@@ -32,16 +39,8 @@ The main focus of the thesis will be on :
 \item Implementation of current (and new) algorithms using Big Data frameworks  such as Hadoop, Spark, ... .
 \end{itemize}
 
-According to Bonchi \cite{Bon11} here are some other open areas that worth investigating:
-\begin{itemize}
-\item Learning the strength of influence exerted from a user
-\item Temporal dimension (role of time)
-\item Market competition (role that competing products will play in influence maximization for marketing)
-\item User characteristics role and their tendency to buy certain products (for example teenagers are more likely to buy video games than seniors)
-\end{itemize}
-
 \section{Other Resources}
-Beside from the papers referenced in the previous sections, some other publications such as \cite{domingo02}, \cite{goyal10}, and \cite{cheng13} are among the related resources to the topic .\\
+Beside from the papers referenced in the previous sections, some other publications such as \cite{domingo02}, \cite{goyal10}, and \cite{cheng13} are among the related resources to the topic. 
 \pagebreak
 \bibliographystyle{tktl}
 
