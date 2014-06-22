@@ -24,7 +24,7 @@ In \cite{kempe03} and other similar methods the arc probabilities/influences are
 A more advance method therefore has been studied, in which the arc probabilities are learned through mining the past propagation. Saito et al. \cite{saito08} were the first to study how to learn probabilities from past propagation by transforming the problem into a likelihood maximization and applying Expectation Maximization algorithm to solve it. A more direct mining approach has been proposed by \cite{goyal11} which eliminates the need for running simulations on the graph to find the optimal initial set of users. 
 The topic of scalability is another aspect of influence maximization, with existence of big social networks and web stores, there are many extremely large networks of users available, and earlier methods do not scale to graphs of this size. Mirzasoleiman et al. \cite{mks13} has proposed a MapReduce method for solving submodular function maximization and Wu et al. \cite{WYH13} has defined the problem under certain set of constraint and conditions and proposed a MapReduce solution to solve the problem. However, they have left out some of the common obstacles in influence maximization when it comes to scalability. 
 \\
-According to Bonchi \cite{Bon11} here are some other open areas that worth investigating:
+According to Bonchi \cite{Bon11} here are some other open areas that have not been yet actively studied:
 \begin{itemize}
 \item Learning the strength of influence exerted from a user
 \item Temporal dimension (role of time)
@@ -34,8 +34,8 @@ According to Bonchi \cite{Bon11} here are some other open areas that worth inves
 \section{Scope}
 The main focus of the thesis will be on :
 \begin{itemize}
-\item Comprehensive survey of literature on the topic of influence maximization and viral marketing 
-\item Investigate the scalability issues of the topic
+\item Comprehensive survey of literature on the topic of influence maximization and its application in viral marketing.
+\item Investigate the scalability issues of the topic.
 \item Implementation of current (and new) algorithms using Big Data frameworks  such as Hadoop, Spark, ... .
 \end{itemize}
 
