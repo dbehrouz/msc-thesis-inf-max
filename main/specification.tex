@@ -16,7 +16,13 @@
 
 \section{Topic Specification}
 Influence maximization in social networks is a topic that has been studied for more than a decade. People always influence each other in context of groups and social networks. The influence can be in form of life style choices, daily habits or purchasing habits among other things. A study by \cite{christ07} showed that obese people can increase the chance of of obesity among their peers. This topic also has an application in marketing, also known as viral marketing,  where by identifying influential people in a social network, the benefit can be increased through effective marketing campaigns and relying on the spread of information about the product throughout the network. 
-
+\section{Scope}
+The main focus of the thesis will be on :
+\begin{itemize}
+\item Comprehensive survey of literature on the topic of influence maximization and its application in viral marketing.
+\item Investigate the scalability issues of the topic.
+\item Implementation of current (and new) algorithms using Big Data frameworks  such as Hadoop, Spark, ... .
+\end{itemize}
 \section{Related works}
 The key problem in this topic, first tackled by Domingos and Richardson \cite{domingo01}, is to find the set of influential people within a social network. 
 Kempe et al. \cite{kempe03} have defined the problem this way; given a graph of nodes with arc weights (probability of a person influencing his/her neighbor) find an initial set of size $k$ that maximizes the expected size of propagation. They have  proposed two propagation models on how the influence will spread through the network starting with the initial set. Hence transforming it to an optimization problem of finding the best initial set. Although it is a NP hard problem but it can be solved using greedy methods in a more efficient manner due to the submodularity of objective function. \\
@@ -30,13 +36,6 @@ According to Bonchi \cite{Bon11} here are some other open areas that have not be
 \item Temporal dimension (role of time)
 \item Market competition (role that competing products will play in influence maximization for marketing)
 \item User characteristics role and their tendency to buy certain products (for example teenagers are more likely to buy video games than seniors)
-\end{itemize}
-\section{Scope}
-The main focus of the thesis will be on :
-\begin{itemize}
-\item Comprehensive survey of literature on the topic of influence maximization and its application in viral marketing.
-\item Investigate the scalability issues of the topic.
-\item Implementation of current (and new) algorithms using Big Data frameworks  such as Hadoop, Spark, ... .
 \end{itemize}
 
 \section{Other Resources}
