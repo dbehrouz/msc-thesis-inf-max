@@ -53,12 +53,14 @@ What are graphs, social graphs. Influence maximization in social networks. Its a
 
 
 
-\subsection{Influcence Maximization}
-In \cite{kempe03} they have studied models by which influce propogates through social networks. They have discussed two diffusion models \\
+\subsection{Influence Maximization}
+In \cite{kempe03} they have studied models by which influence propagates through social networks. They have discussed two diffusion models \\
 Linear Threshold Model (add reference) and Independent Cascade Models(add reference) . Describe the two models briefly. 
 The problem of influence maximization which is finding an initial set that will maximizes the profit( target function) is NP-hard . 
-Formal definition : it asks for a parameter k, to find a k-nod set of maximum influence. They used approximation with a natural greedu hill-climbing strategy which will guarantee a 63 percent of the optimal solution performance (reference) . For the approximation to work te target function should be submodular, they have proved that for both models the target function is indeed submodular.  They have run experiments on co-authorships in physicas theory section of arXiv (www.arxiv.org) . The results show that their greedy algorithm performs better that other methods such as random selection, high-degree or central nodes discussed in book Social Network Analysis by S. Wasserman (find reference) \\
-\cite{domingo01} discusses the use case of influence maximization in marketing. They first, described how to model a market as a social network, then they applied their method to a collaborative filtering data set (reference MovieLenz project) to extract customer values . Explain how the model the market as social network and how they used a collabrative filtering dataset (Neighbours, Marketing action, movie ratings)
+Formal definition : it asks for a parameter k, to find a k-nod set of maximum influence. They used approximation with a natural greedy hill-climbing strategy which will guarantee a 63 percent of the optimal solution performance (reference) . For the approximation to work , he target function should be sub-modular, they have proved that for both models the target function is indeed sub-modular.  They have run experiments on co-authorships in physics theory section of arXiv (www.arxiv.org) . The results show that their greedy algorithm performs better that other methods such as random selection, high-degree or central nodes discussed in book Social Network Analysis by S. Wasserman (find reference) \\
+\cite{domingo01} discusses the use case of influence maximization in marketing. They first, described how to model a market as a social network. Making each individual user only dependent on its neighbours, the product and the marketing action(Markov random field). Through these a function was devised that calculates the global lift in profit given a marketing action was applied to some users. Starting from an initial configuration, using different optimization algorithms a local maxima for the function can be reached. 
+They experimented on a collaborative filtering dataset (MovieLenz) in which users have rated a list of movies. They have first constructed the network using the user rating, by choosing similar users( calculating the Pearson correlation coefficient of users) as neighbours . They have performed experiments on the data set and compared their method with mass marketing and direct marketing. Their method has increased the profit the most. 
+
 
 
 
