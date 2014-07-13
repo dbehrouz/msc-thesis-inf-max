@@ -60,6 +60,29 @@ The problem of influence maximization which is finding an initial set that will 
 Formal definition : it asks for a parameter k, to find a k-nod set of maximum influence. They used approximation with a natural greedy hill-climbing strategy which will guarantee a 63 percent of the optimal solution performance (reference) . For the approximation to work , he target function should be sub-modular, they have proved that for both models the target function is indeed sub-modular.  They have run experiments on co-authorships in physics theory section of arXiv (www.arxiv.org) . The results show that their greedy algorithm performs better that other methods such as random selection, high-degree or central nodes discussed in book Social Network Analysis by S. Wasserman (find reference) \\
 \cite{domingo01} discusses the use case of influence maximization in marketing. They first, described how to model a market as a social network. Making each individual user only dependent on its neighbours, the product and the marketing action(Markov random field). Through these a function was devised that calculates the global lift in profit given a marketing action was applied to some users. Starting from an initial configuration, using different optimization algorithms a local maxima for the function can be reached. 
 They experimented on a collaborative filtering dataset (MovieLenz) in which users have rated a list of movies. They have first constructed the network using the user rating, by choosing similar users( calculating the Pearson correlation coefficient of users) as neighbours . They have performed experiments on the data set and compared their method with mass marketing and direct marketing. Their method has increased the profit the most. Due to non-linearly of the model, it did not scale well for bigger size networks, hence they have proposed a new linear model \cite{domingo02}. Not only the new model decreased the computation time time, the simplified equation for calculating the network value of customers, made it easier to incorporate more complex marketing action. They have experimented with Epinions (cite) data set. Which is a website where users can rate items. It also has a feature called trusted users, where each user can select many other users as trusted sources of reviews. Domingo et .al, hence, applied their model to the dataset, but considering trusted users of a user his neighbours. Their experiments showed that a continuous marketing action (a marketing action that can have unlimited values, such as a discount) performs much better than boolean marketing actions (one that can either be true or false, such whether or not a discount should be given to a user with no regards for the amount of the discount ). 
+\cite{cheng13} Have addressed both the accuracy and scalability of the solutions using the greedy methods. They have pointed out the main bottle neck in methods based on \cite{kempe03} are in the Monte Carlo simulation steps. They have proven that the objective function is not entirely sub-modular due to the randomness in the simulations, and hence to compensate for that many Monte Carlo simulations have to be run in each step of the algorithm which greatly reduces the performance. Present the proof here ....\\
+They proposed a new method called StaticGreedy which uses precomputed a series of snapshots at the beginning of the algorithm and reuses those for every step of the greedy algorithm.  They have defined the two terms, snapshots and simulations which can be both used for the Monte Carlo simulations. \\
+\begin{itemize}
+\item 
+Simulation : The influence spread is obtained by directly simulating the random process of diffusion triggered by a given seed set S.
+\item
+Snapshot : According to the characteristic of IC(Independent Cascade) model, whether u successfully activates v depends only on p(u,v). Hence prior to the main algorithm a Graph G$'$=(V,E$'$), which is a subgraph of G where an edge <u,v> is remained with the probability p(u,v) and deleted otherwise. 
+\end{itemize}
+Before the main steps of the algorithm plenty of snapshots are produced and averaged to estimate the spread function. 
+Have StaticGreedy algorithm here :\\
+1. Static snapshots \\
+2. Greedy selection \\
+
+Two main difference between this method and the previous ones are :
+\begin{itemize}
+\item
+Monte Carlo simulations are conducted in static snapshot manner, which are sampled before the greedy process of selecting seed nodes
+\item
+The same set of snapshots are reused in every iteration to estimate the influence spread I(S), which explains the meaning of ''static''
+\end{itemize}
+
+They have performed experiment and compared their methods with the normal Greedy methods. None of the other greedy methods are any match with StaticGreedy in terms of speed and scalability. 
+
 
 
 
