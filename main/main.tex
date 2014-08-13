@@ -54,6 +54,12 @@ What are graphs, social graphs. Influence maximization in social networks. Its a
 
 
 \subsection{Influence Maximization}
+Influence maximization problem is divided into two major parts. The first one is to find the graph of users (nodes) where edges between each user show the probability of  a user influencing the other. The second part is
+based on this graph find a set of users that are proven to have the highest influence over others, in other words 
+this limited group of users can maximize the influence through the network.
+
+
+
 In \cite{kempe03} they have studied models by which influence propagates through social networks. They have discussed two diffusion models \\
 Linear Threshold Model (add reference) and Independent Cascade Models(add reference) . Describe the two models briefly. 
 The problem of influence maximization which is finding an initial set that will maximizes the profit( target function) is NP-hard . 
@@ -83,9 +89,24 @@ The same set of snapshots are reused in every iteration to estimate the influenc
 
 They have performed experiment and compared their methods with the normal Greedy methods. None of the other greedy methods are any match with StaticGreedy in terms of speed and scalability. 
 
-Saito and Kimura \cite{kimura06} have also investigated the scalability issue of ICM simulations. They have argued that the current simulation model in ICM requires many iterations and each iteration took a lot of processing time and power. They have proposed two natural special cases of the ICM such that a good estimate of this quantity can be efficiently computed. They define the Shortest-Path Model(SPM) which is a special case of the ICM such that each node v has the chance to become active only at step = d(A,v) , where if A is the initial set d(A,v) is the distance of A to node v. This means that each node is activated only through the shortest paths from the initial active set. The other model they have proposed named SP1M, which is each node v has the chance to become active only at steps t = d(A,v) and t =d(A,v) + 1. Through these two models they have proposed methods for calculating the spread of an initial set A. They have proved that the result achieved using this method is also within a bound of the best solution. In their experiments, they have assigned a uniform probably to each edge with two different values p = 0.1 and p =0.01. The experiments showed that the estimation of the spread for ICM increases as p increases while the processing times for the SPM and SP1M hardly change. They have also 
+Saito and Kimura \cite{kimura06} have also investigated the scalability issue of ICM simulations. They have argued that the current simulation model in ICM requires many iterations and each iteration took a lot of processing time and power. They have proposed two natural special cases of the ICM such that a good estimate of this quantity can be efficiently computed. They define the Shortest-Path Model(SPM) which is a special case of the ICM such that each node v has the chance to become active only at step = d(A,v) , where if A is the initial set d(A,v) is the distance of A to node v. This means that each node is activated only through the shortest paths from the initial active set. The other model they have proposed named SP1M, which is each node v has the chance to become active only at steps t = d(A,v) and t =d(A,v) + 1. Through these two models they have proposed methods for calculating the spread of an initial set A. They have proved that the result achieved using this method is also within a bound of the best solution. In their experiments, they have assigned a uniform probably to each edge with two different values p = 0.1 and p =0.01. The experiments showed that the estimation of the spread for ICM increases as p increases while the processing times for the SPM and SP1M hardly change. They have also \\
 
 
+
+\subsubsection{Learning Influence Probabilities}
+\cite{goyal10} have tackled the problem of forming the social graph whose edges have the probability of a user
+influencing the other based on a log of actions. Based on the General Threshold model that simultaneously 
+generalizes the Linear Threshold and Independent Cascade models. They have formulated the problem like this :
+given graph G = (V,E,T) with T being the time when each edge in the graph was constructed, an action log which contains relations Actions(User,Action, Time) which contains tuples indicating a user performed an action at certain time. The aim is to a function p : E --> [0,1] x [0,1] assigning both directions of each edge (u,v) in E the probabilities : $p_{v,u}$ and $p_{u,v}$.
+Three different solution models were proposed. Static Model in which all the probabilities remain the same all the time. Continues Time (CT) model where probability at each time step is based on the neighbours formation and Discrete Time which is approximation to CT model since CT model is very resource and time consuming. 
+The models can be calculated with 2 scans of the data sets. The probability of v activating u $p_{v,u}$ can be calculated in two ways : 
+Bernoulli distribution :  $p_{v,u}$ =  $A_{v2u}$ / ${A_v}$ \\
+Jaccard Index : $p_{v,u}$ =  $A_{v2u}$ / $A_{u|v}$ \\ 
+These two can also be used with a more sophisticated approach card Partial Credits (PC) which will assign a 
+weight to each node based on the size of the active neighbourhood . Experimental evaluations show good results 
+specially with DT and CT models. CT outperformed DT by a very small amount, but it is much more resource intensive. 
+
+\subsubsection{Maximizing Influence through a Network}
 
 
 
