@@ -103,11 +103,17 @@ The models can be calculated with 2 scans of the data sets. The probability of v
 Bernoulli distribution :  $p_{v,u}$ =  $A_{v2u}$ / ${A_v}$ \\
 Jaccard Index : $p_{v,u}$ =  $A_{v2u}$ / $A_{u|v}$ \\ 
 These two can also be used with a more sophisticated approach card Partial Credits (PC) which will assign a 
-weight to each node based on the size of the active neighbourhood . Experimental evaluations show good results 
+weight to each node based on the size of the active neighborhood . Experimental evaluations show good results 
 specially with DT and CT models. CT outperformed DT by a very small amount, but it is much more resource intensive. \\
-In another paper, Goyal et al \cite{goyal11} have also tackled the problem of influence maximization directly. Instead of first learning the edge probabilities and then finding the optimam seed set, they have proposed a method to directly find the optimal seed set based on the action log .
+In another paper, Goyal et al \cite{goyal11} have also tackled the problem of influence maximization directly. Instead of first learning the edge probabilities and then finding the optimum seed set, they have proposed a method to directly find the optimal seed set based on the action log .
 
 \subsubsection{Maximizing Influence through a Network}
+
+
+
+\subsubsection{Submodular function optimization}
+\cite{Leskovec07} et al. in their Cost effective outbreak detection in networks, took upon the task of optimizing the greedy method used in propagation in graph networks. Although they did not work on solving the problem of maximizing influence they have proven their method can be adapted to the problem of maximizing the influence using the greedy algorithm. They studied two problems from different domains which share similarities. The first problem is find the best placement of sensors in a water network, so that contaminated water can be detected as quickly as possible. The other problem is blog network, which is to find blogs that contains the maximum amount of news that cascades from different sources in shortest possible time. Their advanced greedy method, utilizes the submodularity of the objective function, which reduces the number of computation needed to be made in each iteration. Their method is 700 times faster than a simple greedy function. Details of algorithm can be found here :
+PRESENT THE ALGORITHM
 
 
 
