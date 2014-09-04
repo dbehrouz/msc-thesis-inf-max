@@ -78,6 +78,23 @@ The node store file stores node records. Every node created in the user-level gr
 Relationship :\\
 relationships are stored in the relationship store file, neostore.rela tionshipstore.db. Like the node store, the relationship store consists of fixed-sized records in this case each record is 33 bytes long. Each relationship record contains the IDs of the nodes at the start and end of the relationship, a pointer to the relationship type (which is stored in the relationship type store), and pointers for the next and previous relationship records for each of the start and end nodes. These last pointers are part of what is often called the relationship chain.
 
+Titan Storage: \\
+Titan is an open source Graph Database, that provides several different storage back ends, as well different querying language. As opposed to Neo4j that only supported native storage and native query language. Titan is designed to work well in distributed environment, it has support of Hadoop as a processing tool and uses Apache HBase, Apache Cassandra and Oracle BerkelyDB for storage options. 
+Data model of Titan : \\
+Titan stores vertices and edges using an adjacency list format. Where the id of each is stored and it points to a list containing all the connected edges and the vertex properties. It follows Google's BigTable format. The design model imposes a series of technical limitations. Some of which are : 
+\begin{itemize}
+\item 
+Titan can store up to a quintillion edges (2 \^ 60) and half as many vertices. That limitation is imposed by Titan's id scheme.
+\item
+Subclasses cannot be used for data type definitions. For example if a data type is declared as Number one cannot use Long or Integer. 
+\item
+Edge retrieval is O(log(k)) where k is degree of a edge vertex. However, Titan tries to pick the endpoint with smaller degree.
+
+\end{itemize}
+
+Twitter FlockDB, 
+
+
 
 
 
