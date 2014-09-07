@@ -92,7 +92,33 @@ Edge retrieval is O(log(k)) where k is degree of a edge vertex. However, Titan t
 
 \end{itemize}
 
-Twitter FlockDB, 
+FlockDB:\\
+A graph database developed by twitter. It is not a database optimized for graph traversal as opposed to Titan and Neo4j . It is optimized for very large 
+adjacency lists, fast read and writes and arithmetic queries. It was designed with these goals in mind :
+\begin{itemize}
+\item
+A high rate of add/update/remove operations
+\item
+complex set arithmetic operations
+\item
+paging through query result sets containing millions of entires
+\item
+ability to archive and later restore archive edges
+\item
+online data migration
+\end{itemize} 
+
+Twitter uses FlockDB to store social graphs and secondary indices. The underlying storage engine is MySQL. Each edge is stored as a row in the database and contains 4 fields :
+\begin{itemize}
+\item
+64 bit source ID
+\item
+64 bit destination ID
+\item
+state : normal, removed or archived
+\item
+32 bit position used for sorting (usually timestamp)
+\end{itemize}
 
 
 
