@@ -44,7 +44,7 @@ What are graphs, social graphs. Influence maximization in social networks. Its a
 
 \subsection{Graph}
 %\enlargethispage{5mm}
-\subsubsection{Graph Databases Mostly copy paste from the Book GraphDatabase}
+\subsection{Graph Databases Mostly copy paste from the Book GraphDatabase}
 A graph database is an online (real-time) database management system with Create, Read, Update, and Delete (CRUD) methods that expose a graph data model. Graph databases are generally built for use with transactional (OLTP) systems. Accordingly,they are normally optimized for transactional performance, and engineered with transactional integrity and operational availability in mind.
 Two properties of graph databases are useful to understand when investigating graph database technologies :
 The underlying storage: \\
@@ -71,14 +71,14 @@ querying nested relationship between items. \\
 NOSQL databases also are not optimized for storing connected data. Though they usually store fields connecting them to the next item, this value essentially act as a foreign key, hence requiring join operation. They usually tend work well for queries that requires traversing in the direction of links, but reverse the queries will require a brute force scan of the full table. Consider a social network, each user stored with its id as the key, it also holds a field that points to its friends IDs. In this scenario, finding friends of a user is easy, but finding who is friend with a user requires scanning the entire table (Assuming friendship is a one-directional, i.e. one person can consider someone else a friend whereas the other person doesn't consider the first person his/her friend) . Even if each node has another property that holds the id of people who are friend with it, it is still require index look up, something that graph database doesn't require because it provides index-free adjacency, having extra fields cause the disk space to grow, write operations to be more expensive and ... .\\
 Graph Databases have the index-free adjacency property, which means that each node has reference to its connecting node instead of the database maintaining a global index.
 
-Neo4j Storage :\\
+\subsection{Neo4j }
 Neo4j stores graph data in a number of different store files. Each store file contains the data for a specific part of the graph.\\
 Node :\\
 The node store file stores node records. Every node created in the user-level graph ends up in the node store, the physical file for which is neostore.nodestore.db. Like most of the Neo4j store files, the node store is a fixed-size record store, where each record is nine bytes in length. \\
 Relationship :\\
 relationships are stored in the relationship store file, neostore.rela tionshipstore.db. Like the node store, the relationship store consists of fixed-sized records in this case each record is 33 bytes long. Each relationship record contains the IDs of the nodes at the start and end of the relationship, a pointer to the relationship type (which is stored in the relationship type store), and pointers for the next and previous relationship records for each of the start and end nodes. These last pointers are part of what is often called the relationship chain.
 
-Titan Storage: \\
+\subsection{Titan}: 
 Titan is an open source Graph Database, that provides several different storage back ends, as well different querying language. As opposed to Neo4j that only supported native storage and native query language. Titan is designed to work well in distributed environment, it has support of Hadoop as a processing tool and uses Apache HBase, Apache Cassandra and Oracle BerkelyDB for storage options. 
 Data model of Titan : \\
 Titan stores vertices and edges using an adjacency list format. Where the id of each is stored and it points to a list containing all the connected edges and the vertex properties. It follows Google's BigTable format. The design model imposes a series of technical limitations. Some of which are : 
@@ -92,7 +92,7 @@ Edge retrieval is O(log(k)) where k is degree of a edge vertex. However, Titan t
 
 \end{itemize}
 
-FlockDB:\\
+\subsection{FlockDB}
 A graph database developed by twitter. It is not a database optimized for graph traversal as opposed to Titan and Neo4j . It is optimized for very large 
 adjacency lists, fast read and writes and arithmetic queries. It was designed with these goals in mind :
 \begin{itemize}
@@ -111,13 +111,31 @@ online data migration
 Twitter uses FlockDB to store social graphs and secondary indices. The underlying storage engine is MySQL. Each edge is stored as a row in the database and contains 4 fields :
 \begin{itemize}
 \item
-64 bit source ID
+64 bit source IDopen	
 \item
 64 bit destination ID
 \item
 state : normal, removed or archived
 \item
 32 bit position used for sorting (usually timestamp)
+\end{itemize}
+
+\subsection{BigData} 
+\subsection{Giraph}
+Apache Giraph is an iterative graph processing framework, built on top of Apache Hadoop. It is the open source version of Pregel by Google. 
+\subsection{GraphX}
+\subsection{Pregel}
+Graph processing framework by Google. Pregel is a vertex centric computational model where each vertex process the incoming messages from the edges and pass along the output to the next vertices through edges. It is built for iterative processing and in a distributed environment. The API is similar to MapReduce where the users have to implement methods for two set of methods, the compute method and the aggregate method. Compute methods are executed on each vertex in parallel, there are mechansim involved however, to assert data consistency. The computations are done in steps called SuperStep. The main method is the compute method, where in each SuperStep a vertex will receive a list of messages from vertices in an arbitrary order, and after the processing is done, it will send messages to other vertices. The aggregator can collect global values from all vertices, they are usually  to keep track of some global counts or .... . 
+\subsection{GraphLab}
+GraphLab is a graph processing framework, tailored for big data sets. There are three versions of GraphLab :
+\begin{itemize}
+\item
+Shared memory, multi-core parallel GraphLab
+\item
+Distributed GraphLab
+\item
+PowerGraph
+
 \end{itemize}
 
 
@@ -127,10 +145,9 @@ state : normal, removed or archived
 
 
 
+
+
 \subsection{Social Graphs}
-
-
-
 
 \subsection{Influence Maximization}
 Influence maximization problem is divided into two major parts. The first one is to find the graph of users (nodes) where edges between each user show the probability of  a user influencing the other. The second part is
