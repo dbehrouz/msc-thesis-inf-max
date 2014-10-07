@@ -28,15 +28,11 @@ Network influence maximization. Something about graphs, about network influcence
 
 \mytableofcontents
 
-
-
-
 \section{Introduction}
-The term graph, first used by mathematician J. J. Sylvester, is a representation of set of objects, some of which are connected. Typically, in a graph the interconnected components are called \textbf{vertices}, and the links that are connecting them are called edges. Graph theory, is the field of mathematics that studies graphs and since its introduction, it has been used extensively, in many branches of science. In computer science, graphs can represents, networks of computers and the communication between them, it can represent websites and the links between them. In Chemistry and Physics, graphs are used to model the atoms and molecules and their interactions. In sociology, relation between actors, directors and movies can be depicted using a graph. And most notably is the its case in social networks and modeling the relationship between people (friendship, acquaintance) . \\
-Graphs components, can carry extra information, for example the edges can carry weight which represent the connection between two nodes. For example in a graph that represent geographical locations, where vertices (nodes) represent places, the edges represent the length between the locations. 
-With introduction of online social networks, an enormous amount of information is now available . One application that has been studied in social network or in graphs in general is the spread of information between nodes, based on the structure of the graph and the edge weights. In medicine and biology it has been used to find the spread of a disease either to find the initial person who contracted the disease or finding key vertices that could amplify the spread and by identifying those nodes the further spread of the disease can be avoided. It has use cases in marketing as well, in which by the aim is to find key people in a social network, that can spread the information among their friends and acquaintances, and for example by offering discount to a certain group of people they can rely on the work-of-mouth phenomena. \cite{kempe03} has defined models in which network propagation can be studied, and how to maximizes the the propagation in a network. \cite{domingo01} studied how to find the value of a customer in a network and how to use that to influence other customers. Influence maximization that is the topic of this thesis, has been studied for more than a decade now, but with the massive amount of available data, the scalability has become an issue. Some websites, such as Facebook, Twitter, Amazon, ... carry Terabytes and some Petabytes of data related to their customers and their relationship. And the models developed for simulating the network propagation and finding the initial set that maximizes the influence they will all suffer greatly when applied to this amount of data. \\
-Over the past couple of years, many platforms for processing huge amount of data has been developed. This branch of computer science, named BigData, has gain a lot of attention lately, websites can now produce terabytes of data about the users. 
-Some of the most notable frameworks are Hadoop and Spark. Hadoop is open source project that is based on Google's MapReduce framework. 
+The term graph, first used by mathematician J. J. Sylvester, is a representation of set of objects, some of which are connected. Typically, in a graph the interconnected components are called \textbf{vertices}, and the links that are connecting them are called edges. Graph theory, is the field of mathematics that studies graphs and since its introduction, it has been used extensively, in many branches of science. In computer science, graphs can represents, networks of computers and the communication between them, it can represent websites and the links between them. In Chemistry and Physics, graphs are used to model the atoms and molecules and their interactions. In sociology, relation between actors, directors and movies can be depicted using a graph. And most notably is the its use case in social networks and modeling the relationship between people (friendship, acquaintance) . \\
+Graphs components, can carry extra information, for example the edges can carry weight which can quantify or qualify the connection between two nodes. For example in a graph that represent geographical locations, where vertices (nodes) represent places, the edges represent the length between the locations. \\
+With introduction of online social networks, an enormous amount of information is now available . One application that has been studied in social network or in graphs in general is the spread of information between nodes, based on the structure of the graph and the edge weights. In medicine and biology it has been used to find the spread of a disease either to find the initial person who contracted the disease or finding key vertices that could amplify the spread and by identifying those nodes further spread of the disease can be avoided. It has use cases in marketing as well, in which the aim is to find key people in a social network, that can spread the information among their friends and acquaintances, and for example by offering discount to a certain group of people they can rely on the work-of-mouth phenomena. \cite{kempe03} has defined models in which network propagation can be studied, and how to maximizes the the propagation in a network. \cite{domingo01} studied how to find the value of a customer in a network and how to use that to influence other customers. Influence maximization that is the topic of this thesis, has been studied for more than a decade now, but with the massive amount of available data, the scalability has become an issue. Some websites, such as Facebook, Twitter, Amazon, ... carry Terabytes and in some cases Petabytes of data related to their customers and their relationship. And the models developed for simulating the network propagation and finding the initial set that maximizes the influence, they will all suffer greatly when applied to graphs of this magnitude. \\
+Over the past couple of years, many platforms for processing huge amount of data has been developed. This branch of computer science, named BigData, has gain a lot of attention lately. Some of the most notable frameworks are Hadoop and Spark. Hadoop is open source project that is based on Google's MapReduce framework. 
 Using these and other similar frameworks, many graph processing tools and applications are built which utilizes the mechanism of these frameworks to process graphs of millions or billion of nodes and trillions of edges. \\
 The most widely used frameworks for processing big graphs, are :
 \begin{itemize}
@@ -56,9 +52,44 @@ In the next sections, different Big Data platforms are studied in details. Graph
 
 \section{Literature Review}
 
+\subsection{Big Data}
+Age of big data, where it began from. what it used to be. 
+
+\subsubsection{Hadoop}
+Describe Google's MapReduce, Hadoop how it became to be. 
+\subsubsection{Spark}
+What is Spark
+\subsubsection{MPI}
+What is MPI
 
 
 \subsection{Graph}
+Definition of Graph, a more detailed literate review. Maybe I can move some of the stuff from Introduction, or try to complement them
+
+\subsubsection{Graph Frameworks}
+Older graph frameworks, how they used work. A short overview of some important and common frameworks. Why there's a need for scalable frameworks
+
+\subsubsection{Big Graph}
+What is it, where does it come from, why is it important to have frameworks capable of processing massive graphs
+
+\subsection{Giraph}
+Apache Giraph is an iterative graph processing framework, built on top of Apache Hadoop. It is the open source version of Pregel by Google. 
+\subsection{GraphX}
+\subsection{Pregel}
+Graph processing framework by Google. Pregel is a vertex centric computational model where each vertex process the incoming messages from the edges and pass along the output to the next vertices through edges. It is built for iterative processing and in a distributed environment. The API is similar to MapReduce where the users have to implement methods for two set of methods, the compute method and the aggregate method. Compute methods are executed on each vertex in parallel, there are mechansim involved however, to assert data consistency. The computations are done in steps called SuperStep. The main method is the compute method, where in each SuperStep a vertex will receive a list of messages from vertices in an arbitrary order, and after the processing is done, it will send messages to other vertices. The aggregator can collect global values from all vertices, they are usually  to keep track of some global counts or .... . 
+\subsection{GraphLab}
+GraphLab is a graph processing framework, tailored for big data sets. There are three versions of GraphLab :
+\begin{itemize}
+\item
+Shared memory, multi-core parallel GraphLab
+\item
+Distributed GraphLab
+\item
+PowerGraph
+
+\end{itemize} 
+
+
 %\enlargethispage{5mm}
 \subsection{Graph Databases Mostly copy paste from the Book GraphDatabase}
 A graph database is an online (real-time) database management system with Create, Read, Update, and Delete (CRUD) methods that expose a graph data model. Graph databases are generally built for use with transactional (OLTP) systems. Accordingly,they are normally optimized for transactional performance, and engineered with transactional integrity and operational availability in mind.
@@ -136,33 +167,6 @@ state : normal, removed or archived
 32 bit position used for sorting (usually timestamp)
 \end{itemize}
 
-\subsection{BigData} 
-\subsection{Giraph}
-Apache Giraph is an iterative graph processing framework, built on top of Apache Hadoop. It is the open source version of Pregel by Google. 
-\subsection{GraphX}
-\subsection{Pregel}
-Graph processing framework by Google. Pregel is a vertex centric computational model where each vertex process the incoming messages from the edges and pass along the output to the next vertices through edges. It is built for iterative processing and in a distributed environment. The API is similar to MapReduce where the users have to implement methods for two set of methods, the compute method and the aggregate method. Compute methods are executed on each vertex in parallel, there are mechansim involved however, to assert data consistency. The computations are done in steps called SuperStep. The main method is the compute method, where in each SuperStep a vertex will receive a list of messages from vertices in an arbitrary order, and after the processing is done, it will send messages to other vertices. The aggregator can collect global values from all vertices, they are usually  to keep track of some global counts or .... . 
-\subsection{GraphLab}
-GraphLab is a graph processing framework, tailored for big data sets. There are three versions of GraphLab :
-\begin{itemize}
-\item
-Shared memory, multi-core parallel GraphLab
-\item
-Distributed GraphLab
-\item
-PowerGraph
-
-\end{itemize} 
-
-
-
-
-
-
-
-
-
-
 \subsection{Social Graphs}
 
 \subsection{Influence Maximization}
@@ -205,7 +209,7 @@ Saito and Kimura \cite{kimura06} have also investigated the scalability issue of
 
 
 
-\subsubsection{Learning Influence Probabilities}
+\subsection{Learning Influence Probabilities}
 \cite{goyal10} have tackled the problem of forming the social graph whose edges have the probability of a user
 influencing the other based on a log of actions. Based on the General Threshold model that simultaneously 
 generalizes the Linear Threshold and Independent Cascade models. They have formulated the problem like this :
@@ -219,45 +223,30 @@ weight to each node based on the size of the active neighborhood . Experimental 
 specially with DT and CT models. CT outperformed DT by a very small amount, but it is much more resource intensive. \\
 In another paper, Goyal et al \cite{goyal11} have also tackled the problem of influence maximization directly. Instead of first learning the edge probabilities and then finding the optimum seed set, they have proposed a method to directly find the optimal seed set based on the action log .
 
-\subsubsection{Maximizing Influence through a Network}
+\subsection{Maximizing Influence through a Network}
 
 
 
-\subsubsection{Submodular function optimization}
+\subsection{Submodular function optimization}
 \cite{Leskovec07} et al. in their Cost effective outbreak detection in networks, took upon the task of optimizing the greedy method used in propagation in graph networks. Although they did not work on solving the problem of maximizing influence they have proven their method can be adapted to the problem of maximizing the influence using the greedy algorithm. They studied two problems from different domains which share similarities. The first problem is find the best placement of sensors in a water network, so that contaminated water can be detected as quickly as possible. The other problem is blog network, which is to find blogs that contains the maximum amount of news that cascades from different sources in shortest possible time. Their advanced greedy method, utilizes the submodularity of the objective function, which reduces the number of computation needed to be made in each iteration. Their method is 700 times faster than a simple greedy function. Details of algorithm can be found here :
 PRESENT THE ALGORITHM
 
-
-
-
-
-
-\subsection{Big Data and hadoop}
-
-
-\subsection{Use cases reasearch and industry}
-
-
+\subsection{Use cases researcg and industry}
 
 \section{Big data and Network influence maximization}
 
-Description of what I'm going to do, big data/hadoop/mapreduce implementions for network influence
-
-
-\subsection{Tools}
-
-
-
+Description of what I'm going to do, big data/Hadoop/MapReduce implementations for network influence.
 
 \subsection{Data set}
+Present several data sets that the experiments will be based on 
+\subsection{Influence Maximization in Giraph}
 
+\subsection{Influence Maximization in Spark}
 
+\subsection{Influence Maximization in GraphLab}
 
-
-
-\subsection{Algorithm}
-\subsubsection{Algorithm that I'm going to user}
-\subsubsection{Big data implementaiton of the Algorithm}
+\subsection{Comparison}
+Compare all three on similar datasets. Start with single node implementation and comparison. Smaller graphs and then very large graphs.
 
 
 
