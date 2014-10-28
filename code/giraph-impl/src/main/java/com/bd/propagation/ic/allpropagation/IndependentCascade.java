@@ -13,6 +13,7 @@ import java.io.IOException;
  */
 public class IndependentCascade extends
         BasicComputation<LongWritable, DoubleWritable, FloatWritable, DoubleWritable> {
+    public static final String MAX_AGG = "max";
     @Override
     public void compute(Vertex<LongWritable, DoubleWritable, FloatWritable> vertex, Iterable<DoubleWritable> messages) throws IOException {
 

@@ -241,6 +241,35 @@ Description of what I'm going to do, big data/Hadoop/MapReduce implementations f
 Present several data sets that the experiments will be based on 
 \subsection{Influence Maximization in Giraph}
 
+\subsubsection{Simple Implementation}
+All propagation implementation, in each MapReduce cycle one iteration of the Independent Cascade is run and the best vertex is chosen. So if the problem is to find initial list of k items, it will have k MR cycles.
+Superstep : 
+\begin{itemize}
+\item if superstep == 0 
+\begin{itemize}
+\item add your own id to list of influencedBy an increase vertex value by one
+\item try to activate all neighbors 
+\end{itemize}
+\item if superstep > 0
+\begin{itemize}
+\item receive message from every one (message is the id of the vertex)
+\item for each message received
+\begin{itemize}
+\item if it is already in your influecedBy list then vote to halt
+\item else 
+\begin{itemize}
+\item activate all neighbors by using the message
+\item add to influecedBy list
+\item send a message to source vertex notifying it that you have been activated 
+\item vote to halt
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\end{itemize}
+This would simply work when initial set = {}. In each iteration we chose the best vertex and add it to initial set. 
+
+		
+
 \subsection{Influence Maximization in Spark}
 
 \subsection{Influence Maximization in GraphLab}
