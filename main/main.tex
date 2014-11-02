@@ -228,8 +228,8 @@ In another paper, Goyal et al \cite{goyal11} have also tackled the problem of in
 
 
 \subsection{Submodular function optimization}
-\cite{Leskovec07} et al. in their Cost effective outbreak detection in networks, took upon the task of optimizing the greedy method used in propagation in graph networks. Although they did not work on solving the problem of maximizing influence they have proven their method can be adapted to the problem of maximizing the influence using the greedy algorithm. They studied two problems from different domains which share similarities. The first problem is find the best placement of sensors in a water network, so that contaminated water can be detected as quickly as possible. The other problem is blog network, which is to find blogs that contains the maximum amount of news that cascades from different sources in shortest possible time. Their advanced greedy method, utilizes the submodularity of the objective function, which reduces the number of computation needed to be made in each iteration. Their method is 700 times faster than a simple greedy function. Details of algorithm can be found here :
-PRESENT THE ALGORITHM
+\cite{Leskovec07} et al. in their Cost effective outbreak detection in networks, took upon the task of optimizing the greedy method used in propagation in graph networks. Although they did not work on solving the problem of maximizing influence they have proven their method can be adapted to the problem of maximizing the influence using the greedy algorithm. They studied two problems from different domains which share similarities. The first problem is find the best placement of sensors in a water network, so that contaminated water can be detected as quickly as possible. The other problem is blog network, which is to find blogs that contains the maximum amount of news that cascades from different sources in shortest possible time. Their advanced greedy method, utilizes the submodularity of the objective function, which reduces the amount of computation needed to be made in each iteration. Their method is 700 times faster than a simple greedy function. Details of algorithm can be found here :
+Their observation is that, if A is subset of B, the marginal gain of adding a node to B is always less than or equal the marginal gain of the adding the same node to A. Hence instead of recomputing the gain for all the node in each iteration, we can go through the nodes in decreasing order and recompute their values, the change is usually very small and most of the time the value on top of the list stays on top. 
 
 \subsection{Use cases research and industry}
 
@@ -269,10 +269,9 @@ Superstep :
 This would simply work when initial set = {}. In each iteration we chose the best vertex and add it to initial set. 
 I have been thinking a bit about how would the algorithm is different when the initial set is not empty. If the running of many simulation is to eliminate
 the randomness factor, does it mean that we can basically ignore the initial set affect on the network ? \newline
+How bad the result is if instead of we just run the algorithm once and then report the top `k` vertices as the set with maximum influence. 
+\cite{Leskovec07} et al. observed that the element on the top of the list hard ever changes, and in those few occasions that it does it is due the randomness and probabiltiy of edges, so in very large scale networks can we simply ignore this fact and just chose the top k nodes by running the algorithm once on the data set . (TODO : check how much sense it makes) . This is of course a very naive implementation . But a good test case, trade of between the quality of the solution and the time it takes to find the `best` solution is an interesting factor here.
 
-
-
-		
 
 \subsection{Influence Maximization in Spark}
 
