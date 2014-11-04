@@ -2,6 +2,13 @@
 \usepackage[pdftex]{graphicx}
 \usepackage{subfigure}
 \usepackage{url}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+
+\DeclareMathOperator*{\argmax}{arg\,max}
 \begin{document}
 %\doublespacing
 %\singlespacing
@@ -243,34 +250,81 @@ Present several data sets that the experiments will be based on
 
 \subsubsection{Simple Implementation}
 All propagation implementation, in each MapReduce cycle one iteration of the Independent Cascade is run and the best vertex is chosen. So if the problem is to find initial list of k items, it will have k MR cycles.
-Superstep : 
-\begin{itemize}
-\item if superstep == 0 
-\begin{itemize}
-\item add your own id to list of influencedBy an increase vertex value by one
-\item try to activate all neighbors 
-\end{itemize}
-\item if superstep > 0
-\begin{itemize}
-\item receive message from every one (message is the id of the vertex)
-\item for each message received
-\begin{itemize}
-\item if it is already in your influecedBy list then vote to halt
-\item else 
-\begin{itemize}
-\item activate all neighbors by using the message
-\item add to influecedBy list
-\item send a message to source vertex notifying it that you have been activated 
-\item vote to halt
-\end{itemize}
-\end{itemize}
-\end{itemize}
-\end{itemize}
+\begin{algorithm}
+\begin{algorithmic}
+\If {superstep == 0}
+	\State add your own id to list of influencedBy an increase vertex value by one
+	\State try to activate all neighbors 
+\Else
+	\State receive message from every one (message is the id of the vertex)
+	\For {each message received}
+		\If {it is already in your influencedby list}
+			\State vote to halt
+		\Else
+			\State activate all neighbors by using the message
+			\State add to influecedBy list
+			\State notify source vertex
+			\State vote to halt
+		\EndIf
+		
+	\EndFor
+\EndIf
+\end{algorithmic}
+\end{algorithm}
+
 This would simply work when initial set = {}. In each iteration we chose the best vertex and add it to initial set. 
 I have been thinking a bit about how would the algorithm is different when the initial set is not empty. If the running of many simulation is to eliminate
 the randomness factor, does it mean that we can basically ignore the initial set affect on the network ? \newline
 How bad the result is if instead of we just run the algorithm once and then report the top `k` vertices as the set with maximum influence. 
-\cite{Leskovec07} et al. observed that the element on the top of the list hard ever changes, and in those few occasions that it does it is due the randomness and probabiltiy of edges, so in very large scale networks can we simply ignore this fact and just chose the top k nodes by running the algorithm once on the data set . (TODO : check how much sense it makes) . This is of course a very naive implementation . But a good test case, trade of between the quality of the solution and the time it takes to find the `best` solution is an interesting factor here.
+\cite{Leskovec07} et al. observed that the element on the top of the list hard ever changes, and in those few occasions that it does it is due the randomness and probabiltiy of edges, so in very large scale networks can we simply ignore this fact and just chose the top k nodes by running the algorithm once on the data set . (TODO : check how much sense it makes) . This is of course a very naive implementation . But a good test case, trade of between the quality of the solution and the time it takes to find the `best` solution is an interesting factor here. 
+
+\subsubsection{Degree Heuristic}
+A simple implementation where nodes with highest degree are selected as seed.
+
+\subsubsection{Single Discount Heuristic}
+It is similar to Degree Heuristic with the exception that, if for a node v, one of its neighbor is already a seed we will not count that edge towards v's degree i.e reducing the degree by one.
+
+\subsubsection{Random Seed}
+Chose seeds randomly, this is again for comparison only
+
+\subsubsection{Kimura and Saito (Tractable models for information diffusion in social networks )}
+
+\subsubsection{Efficient Influence Maximization in Social Networks(Degree Discount)}
+Here's the detail of Wei Chen's Degree Discount IC Algorithm. It does not require simulation, it simply is based on a heuristic which is derived from the degree of a node but it is affected by its neighbor. 
+Here's the Algorithm \newline
+\begin{algorithm}
+\begin{algorithmic}
+\State $S=\emptyset$
+\For{each vertex $v$}
+	\State compute its degree $d_v$
+ 	\State $dd_v=d_v$
+ 	\State $t_v = 0$
+\EndFor
+\For{$i$ = 1 to $k$}
+	\State $u = \argmax_v \{dd_v |  v \in V \ S\}$
+	\State $S = S \cup \{u\}$
+	\For{each neighbor $v$ of $u$ and $v \in V\ S$ }
+		\State $t_v = t_v + 1$
+		\State $dd_v = d_v - 2t_v - (d_v - t_v)t_v p)$
+	\EndFor
+\EndFor
+\State output $S$
+\end{algorithmic}
+\end{algorithm}
+
+
+
+
+
+
+\subsubsection{Static Greedy}
+
+\subsubsection{Social Influence Analysis in Large-scale Networks}
+
+
+
+
+
 
 
 \subsection{Influence Maximization in Spark}
