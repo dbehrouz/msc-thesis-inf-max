@@ -169,7 +169,18 @@ Their observation is that, if A is subset of B, the marginal gain of adding a no
 Description of what I'm going to do, big data/Hadoop/MapReduce implementations for network influence.
 
 \subsection{Data set}
-Present several data sets that the experiments will be based on 
+Present several data sets that the experiments will be based on .
+Except specified, the Vertex and Edge data types are as follow.
+Vertex Data Type  :
+\begin{itemize}
+\item ID : Long
+\item Value : Long (0 inactive, 1 active, 2 Done computing which is only used during the computation and essentially means the node is active)
+\end{itemize}
+Edge Data Type : 
+\begin{itemize}
+\item ID : Long
+\item Value : Float, probability of activating the incident vertex)
+\end{itemize}
 \subsection{Influence Maximization in Giraph}
 Finding the best initial seed has two steps. Step one, given a graph with vertices without values and edges donating probabilities, output a graph with vertices marked as initial seed and edges untouched. 
 In step two, given the output of step one return the expected spread of the initial seed, which is an integer indicating how many nodes where activated when running the IC model.
@@ -206,8 +217,28 @@ the randomness factor, does it mean that we can basically ignore the initial set
 How bad the result is if instead of we just run the algorithm once and then report the top `k` vertices as the set with maximum influence. 
 \cite{Leskovec07} et al. observed that the element on the top of the list hard ever changes, and in those few occasions that it does it is due the randomness and probabiltiy of edges, so in very large scale networks can we simply ignore this fact and just chose the top k nodes by running the algorithm once on the data set . (TODO : check how much sense it makes) . This is of course a very naive implementation . But a good test case, trade of between the quality of the solution and the time it takes to find the `best` solution is an interesting factor here. 
 
+
+
 \subsubsection{Degree Heuristic}
 A simple implementation where nodes with highest degree are selected as seed.
+\begin{algorithm}
+\begin{algorithmic}
+\If {$superstep == 0$}
+	\State calculate your degree
+	\State send your degree and ID to MaxAggregator
+\ElsIf {superstep $\leq k$}
+	\State $maxVertex=MaxAggregator.value()$
+	\If{$this = maxVertex$}
+		\State set this to ACTIVE
+		\State vote to halt
+	\Else
+		\State send your degree and ID to MaxAggregator
+	\EndIf
+\Else
+	\State vote to halt
+\EndIf
+\end{algorithmic}
+\end{algorithm}
 
 \subsubsection{Single Discount Heuristic}
 It is similar to Degree Heuristic with the exception that, if for a node v, one of its neighbor is already a seed we will not count that edge towards v's degree i.e reducing the degree by one.

@@ -1,8 +1,6 @@
 package com.bd.propagation.function.heuristic;
 
 import com.bd.propagation.Constants;
-import com.bd.propagation.function.ic.allpropagation.IndependentCascade;
-import com.bd.propagation.function.ic.allpropagation.MaxVertexAggregator;
 import org.apache.giraph.aggregators.BasicAggregator;
 import org.apache.giraph.conf.LongConfOption;
 import org.apache.giraph.graph.BasicComputation;
@@ -12,13 +10,14 @@ import org.apache.hadoop.io.ArrayWritable;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Writable;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Choose k vertices randomly
+ *
  * @author Behrouz Derakhshan
  */
 public class Random extends BasicComputation<LongWritable, DoubleWritable, FloatWritable, DoubleWritable> {

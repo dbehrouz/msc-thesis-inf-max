@@ -20,8 +20,7 @@ import java.util.List;
 /**
  * @author Behrouz Derakhshan
  */
-public class JsonLongLongFloatLongVertexInputFormat extends
-        TextVertexInputFormat<LongWritable, ComplexVertexValue, FloatWritable> {
+public class JsonLongLongFloatVertexInputFormat extends TextVertexInputFormat<LongWritable, LongWritable, FloatWritable> {
     @Override
     public TextVertexReader createVertexReader(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException {
         return new JsonLongLongFloatLongVertexReader();
@@ -41,9 +40,9 @@ public class JsonLongLongFloatLongVertexInputFormat extends
         }
 
         @Override
-        protected ComplexVertexValue getValue(JSONArray jsonVertex) throws
+        protected LongWritable getValue(JSONArray jsonVertex) throws
                 JSONException, IOException {
-            return new ComplexVertexValue(jsonVertex.getLong(1));
+            return new LongWritable(jsonVertex.getLong(1));
         }
 
         @Override
@@ -61,10 +60,11 @@ public class JsonLongLongFloatLongVertexInputFormat extends
         }
 
         @Override
-        protected Vertex<LongWritable, ComplexVertexValue, FloatWritable>
+        protected Vertex<LongWritable, LongWritable, FloatWritable>
         handleException(Text line, JSONArray jsonVertex, JSONException e) {
             throw new IllegalArgumentException(
                     "Couldn't get vertex from line " + line, e);
         }
     }
 }
+
