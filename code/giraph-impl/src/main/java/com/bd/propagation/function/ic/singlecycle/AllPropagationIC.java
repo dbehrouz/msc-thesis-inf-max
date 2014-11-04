@@ -1,4 +1,4 @@
-package com.bd.propagation.ic.singlecycle;
+package com.bd.propagation.function.ic.singlecycle;
 
 import com.bd.datatypes.ComplexVertexValue;
 import org.apache.giraph.edge.Edge;

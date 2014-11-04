@@ -1,4 +1,4 @@
-package com.bd.propagation;
+package com.bd.propagation.function;
 
 import org.apache.giraph.conf.LongConfOption;
 import org.apache.giraph.edge.Edge;

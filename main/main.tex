@@ -98,82 +98,6 @@ PowerGraph
 
 
 %\enlargethispage{5mm}
-\subsection{Graph Databases Mostly copy paste from the Book GraphDatabase}
-A graph database is an online (real-time) database management system with Create, Read, Update, and Delete (CRUD) methods that expose a graph data model. Graph databases are generally built for use with transactional (OLTP) systems. Accordingly,they are normally optimized for transactional performance, and engineered with transactional integrity and operational availability in mind.
-Two properties of graph databases are useful to understand when investigating graph database technologies :
-The underlying storage: \\
-Some graph databases use native graph storage, which is optimized and designed for storing and managing graphs. Not all graph database technologies use native graph storage, however. Some serialize the graph data into a relational database, object-oriented databases, or other types of general-purpose data stores.
-The processing engine :\\
-Some definitions of graph databases require that they be capable of index-free adjacency,2 meaning that connected nodes physically ''point'' to each other in the database. Here we take a slightly broader view: that any database that from the user's perspective behaves like a graph database (i.e., exposes a graph data model through CRUD operations), qualifies as a graph database. We do acknowledge, however, the significant performance advantages of index-free adjacency, and therefore use the term native graph processing in reference to graph databases that leverage index- free adjacency.
-
-Graph Data models : \\
-Property Graph : 
-1. It contains nodes and relationships
-2. nodes contain properties
-3. relationships are named and directed
-4. relationships can contain properties
-
-Hypergraphs:
-where each relationship (edge) can connect any number of nodes. It is generally good when the domain consist of many-to-many relations.
-
-Triplets : 
-A triplet is a subject-predicate-object data structure. 
-
-Storage options for graphs.
-Relational databases are not good for storing relations. They rely on joins to find the relation between connected data, and the complexity arises for 
-querying nested relationship between items. \\
-NOSQL databases also are not optimized for storing connected data. Though they usually store fields connecting them to the next item, this value essentially act as a foreign key, hence requiring join operation. They usually tend work well for queries that requires traversing in the direction of links, but reverse the queries will require a brute force scan of the full table. Consider a social network, each user stored with its id as the key, it also holds a field that points to its friends IDs. In this scenario, finding friends of a user is easy, but finding who is friend with a user requires scanning the entire table (Assuming friendship is a one-directional, i.e. one person can consider someone else a friend whereas the other person doesn't consider the first person his/her friend) . Even if each node has another property that holds the id of people who are friend with it, it is still require index look up, something that graph database doesn't require because it provides index-free adjacency, having extra fields cause the disk space to grow, write operations to be more expensive and ... .\\
-Graph Databases have the index-free adjacency property, which means that each node has reference to its connecting node instead of the database maintaining a global index.
-
-\subsection{Neo4j }
-Neo4j stores graph data in a number of different store files. Each store file contains the data for a specific part of the graph.\\
-Node :\\
-The node store file stores node records. Every node created in the user-level graph ends up in the node store, the physical file for which is neostore.nodestore.db. Like most of the Neo4j store files, the node store is a fixed-size record store, where each record is nine bytes in length. \\
-Relationship :\\
-relationships are stored in the relationship store file, neostore.rela tionshipstore.db. Like the node store, the relationship store consists of fixed-sized records in this case each record is 33 bytes long. Each relationship record contains the IDs of the nodes at the start and end of the relationship, a pointer to the relationship type (which is stored in the relationship type store), and pointers for the next and previous relationship records for each of the start and end nodes. These last pointers are part of what is often called the relationship chain.
-
-\subsection{Titan}: 
-Titan is an open source Graph Database, that provides several different storage back ends, as well different querying language. As opposed to Neo4j that only supported native storage and native query language. Titan is designed to work well in distributed environment, it has support of Hadoop as a processing tool and uses Apache HBase, Apache Cassandra and Oracle BerkelyDB for storage options. 
-Data model of Titan : \\
-Titan stores vertices and edges using an adjacency list format. Where the id of each is stored and it points to a list containing all the connected edges and the vertex properties. It follows Google's BigTable format. The design model imposes a series of technical limitations. Some of which are : 
-\begin{itemize}
-\item 
-Titan can store up to a quintillion edges (2 \^ 60) and half as many vertices. That limitation is imposed by Titan's id scheme.
-\item
-Subclasses cannot be used for data type definitions. For example if a data type is declared as Number one cannot use Long or Integer. 
-\item
-Edge retrieval is O(log(k)) where k is degree of a edge vertex. However, Titan tries to pick the endpoint with smaller degree.
-
-\end{itemize}
-
-\subsection{FlockDB}
-A graph database developed by twitter. It is not a database optimized for graph traversal as opposed to Titan and Neo4j . It is optimized for very large 
-adjacency lists, fast read and writes and arithmetic queries. It was designed with these goals in mind :
-\begin{itemize}
-\item
-A high rate of add/update/remove operations
-\item
-complex set arithmetic operations
-\item
-paging through query result sets containing millions of entires
-\item
-ability to archive and later restore archive edges
-\item
-online data migration
-\end{itemize} 
-
-Twitter uses FlockDB to store social graphs and secondary indices. The underlying storage engine is MySQL. Each edge is stored as a row in the database and contains 4 fields :
-\begin{itemize}
-\item
-64 bit source IDopen	
-\item
-64 bit destination ID
-\item
-state : normal, removed or archived
-\item
-32 bit position used for sorting (usually timestamp)
-\end{itemize}
-
 \subsection{Social Graphs}
 
 \subsection{Influence Maximization}
@@ -247,6 +171,10 @@ Description of what I'm going to do, big data/Hadoop/MapReduce implementations f
 \subsection{Data set}
 Present several data sets that the experiments will be based on 
 \subsection{Influence Maximization in Giraph}
+Finding the best initial seed has two steps. Step one, given a graph with vertices without values and edges donating probabilities, output a graph with vertices marked as initial seed and edges untouched. 
+In step two, given the output of step one return the expected spread of the initial seed, which is an integer indicating how many nodes where activated when running the IC model.
+
+There are two classes of algorithm, Greedy which are iterative and heuristic based which only decide on chosing the best nodes given local information of a vertex. below is the implementation of some different methods.
 
 \subsubsection{Simple Implementation}
 All propagation implementation, in each MapReduce cycle one iteration of the Independent Cascade is run and the best vertex is chosen. So if the problem is to find initial list of k items, it will have k MR cycles.

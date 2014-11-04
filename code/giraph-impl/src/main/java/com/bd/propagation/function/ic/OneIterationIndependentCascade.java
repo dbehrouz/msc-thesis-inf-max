@@ -1,5 +1,6 @@
-package com.bd.propagation.ic;
+package com.bd.propagation.function.ic;
 
+import com.bd.propagation.Constants;
 import org.apache.giraph.edge.Edge;
 import org.apache.giraph.graph.BasicComputation;
 import org.apache.giraph.graph.Vertex;
@@ -25,29 +26,28 @@ import java.io.IOException;
  */
 public class OneIterationIndependentCascade extends
         BasicComputation<LongWritable, DoubleWritable, FloatWritable, DoubleWritable> {
-    private static final DoubleWritable DONE_COMPUTING = new DoubleWritable(2.0);
-    private static final DoubleWritable ACTIVE = new DoubleWritable(1.0);
+
 
     @Override
     public void compute(Vertex<LongWritable, DoubleWritable, FloatWritable> vertex,
                         Iterable<DoubleWritable> messages) throws IOException {
-        if (vertex.getValue().equals(DONE_COMPUTING)) {
+        if (vertex.getValue().equals(Constants.DONE_COMPUTING)) {
             vertex.voteToHalt();
-        } else if (vertex.getValue().equals(ACTIVE)) {
+        } else if (vertex.getValue().equals(Constants.ACTIVE)) {
             for (Edge<LongWritable, FloatWritable> edge : vertex.getEdges()) {
                 float weight = edge.getValue().get();
                 if (Math.random() < weight) {
-                    sendMessage(edge.getTargetVertexId(), ACTIVE);
+                    sendMessage(edge.getTargetVertexId(), Constants.ACTIVE);
                 }
             }
-            vertex.setValue(DONE_COMPUTING);
+            vertex.setValue(Constants.DONE_COMPUTING);
             vertex.voteToHalt();
             getContext().getCounter(NodeType.ACTIVE).increment(1);
         } else {
             boolean isActivated = false;
             for (DoubleWritable message : messages) {
-                if (message.equals(ACTIVE)) {
-                    vertex.setValue(ACTIVE);
+                if (message.equals(Constants.ACTIVE)) {
+                    vertex.setValue(Constants.ACTIVE);
                     isActivated = true;
                 }
             }

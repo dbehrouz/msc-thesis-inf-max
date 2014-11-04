@@ -1,4 +1,4 @@
-package com.bd.propagation.ic;
+package com.bd.propagation.function.ic;
 
 /**
  * @author Behrouz Derakhshan

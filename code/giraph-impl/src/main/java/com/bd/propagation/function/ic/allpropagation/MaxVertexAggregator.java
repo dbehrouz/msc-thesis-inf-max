@@ -1,4 +1,4 @@
-package com.bd.propagation.ic.allpropagation;
+package com.bd.propagation.function.ic.allpropagation;
 
 import org.apache.giraph.aggregators.BasicAggregator;
 
