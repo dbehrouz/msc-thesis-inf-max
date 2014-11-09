@@ -105,14 +105,13 @@ Influence maximization problem is divided into two major parts. The first one is
 based on this graph find a set of users that are proven to have the highest influence over others, in other words 
 this limited group of users can maximize the influence through the network.
 
-
-
 In \cite{kempe03} they have studied models by which influence propagates through social networks. They have discussed two diffusion models \\
-Linear Threshold Model (add reference) and Independent Cascade Models(add reference) . Describe the two models briefly. 
+\textit{Linear Threshold Model} and \textit{Independent Cascade Models} . In \textit{Linear Threshold Model} each node $v$ is influence by each neighbor $w$ acourding to a weight $b_v,w$ such that $\sum \nolimits_{w \, neighbor \, of \, v} b_v,w < 1$ . The diffusion process hence is as follows; each node $v$ will randomly chose a weight threshold $0 < \theta_v<1 $, this value determines tendency of node $v$ to become activated. Starting from the initial seed set, in each iteration for each node if the sum of the weight of its active neighbors become greater than the threshold then the node will become active, i.e. $\sum \nolimits_{w \, active neighbor \, of \, v} b_v,w  \geq \theta_v $. The process is deterministic however since $\theta_v$ is chosen at random, it shows our lack of knowledge their values. \textit{Independent Cascade Models} is a stochastic undeterministic process. It starts with an initial set of seeds, and in each time step $t$ every active node will try once to activate all of its neighbors, the probability of a node $v$ activating one of its neighbors $w$ is either define by a system property $p_v,w$ or is governed by the weight of the edge $w_v,w$. The process continues until no more new node can become active. 
+
 The problem of influence maximization which is finding an initial set that will maximizes the profit( target function) is NP-hard . 
-Formal definition : it asks for a parameter k, to find a k-nod set of maximum influence. They used approximation with a natural greedy hill-climbing strategy which will guarantee a 63 percent of the optimal solution performance (reference) . For the approximation to work , he target function should be sub-modular, they have proved that for both models the target function is indeed sub-modular.  They have run experiments on co-authorships in physics theory section of arXiv (www.arxiv.org) . The results show that their greedy algorithm performs better that other methods such as random selection, high-degree or central nodes discussed in book Social Network Analysis by S. Wasserman (find reference) \\
-\cite{domingo01} discusses the use case of influence maximization in marketing. They first, described how to model a market as a social network. Making each individual user only dependent on its neighbours, the product and the marketing action(Markov random field). Through these a function was devised that calculates the global lift in profit given a marketing action was applied to some users. Starting from an initial configuration, using different optimization algorithms a local maxima for the function can be reached. 
-They experimented on a collaborative filtering dataset (MovieLenz) in which users have rated a list of movies. They have first constructed the network using the user rating, by choosing similar users( calculating the Pearson correlation coefficient of users) as neighbours . They have performed experiments on the data set and compared their method with mass marketing and direct marketing. Their method has increased the profit the most. Due to non-linearly of the model, it did not scale well for bigger size networks, hence they have proposed a new linear model \cite{domingo02}. Not only the new model decreased the computation time time, the simplified equation for calculating the network value of customers, made it easier to incorporate more complex marketing action. They have experimented with Epinions (cite) data set. Which is a website where users can rate items. It also has a feature called trusted users, where each user can select many other users as trusted sources of reviews. Domingo et .al, hence, applied their model to the dataset, but considering trusted users of a user his neighbours. Their experiments showed that a continuous marketing action (a marketing action that can have unlimited values, such as a discount) performs much better than boolean marketing actions (one that can either be true or false, such whether or not a discount should be given to a user with no regards for the amount of the discount ). 
+Formal definition : it asks for a parameter k, to find a k-nod set of maximum influence. They used approximation with a natural greedy hill-climbing strategy which will guarantee a 63 percent of the optimal solution performance (reference) . For the approximation to work , he target function should be sub-modular, they have proved that for both models the target function is indeed sub-modular.  They have run experiments on co-authorship in physics theory section of arXiv (www.arxiv.org) . The results show that their greedy algorithm performs better that other methods such as random selection, high-degree or central nodes discussed in book Social Network Analysis by S. Wasserman (find reference) \\
+\cite{domingo01} discusses the use case of influence maximization in marketing. They first, described how to model a market as a social network. Making each individual user only dependent on its neighbors, the product and the marketing action(Markov random field). Through these a function was devised that calculates the global lift in profit given a marketing action was applied to some users. Starting from an initial configuration, using different optimization algorithms a local maxima for the function can be reached. 
+They experimented on a collaborative filtering data set (MovieLenz) in which users have rated a list of movies. They have first constructed the network using the user rating, by choosing similar users( calculating the Pearson correlation coefficient of users) as neighbours . They have performed experiments on the data set and compared their method with mass marketing and direct marketing. Their method has increased the profit the most. Due to non-linearly of the model, it did not scale well for bigger size networks, hence they have proposed a new linear model \cite{domingo02}. Not only the new model decreased the computation time time, the simplified equation for calculating the network value of customers, made it easier to incorporate more complex marketing action. They have experimented with Epinions (cite) data set. Which is a website where users can rate items. It also has a feature called trusted users, where each user can select many other users as trusted sources of reviews. Domingo et .al, hence, applied their model to the dataset, but considering trusted users of a user his neighbors. Their experiments showed that a continuous marketing action (a marketing action that can have unlimited values, such as a discount) performs much better than boolean marketing actions (one that can either be true or false, such whether or not a discount should be given to a user with no regards for the amount of the discount ). 
 \cite{cheng13} Have addressed both the accuracy and scalability of the solutions using the greedy methods. They have pointed out the main bottle neck in methods based on \cite{kempe03} are in the Monte Carlo simulation steps. They have proven that the objective function is not entirely sub-modular due to the randomness in the simulations, and hence to compensate for that many Monte Carlo simulations have to be run in each step of the algorithm which greatly reduces the performance. Present the proof here ....\\
 They proposed a new method called StaticGreedy which uses precomputed a series of snapshots at the beginning of the algorithm and reuses those for every step of the greedy algorithm.  They have defined the two terms, snapshots and simulations which can be both used for the Monte Carlo simulations. \\
 \begin{itemize}
@@ -156,8 +155,6 @@ In another paper, Goyal et al \cite{goyal11} have also tackled the problem of in
 
 \subsection{Maximizing Influence through a Network}
 
-
-
 \subsection{Submodular function optimization}
 \cite{Leskovec07} et al. in their Cost effective outbreak detection in networks, took upon the task of optimizing the greedy method used in propagation in graph networks. Although they did not work on solving the problem of maximizing influence they have proven their method can be adapted to the problem of maximizing the influence using the greedy algorithm. They studied two problems from different domains which share similarities. The first problem is find the best placement of sensors in a water network, so that contaminated water can be detected as quickly as possible. The other problem is blog network, which is to find blogs that contains the maximum amount of news that cascades from different sources in shortest possible time. Their advanced greedy method, utilizes the submodularity of the objective function, which reduces the amount of computation needed to be made in each iteration. Their method is 700 times faster than a simple greedy function. Details of algorithm can be found here :
 Their observation is that, if A is subset of B, the marginal gain of adding a node to B is always less than or equal the marginal gain of the adding the same node to A. Hence instead of recomputing the gain for all the node in each iteration, we can go through the nodes in decreasing order and recompute their values, the change is usually very small and most of the time the value on top of the list stays on top. 
@@ -165,27 +162,12 @@ Their observation is that, if A is subset of B, the marginal gain of adding a no
 \subsection{Use cases research and industry}
 
 \section{Big data and Network influence maximization}
-
-Description of what I'm going to do, big data/Hadoop/MapReduce implementations for network influence.
-
-\subsection{Data set}
-Present several data sets that the experiments will be based on .
-Except specified, the Vertex and Edge data types are as follow.
-Vertex Data Type  :
-\begin{itemize}
-\item ID : Long
-\item Value : Long (0 inactive, 1 active, 2 Done computing which is only used during the computation and essentially means the node is active)
-\end{itemize}
-Edge Data Type : 
-\begin{itemize}
-\item ID : Long
-\item Value : Float, probability of activating the incident vertex)
-\end{itemize}
-\subsection{Influence Maximization in Giraph}
-Finding the best initial seed has two steps. Step one, given a graph with vertices without values and edges donating probabilities, output a graph with vertices marked as initial seed and edges untouched. 
+Several Graph processing frameworks have been developed over the passed few years, that are making large scale graph processing a lot simpler. But they are imposing certain set of restrictions that will make applying some classes of algorithms more difficult. Bulk Synchronous Processing is the base of all the large scale graph frameworks where they are using the method of \textit{Think Like a Vertex}. Although this has many benefits but when it comes to classical IC and LT models, some difficulties will rise. In BSP model, usually algorithms that only need local data are implemented a lot simpler, but in influence maximization we need global aoccess to the network and to find out how many new nodes were affected by adding a node to the initial seed. The whole process is a randomized simulation that should be run hundreds or thousands of time to get a better and more accurate result. Large scale data processing usually suffers in this area, because initializing jobs given huge amount of data whether it is in graph format or others, take up some time and that is something that should be avoided . 
+The main challenges when implementing the methods using BSP models are hence, finding ways to avoid the iterative and simulation like implementation and trying to generalize the whole simulation cycle into one BSP job.
+ Step one, given a graph with vertices without values and edges donating probabilities, output a graph with vertices marked as initial seed and edges untouched. 
 In step two, given the output of step one return the expected spread of the initial seed, which is an integer indicating how many nodes where activated when running the IC model.
 
-There are two classes of algorithm, Greedy which are iterative and heuristic based which only decide on chosing the best nodes given local information of a vertex. below is the implementation of some different methods.
+There are two classes of algorithm, Greedy which are iterative and heuristic based which only decide on choosing the best nodes given local information of a vertex. below is the implementation of some different methods.
 
 \subsubsection{Simple Implementation}
 All propagation implementation, in each MapReduce cycle one iteration of the Independent Cascade is run and the best vertex is chosen. So if the problem is to find initial list of k items, it will have k MR cycles.
@@ -215,7 +197,7 @@ This would simply work when initial set = {}. In each iteration we chose the bes
 I have been thinking a bit about how would the algorithm is different when the initial set is not empty. If the running of many simulation is to eliminate
 the randomness factor, does it mean that we can basically ignore the initial set affect on the network ? \newline
 How bad the result is if instead of we just run the algorithm once and then report the top `k` vertices as the set with maximum influence. 
-\cite{Leskovec07} et al. observed that the element on the top of the list hard ever changes, and in those few occasions that it does it is due the randomness and probabiltiy of edges, so in very large scale networks can we simply ignore this fact and just chose the top k nodes by running the algorithm once on the data set . (TODO : check how much sense it makes) . This is of course a very naive implementation . But a good test case, trade of between the quality of the solution and the time it takes to find the `best` solution is an interesting factor here. 
+\cite{Leskovec07} et al. observed that the element on the top of the list hard ever changes, and in those few occasions that it does it is due the randomness and probability of edges, so in very large scale networks can we simply ignore this fact and just chose the top k nodes by running the algorithm once on the data set . (TODO : check how much sense it makes) . This is of course a very naive implementation . But a good test case, trade of between the quality of the solution and the time it takes to find the `best` solution is an interesting factor here. 
 
 
 
@@ -283,6 +265,25 @@ Here's the Algorithm \newline
 
 
 
+
+
+\subsection{Data set}
+\subsubsection{ArXiv collaboration network data set}
+Two data sets from the e-print arXiv is chosen for testing. Same two data sets have been used in \cite{kempe03} and \cite{chen09}. The data set contains academic collaboration for scientific research papers. There are in total two networks, one from the ''High Energy Physics - Theory'' section with papers from 1991 to 2003, which contains 15,233 nodes and 58,981 edges. The other network is form the fuller paper list of ''Physics'' section, which contains 37,154 nodes and 231,584 edges. The data sets in graph formats were made available for public by \cite{chen09}. It can be found at http://research.microsoft.com/en-us/people/weic/graphdata.zip . The size of this data set is small, the main purpose for including this data set is to have a benchmark and try to test the result of the methods implemented and proposed here with the state of the art methods. A lot of the experiments on maximizing network influence were made on these two networks.
+
+Present several data sets that the experiments will be based on .
+Except specified, the Vertex and Edge data types are as follow.
+Vertex Data Type  :
+\begin{itemize}
+\item ID : Long
+\item Value : Long (0 inactive, 1 active, 2 Done computing which is only used during the computation and essentially means the node is active)
+\end{itemize}
+Edge Data Type : 
+\begin{itemize}
+\item ID : Long
+\item Value : Float, probability of activating the incident vertex)
+\end{itemize}
+\subsection{Influence Maximization in Giraph}
 
 
 
