@@ -6,6 +6,7 @@
 \usepackage{algorithm}
 \usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage{graphicx}
 
 
 \DeclareMathOperator*{\argmax}{arg\,max}
@@ -60,15 +61,56 @@ In the next sections, different Big Data platforms are studied in details. Graph
 \section{Literature Review}
 
 \subsection{Big Data}
-Age of big data, where it began from. what it used to be. 
+Information and data has always been gathered for analysis and improvement or invention of new or existing technologies. It had helped governments to better govern countries, it had helped companies to better understand their costumers, and it had helped researchers and scientists to solve problems. With introduction of World Wide Web(http://webfoundation.org/about/vision/history-of-the-web/) exchange and collection of data has become a lot simpler. Big firms and companies started to collect user's information, browsing behavior and etc . Petabytes of data are being stored and exchanged everyday, and these data contain valuable information that is being used for solving a lot of problems using data mining and machine learning methods. 
+Processing this amount of data, has never been an easy tasks and prior to introduction of new BigData technologies, this processing and analyzing has been always done using expensive Server systems that are able to process millions to billions of bytes of data in a second. 
+Google Inc. revolutionary papers has drastically changed field. \cite{ghemawat03} introduced \textbf{The Google's Distributed System}; a file system built for storing terabytes of data. It is scalable, meaning more storage can be easily added, and it is being deployed on commodity hardware, meaning it does not require any sophisticated and expensive piece of hardware to use. Dean et. al \cite{dean04} introduced \textbf{MapReduce} a framework for processing large amount of data, again it is scalable and it can be deployed on commodity hardware. 
+Although the source code either of these two technologies were never released by Google, but based the publications \textbf{Doug Cutting} created the open source project \textit{Hadoop} which implements both MapReduce (Hadoop's MapReduce) and Google File System (Hadoop Distributed File System or HDFS for short). Since then, Hadoop has become BigData standard, several new technologies and project have been added to it.
 
 \subsubsection{Hadoop}
-Describe Google's MapReduce, Hadoop how it became to be. 
+Hadoop is consists of two major parts. 
+\textbf{MapReduce} which is a parallel programming paradigm. It is designed to run on distributed systems with many commodity computers. It involves three main steps, namely \textit{Map}, \textit{Reduce} and \textit{Shuffle}. The first two are defined by the user. Map operations are run in parallel and they process the data individually, data is divided into different portions and each one is processed by a mapper. The result of the mappers are send to a Reduce task(or several) where the results are combined. A shuffle operation is usually performed on the result of the Map so that similar data are all send to the same nodes. Below is a simple algorithm for counting words in a series of documents. 
+
+\begin{algorithm}
+\begin{algorithmic}
+\Function{map}{String name, String document}
+\State {//name: document name}
+\State{//document: document contents}
+   \For {each word w in document}
+      		\State emit (w, 1)
+   \EndFor
+\EndFunction
+\State 
+\Function {reduce}{String word, Iterator partialCounts}
+\State{//word: a word}
+\State{//partialCounts: a list of aggregated partial counts}
+  \State sum = 0
+  \For{ each pc in partialCounts}
+    \State sum += ParseInt(pc)
+    \State emit (word, sum)
+\EndFor
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/mapreduce.jpg}
+\caption{MapReduce paradigm}
+\end{figure}
+
+\textbf{Hadoop Distributed File System (HDFS)}
+HDFS is a distributed file system, designed to run on commodity hardware. It provides high throughput access to application data and it fault tolerant. Though initially designed for Hadoop's MapReduce framework, it has been used in many different application.
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/hdfsarchitecture.png}
+\caption{HDFS Architecture}
+\end{figure}
+
+
 \subsubsection{Spark}
 What is Spark
 \subsubsection{MPI}
 What is MPI
-
 
 \subsection{Graph}
 Definition of Graph, a more detailed literate review. Maybe I can move some of the stuff from Introduction, or try to complement them

@@ -55,10 +55,7 @@ public class GraphConverter {
 
             }
         }
-
         writeVertices(vertices, outputFile);
-
-
     }
 
     private static void writeVertices(Map<Long, Vertex> vertices, String output) throws IOException {

@@ -1,6 +1,5 @@
 package com.bd.formats;
 
-import com.bd.datatypes.ComplexVertexValue;
 import com.google.common.collect.Lists;
 import org.apache.giraph.edge.Edge;
 import org.apache.giraph.edge.EdgeFactory;

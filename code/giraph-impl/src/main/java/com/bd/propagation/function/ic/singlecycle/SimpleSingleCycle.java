@@ -1,6 +1,6 @@
 package com.bd.propagation.function.ic.singlecycle;
 
-import com.bd.datatypes.ComplexVertexValue;
+import com.bd.datatypes.SingleAttemptVertexValue;
 import org.apache.giraph.edge.Edge;
 import org.apache.giraph.graph.BasicComputation;
 import org.apache.giraph.graph.Vertex;
@@ -15,7 +15,7 @@ import java.util.Arrays;
 /**
  * @author Behrouz Derakhshan
  */
-public class AllPropagationIC extends BasicComputation<LongWritable, ComplexVertexValue, FloatWritable, LongWritable> {
+public class SimpleSingleCycle extends BasicComputation<LongWritable, SingleAttemptVertexValue, FloatWritable, LongWritable> {
     public static final LongWritable INFLUENCED = new LongWritable(-10000);
     public static final String INITIAL_SET = "giraph.single.cycle.initial.set";
     private static List<Long> initialSet;
@@ -34,12 +34,12 @@ public class AllPropagationIC extends BasicComputation<LongWritable, ComplexVert
 
 
     @Override
-    public void compute(Vertex<LongWritable, ComplexVertexValue, FloatWritable> vertex, Iterable<LongWritable> messages) throws IOException {
+    public void compute(Vertex<LongWritable, SingleAttemptVertexValue, FloatWritable> vertex, Iterable<LongWritable> messages) throws IOException {
         if (getSuperstep() == 0) {
             init();
             // adding my self to the list of influencedBy
             vertex.getValue().getVertexIds().add(vertex.getId().get());
-            vertex.setValue(new ComplexVertexValue(1L));
+            vertex.setValue(new SingleAttemptVertexValue(1L));
             // at the start try to activate all around you with your label
             activate(vertex, vertex.getId());
 
@@ -64,7 +64,7 @@ public class AllPropagationIC extends BasicComputation<LongWritable, ComplexVert
         }
     }
 
-    private void activate(Vertex<LongWritable, ComplexVertexValue, FloatWritable> vertex, LongWritable message) {
+    private void activate(Vertex<LongWritable, SingleAttemptVertexValue, FloatWritable> vertex, LongWritable message) {
         for (Edge<LongWritable, FloatWritable> edge : vertex.getEdges()) {
             LongWritable targetVertex = edge.getTargetVertexId();
             if (targetVertex.get() != message.get()) {

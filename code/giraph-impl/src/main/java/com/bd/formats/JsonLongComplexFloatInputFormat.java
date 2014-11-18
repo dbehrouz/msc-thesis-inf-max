@@ -1,6 +1,6 @@
 package com.bd.formats;
 
-import com.bd.datatypes.ComplexVertexValue;
+import com.bd.datatypes.SingleAttemptVertexValue;
 import com.google.common.collect.Lists;
 import org.apache.giraph.edge.Edge;
 import org.apache.giraph.edge.EdgeFactory;
@@ -21,7 +21,7 @@ import java.util.List;
  * @author Behrouz Derakhshan
  */
 public class JsonLongComplexFloatInputFormat extends
-        TextVertexInputFormat<LongWritable, ComplexVertexValue, FloatWritable> {
+        TextVertexInputFormat<LongWritable, SingleAttemptVertexValue, FloatWritable> {
     @Override
     public TextVertexReader createVertexReader(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException {
         return new JsonLongLongFloatLongVertexReader();
@@ -41,9 +41,9 @@ public class JsonLongComplexFloatInputFormat extends
         }
 
         @Override
-        protected ComplexVertexValue getValue(JSONArray jsonVertex) throws
+        protected SingleAttemptVertexValue getValue(JSONArray jsonVertex) throws
                 JSONException, IOException {
-            return new ComplexVertexValue(jsonVertex.getLong(1));
+            return new SingleAttemptVertexValue(jsonVertex.getLong(1));
         }
 
         @Override
@@ -61,7 +61,7 @@ public class JsonLongComplexFloatInputFormat extends
         }
 
         @Override
-        protected Vertex<LongWritable, ComplexVertexValue, FloatWritable>
+        protected Vertex<LongWritable, SingleAttemptVertexValue, FloatWritable>
         handleException(Text line, JSONArray jsonVertex, JSONException e) {
             throw new IllegalArgumentException(
                     "Couldn't get vertex from line " + line, e);

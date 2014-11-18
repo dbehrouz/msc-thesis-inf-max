@@ -12,20 +12,20 @@ import java.util.List;
 /**
  * @author Behrouz Derakhshan
  */
-public class ComplexVertexValue implements Writable {
+public class SingleAttemptVertexValue implements Writable {
 
     private Long influenceSize;
     private List<Long> vertexIds;
 
-    public ComplexVertexValue() {
+    public SingleAttemptVertexValue() {
         this(0L);
     }
 
-    public ComplexVertexValue(Long influenceSize) {
+    public SingleAttemptVertexValue(Long influenceSize) {
         this(influenceSize, new LinkedList<Long>());
     }
 
-    public ComplexVertexValue(Long influenceSize, List<Long> vertexIds) {
+    public SingleAttemptVertexValue(Long influenceSize, List<Long> vertexIds) {
         this.influenceSize = influenceSize;
         this.vertexIds = vertexIds;
     }
