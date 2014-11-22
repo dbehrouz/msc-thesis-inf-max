@@ -17,26 +17,11 @@ import java.util.Arrays;
  */
 public class SimpleSingleCycle extends BasicComputation<LongWritable, SingleAttemptVertexValue, FloatWritable, LongWritable> {
     public static final LongWritable INFLUENCED = new LongWritable(-10000);
-    public static final String INITIAL_SET = "giraph.single.cycle.initial.set";
-    private static List<Long> initialSet;
-
-    public void init() {
-        initialSet = toLong(Arrays.asList(getConf().get(INITIAL_SET, "").split(",")));
-    }
-
-    private List<Long> toLong(List<String> items) {
-        List<Long> longs = new LinkedList<>();
-        for (String item : items) {
-            longs.add(Long.parseLong(item));
-        }
-        return longs;
-    }
 
 
     @Override
     public void compute(Vertex<LongWritable, SingleAttemptVertexValue, FloatWritable> vertex, Iterable<LongWritable> messages) throws IOException {
         if (getSuperstep() == 0) {
-            init();
             // adding my self to the list of influencedBy
             vertex.getValue().getVertexIds().add(vertex.getId().get());
             vertex.setValue(new SingleAttemptVertexValue(1L));

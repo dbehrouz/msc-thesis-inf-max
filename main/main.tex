@@ -3,10 +3,11 @@
 \usepackage{subfigure}
 \usepackage{url}
 \usepackage{algpseudocode}
-\usepackage{algorithm}
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{algorithmicx}
+\usepackage[Algorithm,ruled]{algorithm}
 
 
 \DeclareMathOperator*{\argmax}{arg\,max}
@@ -212,6 +213,7 @@ There are two classes of algorithm, Greedy which are iterative and heuristic bas
 \subsubsection{Simple Implementation}
 Based on \cite{kempe03} \textbf{Independent Cascade} method, I have implemented a simple \textbf{BSP} method. However, as discussed earlier, iteration based algorithms are very time consuming to run in big data. The algorithm presented below, is limited version of the method. It removes the need for the simulation and it only runs it once. 
 \begin{algorithm}
+\floatname{algorithm}{IndependentCascade}
 \begin{algorithmic}
 \If {superstep == 0}
 	\State add your own id to list of influencedBy an increase vertex value by one
@@ -231,6 +233,7 @@ Based on \cite{kempe03} \textbf{Independent Cascade} method, I have implemented 
 	\EndFor
 \EndIf
 \end{algorithmic}
+\caption{Simple Method}
 \end{algorithm}
 
 Every vertex starts by sending its own id to all of its neighbors along the edge, this is a probabilistic process, governed by the edge weight between the two nodes. Every node will then check all the incoming messages. There are two types of messages, a message which is the id of another vertex, which means the vertex has successfully activated the current vertex. As soon as a vertex encounters such a message, it will send another message directly to the original vertex indicating that it has been activated. Once this message is seen by the initiating vertex, the vertex will increment its internal counter by 1. All the vertices keep track of which of their neighbors they have already tried to activate so the activation process does not happen more than once for each neighbor. While trying to activate a neighbor by sending its own id, every vertex will also send the vertex id of vertices that it has been affected by so far. After the algorithm is finished running, each vertex knows how many other vertices it has managed to activate. We report the top $k$ vertices as the solution to the problem. Draw backs of this method are :
@@ -243,13 +246,40 @@ Every vertex starts by sending its own id to all of its neighbors along the edge
 
 \cite{Leskovec07} et al. observed that the element on the top of the list hard ever changes, and in those few occasions that it does it is due the randomness and probability of edges, so in very large scale networks can we simply ignore this fact and just chose the top k nodes by running the algorithm once on the data set . This is of course a very naive implementation . But a good test case, trade of between the quality of the solution and the time it takes to find the `best` solution is an interesting factor here. 
 
-\subsubsection{Simple Implementation Token Based}
-A variation of simple implementation method, where the simulation aspect of the \textbf{Independent Cascade} is implemented. In this algorithm, each vertex, instead of trying to activate its neighbors only once, it will try many times. T
+\subsubsection{Token Based Implementation}
+A variation of \textbf{Simple Implementation}method, where the simulation aspect of the \textbf{Independent Cascade} is implemented. In this algorithm, each vertex, instead of trying to activate its neighbors only once, it will try many times. Vertices, will keep many tokens with unique ids. Each token can be tracked back to the vertex it self. In each superstep a vertex will try to activate its neighbors once with every token. If a node is activates using a token, it will notify the originating vertex. The vertex will increment its internal counter for that specific token. Once no new nodes are activated, the program ends and all the vertices will report the average of token counters as their expected spread. Top $k$ nodes then can be selected as the initial seed.
+\begin{algorithm}
+\floatname{algorithm}{IndependentCascade}
+\begin{algorithmic}
+\If {superstep == 0}
+	\State add your own id to list of influencedBy an increase all token counter values by one
+	\For{each token}
+		\State activate all neighbors using the token
+	\EndFor
+\Else
+	\State receive message from every one (message is the id of the vertex)
+	\For {each message received}
+		\State extract token out of the message
+		\If {token is already in your influencedby list}
+			\State vote to halt
+		\Else
+			\State activate all neighbors by using the token
+			\State add to influecedBy token list 
+			\State notify source vertex
+			\State vote to halt
+		\EndIf
+		
+	\EndFor
+\EndIf
+\end{algorithmic}
+\caption{Token Based}
+\end{algorithm}
 
 
 \subsubsection{Degree Heuristic}
 A simple implementation where nodes with highest degree are selected as seed.
 \begin{algorithm}
+\floatname{algorithm}{IndependentCascade}
 \begin{algorithmic}
 \If {$superstep == 0$}
 	\State calculate your degree
@@ -266,6 +296,7 @@ A simple implementation where nodes with highest degree are selected as seed.
 	\State vote to halt
 \EndIf
 \end{algorithmic}
+\caption{Degree Heuristic}
 \end{algorithm}
 
 \subsubsection{Single Discount Heuristic}
@@ -280,6 +311,7 @@ Chose seeds randomly, this is again for comparison only
 Here's the detail of Wei Chen's Degree Discount IC Algorithm. It does not require simulation, it simply is based on a heuristic which is derived from the degree of a node but it is affected by its neighbor. 
 Here's the Algorithm \newline
 \begin{algorithm}
+\floatname{algorithm}{IndependentCascade}
 \begin{algorithmic}
 \State $S=\emptyset$
 \For{each vertex $v$}
@@ -297,6 +329,7 @@ Here's the Algorithm \newline
 \EndFor
 \State output $S$
 \end{algorithmic}
+\caption{Degree Discount}
 \end{algorithm}
 
 
@@ -308,11 +341,21 @@ Here's the Algorithm \newline
 
 \subsubsection{Social Influence Analysis in Large-scale Networks}
 
+\subsection{Influence Maximization in Giraph}
+
+
+\subsection{Influence Maximization in Spark}
+
+\subsection{Influence Maximization in GraphLab}
+
+\subsection{Comparison}
+Compare all three on similar datasets. Start with single node implementation and comparison. Smaller graphs and then very large graphs.
 
 
 
+\subsection{Other challenges and open questions}
 
-
+\section{Experiments}
 \subsection{Data set}
 \subsubsection{ArXiv collaboration network data set}
 Two data sets from the e-print arXiv is chosen for testing. Same two data sets have been used in \cite{kempe03} and \cite{chen09}. The data set contains academic collaboration for scientific research papers. There are in total two networks, one from the ''High Energy Physics - Theory'' section with papers from 1991 to 2003, which contains 15,233 nodes and 58,981 edges. The other network is form the fuller paper list of ''Physics'' section, which contains 37,154 nodes and 231,584 edges. The data sets in graph formats were made available for public by \cite{chen09}. It can be found at http://research.microsoft.com/en-us/people/weic/graphdata.zip . The size of this data set is small, the main purpose for including this data set is to have a benchmark and try to test the result of the methods implemented and proposed here with the state of the art methods. A lot of the experiments on maximizing network influence were made on these two networks.
@@ -329,20 +372,6 @@ Edge Data Type :
 \item ID : Long
 \item Value : Float, probability of activating the incident vertex)
 \end{itemize}
-\subsection{Influence Maximization in Giraph}
-
-
-
-\subsection{Influence Maximization in Spark}
-
-\subsection{Influence Maximization in GraphLab}
-
-\subsection{Comparison}
-Compare all three on similar datasets. Start with single node implementation and comparison. Smaller graphs and then very large graphs.
-
-
-
-\subsection{Other challenges and open questions}
 
 
 
@@ -353,16 +382,10 @@ In conclusion
 
 
 \bibliographystyle{tktl}
-
 \bibliography{bibliography}
-
 \lastpage
-
 \appendices
-
 \pagestyle{empty}
-
-
 \end{document}
 
 

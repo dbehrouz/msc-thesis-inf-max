@@ -22,6 +22,7 @@ import java.util.List;
 public class JsonLongLongFloatVertexInputFormat extends TextVertexInputFormat<LongWritable, LongWritable, FloatWritable> {
     @Override
     public TextVertexReader createVertexReader(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException {
+        System.out.println("Input split");
         return new JsonLongLongFloatLongVertexReader();
     }
 
