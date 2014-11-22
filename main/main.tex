@@ -8,6 +8,7 @@
 \usepackage{graphicx}
 \usepackage{algorithmicx}
 \usepackage[Algorithm,ruled]{algorithm}
+\usepackage{float}
 
 
 \DeclareMathOperator*{\argmax}{arg\,max}
@@ -52,6 +53,7 @@ GraphX is open source project built on top of Spark
 \item
 Graphlab and open source project written in  and C++ . 
 \end{itemize}
+
 In this thesis, I will study the performance penalty of running state of the art algorithms for network propagation, more specifically the Independent Cascade method (which will be explained in the next section) . And propose and implement distributed methods for the algorithm written for GraphLab, GraphX and Giraph and comparison between each frameworks will be made. 
 The rest of this document is organized as follow; in section 2, Big Data frameworks, graph frameworks, influence maximization methods are studies. In section 3, a distributed algorithm and implementation methods are presented. In section 4, comparison of the distributed and single node implementations as well as the difference between each graph framework are studied . In section 5 conclusion blah blah
 In the next sections, different Big Data platforms are studied in details. Graph processing frameworks are explained extensively. And current and state of the art algorithms for network propagation and influence maximization are studied. 
@@ -69,7 +71,7 @@ Although the source code either of these two technologies were never released by
 
 \subsubsection{Hadoop}
 Hadoop is consists of two major parts. 
-\textbf{MapReduce} which is a parallel programming paradigm. It is designed to run on distributed systems with many commodity computers. It involves three main steps, namely \textit{Map}, \textit{Reduce} and \textit{Shuffle}. The first two are defined by the user. Map operations are run in parallel and they process the data individually, data is divided into different portions and each one is processed by a mapper. The result of the mappers are send to a Reduce task(or several) where the results are combined. A shuffle operation is usually performed on the result of the Map so that similar data are all send to the same nodes. Below is a simple algorithm for counting words in a series of documents. 
+\textbf{MapReduce} which is a parallel programming paradigm. It is designed to run on distributed systems with many commodity computers. It involves three main steps, namely \textit{Map}, \textit{Reduce} and \textit{Shuffle}. The first two are defined by the user. Map operations are run in parallel and they process the data individually, data is divided into different portions and each one is processed by a mapper. The result of the mappers are send to a Reduce task(or several) where the results are combined. A shuffle operation is usually performed on the result of the Map tasks so that similar data are all send to the same nodes. Below is a simple algorithm for counting words in a series of documents. 
 
 \begin{algorithm}
 \begin{algorithmic}
@@ -99,6 +101,8 @@ Hadoop is consists of two major parts.
 \caption{MapReduce paradigm}
 \end{figure}
 
+The popularity of Hadoop's MapReduce framework rises from the fact that many complexities of the system is being handled automatically by the framework. In most typical use cases, the user only needs to provide the method for Mappers and Reducers. Framework will take care of compiling and distributing the code to all the nodes, and running them in parallel. As previously mentioned it is fault tolerant, it means if during the processing a task fails, it will restart the task again, if a node encounters a problem the framework will move the computation to another node. It is scalable, which means the program does not need to know how many nodes are involved in the system. The program will scale to many nodes depending on the size of the input data and amount of available resources. There are however many advanced options that users can do to further optimize the program, but they are generally not required for simple tasks. 
+
 \textbf{Hadoop Distributed File System (HDFS)}
 HDFS is a distributed file system, designed to run on commodity hardware. It provides high throughput access to application data and it fault tolerant. Though initially designed for Hadoop's MapReduce framework, it has been used in many different application.
 \begin{figure}[ht!]
@@ -123,10 +127,35 @@ Older graph frameworks, how they used work. A short overview of some important a
 What is it, where does it come from, why is it important to have frameworks capable of processing massive graphs
 
 \subsection{Giraph}
-Apache Giraph is an iterative graph processing framework, built on top of Apache Hadoop. It is the open source version of Pregel by Google. 
+Apache Giraph is an iterative graph processing framework, built on top of Apache Hadoop. It is the open source version of Pregel by Google \cite{malewicz10} . Its input is a graph consists of vertices and edges. Each vertex and edge contains value as well, hence the input to a \textbf{Giraph} program besides from the structure of the vertices and edges includes their initial values. The project is now being actively developed by several companies. It is being used in many real case scenarios. For example, Facebook is using it to analyze the graphs formed by users and their connection with their friends. Similar to Pregel, the computation model of Giraph is Bulk Synchronous Parallel(TODO : reference). 
+Figure below shows the work flow of Giraph . (TODO, source or create your own graph)
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/giraphdataflow.png}
+\caption{Giraph Work Flow}
+\end{figure}
+A typical Giraph program is carried out in several steps, each one called a \textit{superstep} . Initially all vertices are in an \textit{active} state, and each iteration an active vertex will call its compute method which is defined by the user and generally carries out the Giraph algorithm. A typical Compute method:
+\begin{itemize}
+\item
+receives messages sent to the vertex in the previous superstep
+\item
+computes using the messages, and the vertex and outgoing edge values, which may result in modifications to the values, and
+\item
+may send messages to other vertices.
+\end{itemize}
+
+The figure below shows supersteps involved with computing the single source shortest path for a simple graph.(TODO, make your own proper reference)
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/giraphsuperstep.jpg}
+\caption{Single Source Shortest Path}
+\end{figure}
+
+The input is a chain graph with three vertices (black) and two edges (green). The values of edges are 1 and 3 respectively. The algorithm computes distances from the leftmost vertex. The initial values of vertices are 0, $\infty$ and $\infty$ (top row). Distance upper bounds are sent as messages (blue), resulting in updates to vertex values (successive rows going down). The execution lasts three supersteps (separated by red lines).
+
+On a cluster level, a graph is distributed into several connected components and each one is stored in one of the computation nodes. Each cluster, has a master node that coordinates the other nodes. It will decide on which components should be stored on each device and it stored reference and tables of information about the vertices and edges and where they resides. It will ensure the supersteps are synchronized, i.e. it makes sure all vertices have finished their computation in the current superstep before starting the next superstep. It will monitor the status of the components and decide when to end the program by checking if there are any active vertices or not. 
 \subsection{GraphX}
-\subsection{Pregel}
-Graph processing framework by Google. Pregel is a vertex centric computational model where each vertex process the incoming messages from the edges and pass along the output to the next vertices through edges. It is built for iterative processing and in a distributed environment. The API is similar to MapReduce where the users have to implement methods for two set of methods, the compute method and the aggregate method. Compute methods are executed on each vertex in parallel, there are mechansim involved however, to assert data consistency. The computations are done in steps called SuperStep. The main method is the compute method, where in each SuperStep a vertex will receive a list of messages from vertices in an arbitrary order, and after the processing is done, it will send messages to other vertices. The aggregator can collect global values from all vertices, they are usually  to keep track of some global counts or .... . 
+
 \subsection{GraphLab}
 GraphLab is a graph processing framework, tailored for big data sets. There are three versions of GraphLab :
 \begin{itemize}
@@ -212,7 +241,7 @@ There are two classes of algorithm, Greedy which are iterative and heuristic bas
 
 \subsubsection{Simple Implementation}
 Based on \cite{kempe03} \textbf{Independent Cascade} method, I have implemented a simple \textbf{BSP} method. However, as discussed earlier, iteration based algorithms are very time consuming to run in big data. The algorithm presented below, is limited version of the method. It removes the need for the simulation and it only runs it once. 
-\begin{algorithm}
+\begin{algorithm}[ht!]
 \floatname{algorithm}{IndependentCascade}
 \begin{algorithmic}
 \If {superstep == 0}
@@ -248,7 +277,7 @@ Every vertex starts by sending its own id to all of its neighbors along the edge
 
 \subsubsection{Token Based Implementation}
 A variation of \textbf{Simple Implementation}method, where the simulation aspect of the \textbf{Independent Cascade} is implemented. In this algorithm, each vertex, instead of trying to activate its neighbors only once, it will try many times. Vertices, will keep many tokens with unique ids. Each token can be tracked back to the vertex it self. In each superstep a vertex will try to activate its neighbors once with every token. If a node is activates using a token, it will notify the originating vertex. The vertex will increment its internal counter for that specific token. Once no new nodes are activated, the program ends and all the vertices will report the average of token counters as their expected spread. Top $k$ nodes then can be selected as the initial seed.
-\begin{algorithm}
+\begin{algorithm}[ht!]
 \floatname{algorithm}{IndependentCascade}
 \begin{algorithmic}
 \If {superstep == 0}
@@ -275,10 +304,15 @@ A variation of \textbf{Simple Implementation}method, where the simulation aspect
 \caption{Token Based}
 \end{algorithm}
 
+\subsubsection{Single Discount Heuristic}
+It is similar to Degree Heuristic with the exception that, if for a node v, one of its neighbor is already a seed we will not count that edge towards v's degree i.e reducing the degree by one.
+
+\subsubsection{Random Seed}
+Chose seeds randomly, this is again for comparison only
 
 \subsubsection{Degree Heuristic}
 A simple implementation where nodes with highest degree are selected as seed.
-\begin{algorithm}
+\begin{algorithm}[ht!]
 \floatname{algorithm}{IndependentCascade}
 \begin{algorithmic}
 \If {$superstep == 0$}
@@ -299,18 +333,12 @@ A simple implementation where nodes with highest degree are selected as seed.
 \caption{Degree Heuristic}
 \end{algorithm}
 
-\subsubsection{Single Discount Heuristic}
-It is similar to Degree Heuristic with the exception that, if for a node v, one of its neighbor is already a seed we will not count that edge towards v's degree i.e reducing the degree by one.
-
-\subsubsection{Random Seed}
-Chose seeds randomly, this is again for comparison only
-
 \subsubsection{Kimura and Saito (Tractable models for information diffusion in social networks )}
 
 \subsubsection{Efficient Influence Maximization in Social Networks(Degree Discount)}
 Here's the detail of Wei Chen's Degree Discount IC Algorithm. It does not require simulation, it simply is based on a heuristic which is derived from the degree of a node but it is affected by its neighbor. 
 Here's the Algorithm \newline
-\begin{algorithm}
+\begin{algorithm}[ht!]
 \floatname{algorithm}{IndependentCascade}
 \begin{algorithmic}
 \State $S=\emptyset$
@@ -332,27 +360,13 @@ Here's the Algorithm \newline
 \caption{Degree Discount}
 \end{algorithm}
 
-
-
-
-
-
 \subsubsection{Static Greedy}
-
 \subsubsection{Social Influence Analysis in Large-scale Networks}
-
 \subsection{Influence Maximization in Giraph}
-
-
 \subsection{Influence Maximization in Spark}
-
 \subsection{Influence Maximization in GraphLab}
-
 \subsection{Comparison}
 Compare all three on similar datasets. Start with single node implementation and comparison. Smaller graphs and then very large graphs.
-
-
-
 \subsection{Other challenges and open questions}
 
 \section{Experiments}
