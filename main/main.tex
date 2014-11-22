@@ -179,8 +179,6 @@ They have performed experiment and compared their methods with the normal Greedy
 
 Saito and Kimura \cite{kimura06} have also investigated the scalability issue of ICM simulations. They have argued that the current simulation model in ICM requires many iterations and each iteration took a lot of processing time and power. They have proposed two natural special cases of the ICM such that a good estimate of this quantity can be efficiently computed. They define the Shortest-Path Model(SPM) which is a special case of the ICM such that each node v has the chance to become active only at step = d(A,v) , where if A is the initial set d(A,v) is the distance of A to node v. This means that each node is activated only through the shortest paths from the initial active set. The other model they have proposed named SP1M, which is each node v has the chance to become active only at steps t = d(A,v) and t =d(A,v) + 1. Through these two models they have proposed methods for calculating the spread of an initial set A. They have proved that the result achieved using this method is also within a bound of the best solution. In their experiments, they have assigned a uniform probably to each edge with two different values p = 0.1 and p =0.01. The experiments showed that the estimation of the spread for ICM increases as p increases while the processing times for the SPM and SP1M hardly change. They have also \\
 
-
-
 \subsection{Learning Influence Probabilities}
 \cite{goyal10} have tackled the problem of forming the social graph whose edges have the probability of a user
 influencing the other based on a log of actions. Based on the General Threshold model that simultaneously 
@@ -203,7 +201,7 @@ Their observation is that, if A is subset of B, the marginal gain of adding a no
 
 \subsection{Use cases research and industry}
 
-\section{Big data and Network influence maximization}
+\section{Big data and Network Influence Maximization}
 Several Graph processing frameworks have been developed over the passed few years, that are making large scale graph processing a lot simpler. But they are imposing certain set of restrictions that will make applying some classes of algorithms more difficult. Bulk Synchronous Processing is the base of all the large scale graph frameworks where they are using the method of \textit{Think Like a Vertex}. Although this has many benefits but when it comes to classical IC and LT models, some difficulties will rise. In BSP model, usually algorithms that only need local data are implemented a lot simpler, but in influence maximization we need global aoccess to the network and to find out how many new nodes were affected by adding a node to the initial seed. The whole process is a randomized simulation that should be run hundreds or thousands of time to get a better and more accurate result. Large scale data processing usually suffers in this area, because initializing jobs given huge amount of data whether it is in graph format or others, take up some time and that is something that should be avoided . 
 The main challenges when implementing the methods using BSP models are hence, finding ways to avoid the iterative and simulation like implementation and trying to generalize the whole simulation cycle into one BSP job.
  Step one, given a graph with vertices without values and edges donating probabilities, output a graph with vertices marked as initial seed and edges untouched. 
@@ -212,7 +210,7 @@ In step two, given the output of step one return the expected spread of the init
 There are two classes of algorithm, Greedy which are iterative and heuristic based which only decide on choosing the best nodes given local information of a vertex. below is the implementation of some different methods.
 
 \subsubsection{Simple Implementation}
-All propagation implementation, in each MapReduce cycle one iteration of the Independent Cascade is run and the best vertex is chosen. So if the problem is to find initial list of k items, it will have k MR cycles.
+Based on \cite{kempe03} \textbf{Independent Cascade} method, I have implemented a simple \textbf{BSP} method. However, as discussed earlier, iteration based algorithms are very time consuming to run in big data. The algorithm presented below, is limited version of the method. It removes the need for the simulation and it only runs it once. 
 \begin{algorithm}
 \begin{algorithmic}
 \If {superstep == 0}
@@ -235,12 +233,18 @@ All propagation implementation, in each MapReduce cycle one iteration of the Ind
 \end{algorithmic}
 \end{algorithm}
 
-This would simply work when initial set = {}. In each iteration we chose the best vertex and add it to initial set. 
-I have been thinking a bit about how would the algorithm is different when the initial set is not empty. If the running of many simulation is to eliminate
-the randomness factor, does it mean that we can basically ignore the initial set affect on the network ? \newline
-How bad the result is if instead of we just run the algorithm once and then report the top `k` vertices as the set with maximum influence. 
-\cite{Leskovec07} et al. observed that the element on the top of the list hard ever changes, and in those few occasions that it does it is due the randomness and probability of edges, so in very large scale networks can we simply ignore this fact and just chose the top k nodes by running the algorithm once on the data set . (TODO : check how much sense it makes) . This is of course a very naive implementation . But a good test case, trade of between the quality of the solution and the time it takes to find the `best` solution is an interesting factor here. 
+Every vertex starts by sending its own id to all of its neighbors along the edge, this is a probabilistic process, governed by the edge weight between the two nodes. Every node will then check all the incoming messages. There are two types of messages, a message which is the id of another vertex, which means the vertex has successfully activated the current vertex. As soon as a vertex encounters such a message, it will send another message directly to the original vertex indicating that it has been activated. Once this message is seen by the initiating vertex, the vertex will increment its internal counter by 1. All the vertices keep track of which of their neighbors they have already tried to activate so the activation process does not happen more than once for each neighbor. While trying to activate a neighbor by sending its own id, every vertex will also send the vertex id of vertices that it has been affected by so far. After the algorithm is finished running, each vertex knows how many other vertices it has managed to activate. We report the top $k$ vertices as the solution to the problem. Draw backs of this method are :
+\begin{itemize}
+\item Activation of a new node is done through only one single random process, based on edge weight
+\item All nodes are trying to activate others independent of other nodes, depending on network structure this could have some affect on the final result
+\item Since each vertex, is sending it's own id and id of vertices that it has been affected by, it might create network traffic. But it is safe to assume that real big data graphs are sparse and generally a vertex effect cannot go beyond a limited number of hops.
 
+\end{itemize}
+
+\cite{Leskovec07} et al. observed that the element on the top of the list hard ever changes, and in those few occasions that it does it is due the randomness and probability of edges, so in very large scale networks can we simply ignore this fact and just chose the top k nodes by running the algorithm once on the data set . This is of course a very naive implementation . But a good test case, trade of between the quality of the solution and the time it takes to find the `best` solution is an interesting factor here. 
+
+\subsubsection{Simple Implementation Token Based}
+A variation of simple implementation method, where the simulation aspect of the \textbf{Independent Cascade} is implemented. In this algorithm, each vertex, instead of trying to activate its neighbors only once, it will try many times. T
 
 
 \subsubsection{Degree Heuristic}
