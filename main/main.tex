@@ -103,7 +103,7 @@ Hadoop is consists of two major parts.
 
 The popularity of Hadoop's MapReduce framework rises from the fact that many complexities of the system is being handled automatically by the framework. In most typical use cases, the user only needs to provide the method for Mappers and Reducers. Framework will take care of compiling and distributing the code to all the nodes, and running them in parallel. As previously mentioned it is fault tolerant, it means if during the processing a task fails, it will restart the task again, if a node encounters a problem the framework will move the computation to another node. It is scalable, which means the program does not need to know how many nodes are involved in the system. The program will scale to many nodes depending on the size of the input data and amount of available resources. There are however many advanced options that users can do to further optimize the program, but they are generally not required for simple tasks. The other feature of MapReduce and Hadoop in general is that it is available in many different languages. Java, Python, C++, Scala and many more. 
 
-Newer versions of Hadoop and MapReduce employs 
+Newer versions of Hadoop and MapReduce employs more sophistcated Resource manager and Scheduler called YARN(TODO REFERENCE) . YARN essentially, provides container for running different applications and it is not limited to MapReduce. Spark, Storm and and even simple Java programs can be run on YARN. YARN is more or a less cluster manager program and overviews the resource and allocates resources to different jobs being submitted to it. It has become available as part of Hadoop 2.0 technology Stack .
 
 \textbf{Hadoop Distributed File System (HDFS)}
 HDFS is a distributed file system, designed to run on commodity hardware. It provides high throughput access to application data and it fault tolerant. Though initially designed for Hadoop's MapReduce framework, it has been used in many different application.
@@ -112,6 +112,8 @@ HDFS is a distributed file system, designed to run on commodity hardware. It pro
 \includegraphics[width=130mm]{figures/hdfsarchitecture.png}
 \caption{HDFS Architecture}
 \end{figure}
+
+It is fault tolerant, meaning if a node in a cluster fails, the data is not gone. HDFS employs a feature called \textit{Data Replication}, which indicates the number of type each object is being replicated. NameNode keeps track of where are all the same instances of the data is stored and in case a node fails it knows where to look for it. HDFS emphasizes on moving computation is much cheaper than moving data, it is true since HDFS is designed to store BigData sets, Tera or even PetaBytes of data, hence in conjunction with MapReduce, instead of moving the data around, the computation is done on the node containing the data. It is design for high throughput  rather than low latency so it is not ideal for streaming application, although several improvements are being made to further decrease the latency and making it suitable for real time streaming application. Similar to MapReduce it is design to work across heterogeneous hardware and software platforms. Meaning the nodes in the cluster do not have to be identical and even running the same operating system. Hadoop runs on JVM hence it is OS agnostic. 
 
 
 \subsubsection{Spark}
