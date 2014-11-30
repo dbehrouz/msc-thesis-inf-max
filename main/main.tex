@@ -117,9 +117,24 @@ It is fault tolerant, meaning if a node in a cluster fails, the data is not gone
 
 
 \subsubsection{Spark}
-What is Spark
-\subsubsection{MPI}
-What is MPI
+Apache Spark \cite{zaharia10} was originally developed in AMPLab at UC Berkeley. The main idea was to solve MapReduce's problems. In contrast to MapReduce's 2 stage program (Map and Reduce), Spark employs an iterative paradigm. It allows users to load data into memory and perform many operations on the data, this is ideal for a lot of Machine learning problems. The underlying frameworks work on entities called Resilient Distributed Datasets (RDDs) \cite{zaharia12}. RDD  is a read only and partitioned collection of data. It can be created from storage or other RDDs. There two types operation on RDDs, transformations and actions. Transformations are operations that will create a new RDD from the existing one, for example \textit{filter}is a transformation operation. The power of RDDs lie in their internal structure, they do not need to be materialized all the time. If a RDD is created using a transformation, it will hold information about how the transformation was made and only apply them to the data once the user requests that through an action or caching the data set. Actions are operations that will materialize the dataset. Users can also ask the RDD to be stored in memory if they know they are going to use its value many times. These characteristics of RDD makes the perfect tool for performing iterative applications. Many machine learning algorithms require iterative calls to the same dataset. This is one of MapReduce's deficiency since every algorithm and job has to be written in terms of Map and Reduces. Spark with the help of RDDs allow many of the well known machine learning algorithms to be applied to without much change to actual algorithm. With success of Spark, it had become part of the Hadoop framework. Recent versions can now on top of Yarn and they have integration with HDFS and other Hadoop components. 
+A typical Spark program is consists of a driver program that launches multiple workers. Worker programs are run on data nodes. upon execution of a program, Spark will try to send the computation to where the data is, hence minimizing the network traffic. Spark tracks where the RDDs and their partitions are.
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/sparkprogram.png}
+\caption{Spark Program}
+\end{figure}
+
+ User's can control RDDs behavior by persisting it, or caching it. Tests performed on Spark showed that it is 100x times faster than MapReduce and it is able to run application that are not even possible to run using MapReduce. Spark is fault tolerant by means of RDDs. Since RDDs track the changes made to them, they can be recreated. So if a node containing some partitions of RDDs are lost they can be recreated using the these information. 
+ 
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/rdd.png}
+\caption{Spark stages and RDDs}
+\end{figure}
+Figure above shows how Spark computes job stages. Boxes with solid outlines are RDDs. Partitions are shaded rectangles, in black if they are cached. To run an action on RDD G, the scheduler builds stages at wide dependencies and pipelines narrow transformations inside each stage. In this case, stage 1 does not need to run since B is cached, so we run 2 and then 3. If any of the stages fail, the computation will restart from the last healthy RDD. Also if a node containing some specific partitions of an RDD fails, the RDD will be transferred to another node and the computation will be restarted. 
+
+Spark contains a Machine learning framework named MLib and graph processing framework named GraphX . 
 
 \subsection{Graph}
 Definition of Graph, a more detailed literate review. Maybe I can move some of the stuff from Introduction, or try to complement them
