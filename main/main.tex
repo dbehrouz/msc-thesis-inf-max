@@ -175,6 +175,7 @@ The input is a chain graph with three vertices (black) and two edges (green). Th
 On a cluster level, a graph is distributed into several connected components and each one is stored in one of the computation nodes. Each cluster, has a master node that coordinates the other nodes. It will decide on which components should be stored on each device and it stored reference and tables of information about the vertices and edges and where they resides. It will ensure the supersteps are synchronized, i.e. it makes sure all vertices have finished their computation in the current superstep before starting the next superstep. It will monitor the status of the components and decide when to end the program by checking if there are any active vertices or not. 
 \subsection{GraphX}
 
+
 \subsection{GraphLab}
 GraphLab is a graph processing framework, tailored for big data sets. There are three versions of GraphLab :
 \begin{itemize}
