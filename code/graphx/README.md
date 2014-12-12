@@ -1,0 +1,7 @@
+To run the simulation :
+
+spark-submit --class "com.bd.propogation.ic.Simulation" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/hep.txt data/active.txt 1 0.2
+
+To run Independent Cascade Greedy method:
+
+spark-submit --class "com.bd.propogation.ic.GreedyIC" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/hep.txt 40 1 0.2 output.txt

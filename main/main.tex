@@ -135,19 +135,46 @@ A typical Spark program is consists of a driver program that launches multiple w
 Figure above shows how Spark computes job stages. Boxes with solid outlines are RDDs. Partitions are shaded rectangles, in black if they are cached. To run an action on RDD G, the scheduler builds stages at wide dependencies and pipelines narrow transformations inside each stage. In this case, stage 1 does not need to run since B is cached, so we run 2 and then 3. If any of the stages fail, the computation will restart from the last healthy RDD. Also if a node containing some specific partitions of an RDD fails, the RDD will be transferred to another node and the computation will be restarted. 
 
 Spark contains a Machine learning framework named MLib and graph processing framework named GraphX . 
+Spark works very well with iterative algorithms, it doesn't have MapReduce limitation which is the result of each job has to be written to disk. Spark has in memory computation which will speed up the process. 
+% Spark Word Count Problem in Java and Scala
 
 \subsection{Graph}
-Definition of Graph, a more detailed literate review. Maybe I can move some of the stuff from Introduction, or try to complement them
+A graph G is a pair (V, E), where V is a set of vertices and E is links between the vertices ($E \subset V * V$). Graphs can be directed, or undirected. 
+%Define what is a graph in general
+% nodes and vertices
+% its use cases
 
 \subsubsection{Graph Frameworks}
 Older graph frameworks, how they used work. A short overview of some important and common frameworks. Why there's a need for scalable frameworks
+% Graph in computer
+% Single threaded ones
+% Why don't they suffice today's data
+
 
 \subsubsection{Big Graph}
 What is it, where does it come from, why is it important to have frameworks capable of processing massive graphs
 
 \subsection{Giraph}
-Apache Giraph is an iterative graph processing framework, built on top of Apache Hadoop. It is the open source version of Pregel by Google \cite{malewicz10} . Its input is a graph consists of vertices and edges. Each vertex and edge contains value as well, hence the input to a \textbf{Giraph} program besides from the structure of the vertices and edges includes their initial values. The project is now being actively developed by several companies. It is being used in many real case scenarios. For example, Facebook is using it to analyze the graphs formed by users and their connection with their friends. Similar to Pregel, the computation model of Giraph is Bulk Synchronous Parallel(TODO : reference). 
-Figure below shows the work flow of Giraph . (TODO, source or create your own graph)
+Apache Giraph is an iterative graph processing framework, built on top of Apache Hadoop. It is the open source version of Pregel by Google \cite{malewicz10} . Its input is a graph consists of vertices and edges. Each vertex and edge contains value as well, hence the input to a \textbf{Giraph} program besides from the structure of the vertices and edges includes their initial values. The project is now being actively developed by several companies. It is being used in many real case scenarios. For example, Facebook is using it to analyze the graphs formed by users and their connection with their friends. Similar to Pregel, the computation model of Giraph is Bulk Synchronous Parallel \cite{valiant90}. A BSP computation model consists of three physical components : 
+\begin{itemize}
+\item
+A component capable of local processing
+\item
+A network for transferring messages
+\item
+A hardware which synchronizes the components
+\end{itemize}
+BSP programs are run in parallel on each processing components and then the messages are transferred between these nodes. All of the computations are done in steps and after each step is done all the components should wait until every other component have finished its processing and sends messages to other components. \\
+The architecture fits very well with BigGraph computations in a way that vertices will process data individually and send messages along the edges (or directly) to other vertices in each step. The process can be parallelized then so that all or as many vertices as possible will perform computation at the same time and send messages and at the end of each step (which is called a super step in BSP) they will wait to synchronize with other vertices. 
+The computation will continue until all vertices are inactive or no more messages were sent during a step. This figure shows the general process in BSP models : 
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/bsp.png}
+\caption{Bulk Synchronous Parallel}
+\end{figure}
+
+Based on BSP, Giraph first distribute all the vertices to different nodes, users can define the partitioning behavior so it would suite the specific kind of algorithm they are going to run. Generally the idea is to have vertices that are connected on the same node, since most of the communications are done through edges and hence this would minimize the network traffic across the cluster. Computation then begins in a series of super steps, in each one messages from the previous super step are gathered by each vertex, the vertex will do its computation and send new messages to other vertices, at the end of the each superstep, all the vertices are synchronized, counters that keep track of the status of the cluster are updated, users can also define counters and aggregators. For example, finding the vertex with the maximum value in each iteration or etc. Giraph has a series of built in aggregators and users can define their own. At the end of the computation vertices can send a command to master node telling it that they'd like to halt and done computing, their state is changed to in active and it will stay like that unless new messages are sent to those vertices. When all the vertices are in active the computation will halt and the result will be reported.
+Figure below shows how computation is done in Giraph . (TODO, source or create your own graph)
 \begin{figure}[ht!]
 \centering
 \includegraphics[width=130mm]{figures/giraphdataflow.png}
@@ -173,29 +200,25 @@ The figure below shows supersteps involved with computing the single source shor
 The input is a chain graph with three vertices (black) and two edges (green). The values of edges are 1 and 3 respectively. The algorithm computes distances from the leftmost vertex. The initial values of vertices are 0, $\infty$ and $\infty$ (top row). Distance upper bounds are sent as messages (blue), resulting in updates to vertex values (successive rows going down). The execution lasts three supersteps (separated by red lines).
 
 On a cluster level, a graph is distributed into several connected components and each one is stored in one of the computation nodes. Each cluster, has a master node that coordinates the other nodes. It will decide on which components should be stored on each device and it stored reference and tables of information about the vertices and edges and where they resides. It will ensure the supersteps are synchronized, i.e. it makes sure all vertices have finished their computation in the current superstep before starting the next superstep. It will monitor the status of the components and decide when to end the program by checking if there are any active vertices or not. 
+Although it has many advantages over MapReduce, it is still has many limitations, in one Giraph job many iterations can be done, but if graphs should go through several transformation that would require multiple Giraph jobs, which means that the data has be written to HDFS after each job which adds overhead. A lot of the Machine learning and graph algorithms and problems are iterative in nature, which will cause Giraph to have severe performance issues in some of these cases. 
+% Sample code 
 \subsection{GraphX}
-
-
-\subsection{GraphLab}
-GraphLab is a graph processing framework, tailored for big data sets. There are three versions of GraphLab :
-\begin{itemize}
-\item
-Shared memory, multi-core parallel GraphLab
-\item
-Distributed GraphLab
-\item
-PowerGraph
-
-\end{itemize} 
+% Where did it come from
+% Advantages over Giraph and traditional MapReduce and Spark
+% Limitations 
 
 
 %\enlargethispage{5mm}
 \subsection{Social Graphs}
 
 \subsection{Influence Maximization}
+% What is Influence Maximization
+% Where is it applicable
+% Examples where it can be useful
 Influence maximization problem is divided into two major parts. The first one is to find the graph of users (nodes) where edges between each user show the probability of  a user influencing the other. The second part is
 based on this graph find a set of users that are proven to have the highest influence over others, in other words 
 this limited group of users can maximize the influence through the network.
+
 
 In \cite{kempe03} they have studied models by which influence propagates through social networks. They have discussed two diffusion models \\
 \textit{Linear Threshold Model} and \textit{Independent Cascade Models} . In \textit{Linear Threshold Model} each node $v$ is influence by each neighbor $w$ acourding to a weight $b_v,w$ such that $\sum \nolimits_{w \, neighbor \, of \, v} b_v,w < 1$ . The diffusion process hence is as follows; each node $v$ will randomly chose a weight threshold $0 < \theta_v<1 $, this value determines tendency of node $v$ to become activated. Starting from the initial seed set, in each iteration for each node if the sum of the weight of its active neighbors become greater than the threshold then the node will become active, i.e. $\sum \nolimits_{w \, active neighbor \, of \, v} b_v,w  \geq \theta_v $. The process is deterministic however since $\theta_v$ is chosen at random, it shows our lack of knowledge their values. \textit{Independent Cascade Models} is a stochastic undeterministic process. It starts with an initial set of seeds, and in each time step $t$ every active node will try once to activate all of its neighbors, the probability of a node $v$ activating one of its neighbors $w$ is either define by a system property $p_v,w$ or is governed by the weight of the edge $w_v,w$. The process continues until no more new node can become active. 
@@ -203,7 +226,7 @@ In \cite{kempe03} they have studied models by which influence propagates through
 The problem of influence maximization which is finding an initial set that will maximizes the profit( target function) is NP-hard . 
 Formal definition : it asks for a parameter k, to find a k-nod set of maximum influence. They used approximation with a natural greedy hill-climbing strategy which will guarantee a 63 percent of the optimal solution performance (reference) . For the approximation to work , he target function should be sub-modular, they have proved that for both models the target function is indeed sub-modular.  They have run experiments on co-authorship in physics theory section of arXiv (www.arxiv.org) . The results show that their greedy algorithm performs better that other methods such as random selection, high-degree or central nodes discussed in book Social Network Analysis by S. Wasserman (find reference) \\
 \cite{domingo01} discusses the use case of influence maximization in marketing. They first, described how to model a market as a social network. Making each individual user only dependent on its neighbors, the product and the marketing action(Markov random field). Through these a function was devised that calculates the global lift in profit given a marketing action was applied to some users. Starting from an initial configuration, using different optimization algorithms a local maxima for the function can be reached. 
-They experimented on a collaborative filtering data set (MovieLenz) in which users have rated a list of movies. They have first constructed the network using the user rating, by choosing similar users( calculating the Pearson correlation coefficient of users) as neighbours . They have performed experiments on the data set and compared their method with mass marketing and direct marketing. Their method has increased the profit the most. Due to non-linearly of the model, it did not scale well for bigger size networks, hence they have proposed a new linear model \cite{domingo02}. Not only the new model decreased the computation time time, the simplified equation for calculating the network value of customers, made it easier to incorporate more complex marketing action. They have experimented with Epinions (cite) data set. Which is a website where users can rate items. It also has a feature called trusted users, where each user can select many other users as trusted sources of reviews. Domingo et .al, hence, applied their model to the dataset, but considering trusted users of a user his neighbors. Their experiments showed that a continuous marketing action (a marketing action that can have unlimited values, such as a discount) performs much better than boolean marketing actions (one that can either be true or false, such whether or not a discount should be given to a user with no regards for the amount of the discount ). 
+They experimented on a collaborative filtering data set (MovieLenz) in which users have rated a list of movies. They have first constructed the network using the user rating, by choosing similar users( calculating the Pearson correlation coefficient of users) as neighbors . They have performed experiments on the data set and compared their method with mass marketing and direct marketing. Their method has increased the profit the most. Due to non-linearly of the model, it did not scale well for bigger size networks, hence they have proposed a new linear model \cite{domingo02}. Not only the new model decreased the computation time time, the simplified equation for calculating the network value of customers, made it easier to incorporate more complex marketing action. They have experimented with Epinions (cite) data set. Which is a website where users can rate items. It also has a feature called trusted users, where each user can select many other users as trusted sources of reviews. Domingo et .al, hence, applied their model to the dataset, but considering trusted users of a user his neighbors. Their experiments showed that a continuous marketing action (a marketing action that can have unlimited values, such as a discount) performs much better than boolean marketing actions (one that can either be true or false, such whether or not a discount should be given to a user with no regards for the amount of the discount ). 
 \cite{cheng13} Have addressed both the accuracy and scalability of the solutions using the greedy methods. They have pointed out the main bottle neck in methods based on \cite{kempe03} are in the Monte Carlo simulation steps. They have proven that the objective function is not entirely sub-modular due to the randomness in the simulations, and hence to compensate for that many Monte Carlo simulations have to be run in each step of the algorithm which greatly reduces the performance. Present the proof here ....\\
 They proposed a new method called StaticGreedy which uses precomputed a series of snapshots at the beginning of the algorithm and reuses those for every step of the greedy algorithm.  They have defined the two terms, snapshots and simulations which can be both used for the Monte Carlo simulations. \\
 \begin{itemize}
@@ -252,7 +275,7 @@ Their observation is that, if A is subset of B, the marginal gain of adding a no
 \subsection{Use cases research and industry}
 
 \section{Big data and Network Influence Maximization}
-Several Graph processing frameworks have been developed over the passed few years, that are making large scale graph processing a lot simpler. But they are imposing certain set of restrictions that will make applying some classes of algorithms more difficult. Bulk Synchronous Processing is the base of all the large scale graph frameworks where they are using the method of \textit{Think Like a Vertex}. Although this has many benefits but when it comes to classical IC and LT models, some difficulties will rise. In BSP model, usually algorithms that only need local data are implemented a lot simpler, but in influence maximization we need global aoccess to the network and to find out how many new nodes were affected by adding a node to the initial seed. The whole process is a randomized simulation that should be run hundreds or thousands of time to get a better and more accurate result. Large scale data processing usually suffers in this area, because initializing jobs given huge amount of data whether it is in graph format or others, take up some time and that is something that should be avoided . 
+Several Graph processing frameworks have been developed over the passed few years, that are making large scale graph processing a lot simpler. But they are imposing certain set of restrictions that will make applying some classes of algorithms more difficult. Bulk Synchronous Processing is the base of all the large scale graph frameworks where they are using the method of \textit{Think Like a Vertex}. Although this has many benefits but when it comes to classical IC and LT models, some difficulties will rise. In BSP model, usually algorithms that only need local data are implemented a lot simpler, but in influence maximization we need global access to the network and to find out how many new nodes were affected by adding a node to the initial seed. The whole process is a randomized simulation that should be run hundreds or thousands of time to get a better and more accurate result. Large scale data processing usually suffers in this area, because initializing jobs given huge amount of data whether it is in graph format or others, take up some time and that is something that should be avoided . 
 The main challenges when implementing the methods using BSP models are hence, finding ways to avoid the iterative and simulation like implementation and trying to generalize the whole simulation cycle into one BSP job.
  Step one, given a graph with vertices without values and edges donating probabilities, output a graph with vertices marked as initial seed and edges untouched. 
 In step two, given the output of step one return the expected spread of the initial seed, which is an integer indicating how many nodes where activated when running the IC model.

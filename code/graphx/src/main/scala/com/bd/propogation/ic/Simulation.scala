@@ -24,39 +24,19 @@ object Simulation extends Logging {
   val NOT_ACTIVE: Int = 0
   val TRIED: Int = 2
   val SKIP: Int = -1
-  var EDGE_WEIGHT = 0.01
 
-  def main(args: Array[String]) {
-    val start = System.currentTimeMillis
-    val conf = new SparkConf().setAppName("IC Simulation")
-    val sc = new SparkContext(conf)
-    val inputGraphFile = args(0)
-    val activeNodesFile = args(1)
-    val iterations = args(2).toInt
-    println("Number of Simulations: " + iterations)
+  def run(graph: Graph[Int, Int],
+          activeNodes: List[VertexId],
+          iterations: Int,
+          prob: Double): Double = {
 
-    if (args.length == 4)
-      EDGE_WEIGHT = args(3).toDouble
-    println("Propagation Prob : " + EDGE_WEIGHT)
-
-    val activeNodes = sc.textFile(activeNodesFile)
-      .flatMap(l => l.split(','))
-      .map(l => l.toInt)
-      .collect
-      .toList
-
-    println("Number of Initial Active Nodes" + activeNodes.length)
-
-    val icGraph = EdgeListTransformer
-      .transform(GraphLoader.edgeListFile(sc, inputGraphFile))
-      .mapVertices {
+    val icGraph = graph.mapVertices {
       (id, attr) =>
         if (activeNodes.contains(id))
           ACTIVE
         else
           NOT_ACTIVE
     }.cache()
-
 
     def vertexProgram(id: VertexId, attr: Int, msg: Int): Int = {
       if (msg == SKIP) {
@@ -75,7 +55,7 @@ object Simulation extends Logging {
 
     def sendMessage(edge: EdgeTriplet[Int, Int]) = {
       if (edge.srcAttr == ACTIVE) {
-        if (math.random < EDGE_WEIGHT) {
+        if (math.random < prob) {
           Iterator((edge.dstId, ACTIVE))
         } else {
           Iterator.empty
@@ -104,16 +84,43 @@ object Simulation extends Logging {
       }
     }
 
+    (sum.toDouble / iterations.toDouble)
+  }
+
+
+  // get the graph
+  // filter all active vertices
+  // try to active along edges
+  // change the attr of active vertices to some other constant
+  // do until no vertices are "active" anymore
+  // return number of vertices activated in the process
+  def main(args: Array[String]) {
+    val start = System.currentTimeMillis
+    val conf = new SparkConf().setAppName("IC Simulation")
+    val sc = new SparkContext(conf)
+    val inputGraphFile = args(0)
+    val activeNodesFile = args(1)
+    val iterations = args(2).toInt
+    println("Number of Simulations: " + iterations)
+    val prob = args(3).toDouble
+    println("Propagation Prob : " + prob)
+
+    val activeNodes = sc.textFile(activeNodesFile)
+      .flatMap(l => l.split(','))
+      .map(l => l.toLong)
+      .collect
+      .toList
+
+
+    println("Number of Initial Active Nodes " + activeNodes.length)
+    val graph = EdgeListTransformer
+      .transform(GraphLoader.edgeListFile(sc, inputGraphFile))
+
+    val spread = run(graph, activeNodes, iterations, prob)
+    println("Total Spread: " + spread)
+
     var totalTime = System.currentTimeMillis - start
     println("Total Time : " + totalTime.toDouble / 1000)
-    println("Expected Spread : " + (sum.toDouble / iterations.toDouble))
-
-    // get the graph
-    // filter all active vertices
-    // try to active along edges
-    // change the attr of active vertices to some other constant
-    // do until no vertices are "active" anymore
-    // return number of vertices activated in the process
 
 
   }
