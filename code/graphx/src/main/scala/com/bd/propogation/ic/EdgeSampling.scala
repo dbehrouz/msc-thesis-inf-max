@@ -20,19 +20,27 @@ object EdgeSampling extends SeedFinder {
     var vs = graph.mapVertices((id, attr) => 0L).vertices
     for (i <- 1 to iterations) {
       // sample based on probability
-      val sampledGraph = graph.subgraph(epred = e => math.random < e.attr)
+      val sampledGraph = graph.subgraph(epred = e => math.random < e.attr).cache
 
       // vertex id, component id
-      val cc = sampledGraph.connectedComponents().vertices
+      val cc = sampledGraph.connectedComponents().vertices.cache
 
       // Group by component id
+      // a map of component ids to size of component
       val ccSize = cc.groupBy(_._2).map(c => (c._1, c._2.size.toLong)).collect().toList.toMap
 
       vs = cc.mapValues(value => ccSize.get(value).get).leftJoin(vs) {
         case (id, val1, val2) => val1 + val2.get
-      }
+      }.cache
+
+      val oldVs = vs
+
       println("Iteration : " + i)
-      println(vs.top(seedSize)(Ordering.by(_._2)))
+      println(vs.top(seedSize)(Ordering.by(_._2)).toList)
+      oldVs.unpersist(blocking = false)
+      sampledGraph.unpersistVertices(blocking = false)
+      sampledGraph.edges.unpersist(blocking = false)
+      cc.unpersist(blocking = false)
     }
     sc.parallelize(vs.top(seedSize)(Ordering.by(_._2))).map(_._1)
   }
