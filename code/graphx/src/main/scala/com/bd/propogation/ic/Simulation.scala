@@ -20,15 +20,14 @@ import org.apache.spark.{SparkContext, SparkConf, Logging}
  * @author Behrouz Derakhshan
  */
 object Simulation extends Logging {
-  val ACTIVE: Int = 1
-  val NOT_ACTIVE: Int = 0
-  val TRIED: Int = 2
-  val SKIP: Int = -1
+  val ACTIVE: Long = 1
+  val NOT_ACTIVE: Long = 0
+  val TRIED: Long = 2
+  val SKIP: Long = -1
 
-  def run(graph: Graph[Int, Int],
+  def run(graph: Graph[Long, Double],
           activeNodes: List[VertexId],
-          iterations: Int,
-          prob: Double): Double = {
+          iterations: Int): Double = {
 
     val icGraph = graph.mapVertices {
       (id, attr) =>
@@ -38,7 +37,7 @@ object Simulation extends Logging {
           NOT_ACTIVE
     }.cache()
 
-    def vertexProgram(id: VertexId, attr: Int, msg: Int): Int = {
+    def vertexProgram(id: VertexId, attr: Long, msg: Long): Long = {
       if (msg == SKIP) {
         attr
       }
@@ -53,9 +52,9 @@ object Simulation extends Logging {
       }
     }
 
-    def sendMessage(edge: EdgeTriplet[Int, Int]) = {
+    def sendMessage(edge: EdgeTriplet[Long, Double]) = {
       if (edge.srcAttr == ACTIVE) {
-        if (math.random < prob) {
+        if (math.random < edge.attr) {
           Iterator((edge.dstId, ACTIVE))
         } else {
           Iterator.empty
@@ -65,7 +64,7 @@ object Simulation extends Logging {
       }
     }
 
-    def messageCombiner(a: Int, b: Int) = ACTIVE
+    def messageCombiner(a: Long, b: Long) = ACTIVE
 
     val initialMessage = SKIP
 
@@ -108,15 +107,15 @@ object Simulation extends Logging {
     val activeNodes = sc.textFile(activeNodesFile)
       .flatMap(l => l.split(','))
       .map(l => l.toLong)
-      .collect
+      .collect()
       .toList
 
 
     println("Number of Initial Active Nodes " + activeNodes.length)
     val graph = EdgeListTransformer
-      .transform(GraphLoader.edgeListFile(sc, inputGraphFile))
+      .transform(GraphLoader.edgeListFile(sc, inputGraphFile), prob)
 
-    val spread = run(graph, activeNodes, iterations, prob)
+    val spread = run(graph, activeNodes, iterations)
     println("Total Spread: " + spread)
 
     var totalTime = System.currentTimeMillis - start

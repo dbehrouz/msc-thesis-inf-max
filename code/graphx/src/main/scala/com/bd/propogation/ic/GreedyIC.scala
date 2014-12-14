@@ -1,36 +1,24 @@
 package com.bd.propogation.ic
 
-import com.bd.util.EdgeListTransformer
-import org.apache.spark.{SparkContext, SparkConf}
+import com.bd.SeedFinder
+import org.apache.spark.SparkContext
 import org.apache.spark.graphx._
-import scala.util.control.Breaks._
+import org.apache.spark.rdd.RDD
 
-import scala.reflect.io.File
+import scala.util.control.Breaks._
 
 /**
  * Single Cycle IC, each vertex tries to propagate based on edge weight
  * Assume constant edge weight of 0.01 for now
  * @author Behrouz Derakhshan
  */
-object GreedyIC {
+object GreedyIC extends SeedFinder{
   // args : graph location (edgeFileList), output location
-  def main(args: Array[String]) {
-    val conf = new SparkConf().setAppName("Greedy Algorithm")
-    val sc = new SparkContext(conf)
-
-    val inputGraphFile = args(0)
-    val seedSize = args(1).toInt
-    println("Seed Size :" + seedSize)
-    val iterations = args(2).toInt
-    println("Iterations :" + iterations)
-    val prob = args(3).toDouble
-    println("Propagation Probability: " + prob)
-    // read graph and pre process it
-    val graph = EdgeListTransformer.transform(GraphLoader.edgeListFile(sc, inputGraphFile))
+  override def run(graph: Graph[Long, Double], seedSize: Int, iterations: Int, sc: SparkContext): RDD[VertexId] = {
     val vertices = graph.vertices.collect.toList.map(l => (l._1, 0.0))
 
     var sorted = vertices.map {
-      v => (v._1, Simulation.run(graph, List(v._1), iterations, prob))
+      v => (v._1, Simulation.run(graph, List(v._1), iterations))
     }
 
     var initialSeed = List[VertexId]()
@@ -41,7 +29,7 @@ object GreedyIC {
       breakable {
         for (j <- 0 to sorted.length) {
           val activeNodes = sorted(j)._1 :: initialSeed
-          val spread = Simulation.run(graph, activeNodes, iterations, prob)
+          val spread = Simulation.run(graph, activeNodes, iterations)
           if (spread > bestVertex._2) {
             bestVertex = (sorted(j)._1, spread)
             if (j < sorted.length - 1 && spread > sorted(j + 1)._2) {
@@ -57,14 +45,7 @@ object GreedyIC {
       initialSeed = bestVertex._1 :: initialSeed
       println("Initial Seed : " + initialSeed)
     }
-
-    def output = if (args.length == 5) args(4) else "target/activenodes.txt"
-
-    println("Final Initial Seed : " + initialSeed)
-
-    File(output).writeAll(initialSeed.toString)
-
-
+    sc.parallelize(initialSeed)
   }
 
 }
