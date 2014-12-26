@@ -1,6 +1,6 @@
 To run the simulation :
 
-spark-submit --class "com.bd.propogation.ic.Simulation" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/hep.txt output/ 10000 0.05
+spark-submit --class "com.bd.propogation.ic.Simulation" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/hep.txt output-cc/ 1 1.0
 
 To run Independent Cascade Greedy method:
 
@@ -13,3 +13,11 @@ spark-submit --class "com.bd.InfluenceMax" --master local[*] target/spark-graphx
 To run Degree Method:
 
 spark-submit --class "com.bd.InfluenceMax" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar degree data/hep.txt 40 10 0.01 output-degree
+
+To run Random Method:
+
+spark-submit --class "com.bd.InfluenceMax" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar random data/hep.txt 40 10 0.01 output-random
+
+To run cc(connected components) methods:
+
+spark-submit --class "com.bd.InfluenceMax" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar cc data/hep.txt 40 10 0.01 output-cc

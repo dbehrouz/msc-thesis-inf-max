@@ -12,7 +12,7 @@ import scala.util.control.Breaks._
  * Assume constant edge weight of 0.01 for now
  * @author Behrouz Derakhshan
  */
-object GreedyIC extends SeedFinder{
+object GreedyIC extends SeedFinder {
   // args : graph location (edgeFileList), output location
   override def run(graph: Graph[Long, Double], seedSize: Int, iterations: Int, sc: SparkContext): RDD[VertexId] = {
     val vertices = graph.vertices.collect.toList.map(l => (l._1, 0.0))

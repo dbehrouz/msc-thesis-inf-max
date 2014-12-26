@@ -1,7 +1,7 @@
 package com.bd
 
 import com.bd.propogation.heuristic.{DegreeDiscount, Degree}
-import com.bd.propogation.ic.{GreedyIC, EdgeSampling}
+import com.bd.propogation.ic.{ConnectedComponents, RandomMethod, GreedyIC, EdgeSampling}
 import com.bd.util.EdgeListTransformer
 import org.apache.spark.graphx._
 import org.apache.spark.rdd.RDD
@@ -29,7 +29,12 @@ object InfluenceMax extends Logging {
     } else if ("greedyic".equals(method)) {
       println("Running Greedy IC method")
       GreedyIC.run(graph, seedSize, iterations, sc)
-    } else {
+    } else if ("random".equals(method)) {
+      RandomMethod.run(graph, seedSize, iterations, sc)
+    } else if ("cc".equals(method)) {
+      ConnectedComponents.run(graph, seedSize, iterations, sc)
+    }
+    else {
       throw new IllegalArgumentException
     }
   }
