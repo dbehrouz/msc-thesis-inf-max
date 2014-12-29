@@ -76,14 +76,14 @@ object Simulation extends Logging {
       sum += Pregel(icGraph, initialMessage, activeDirection = EdgeDirection.Out)(
         vertexProgram, sendMessage, messageCombiner)
         .vertices.filter(vd => vd._2 == ACTIVE || vd._2 == TRIED)
-        .collect.length
+        .collect().length
       iter += 1
       if (iter % 50 == 0) {
         println("iter : " + iter)
       }
     }
 
-    (sum.toDouble / iterations.toDouble)
+    sum.toDouble / iterations.toDouble
   }
 
 
