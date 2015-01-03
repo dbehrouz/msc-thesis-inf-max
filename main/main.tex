@@ -231,11 +231,11 @@ The greedy algorithm proposed by Kempe i \cite{kempe03} is as follows
 \Require k,G(V,E)
 \State A = $\emptyset$
 \For {i = 1 to k}
-\For {every $v \in V$ and $v \notin A$}
-\State $\delta_v = \sigma(v)$
-\EndFor
-\State $v^* = \argmax_v \{\delta_v\}$
-\State $A = A \cup v^*$
+	\For {every $v \in V$ and $v \notin A$}
+		\State $\delta_v = \sigma(v)$
+	\EndFor
+	\State $v^* = \argmax_v \{\delta_v\}$
+	\State $A = A \cup v^*$
 \EndFor
 \end{algorithmic}
 \end{algorithm}
@@ -243,8 +243,10 @@ They have run experiments on co-authorship in physics theory section of arXiv \f
 Both in estimating the spread and also in the greedy method, $\sigma (A)$ has to be calculated, but both of the propagation models are non-deterministic. To overcome this, the model is run many times (10000 times) and the spread is the average of all the runs. The nature of the spread function makes the algorithm highly non scalable. Even on medium sized graphs running the simulation thousands of time will take a lot of time, but on the other hand a good solution is only guaranteed if the simulation is run many times. From Algorithm \ref{alg:KempeInfMax1} it can be observed that $\sigma(v)$ is run for every node in every iteration, this will greatly affect the performance of the greedy method.
 Leskovec et .al \cite{leskovec07}  in their Cost effective outbreak detection in networks, took upon the task of optimizing the greedy method used in propagation in graph networks. Although they did not work on solving the problem of maximizing influence they have proven their method can be adapted to the problem of maximizing the influence using the greedy algorithm. They studied two problems from different domains which share similarities. The first problem is find the best placement of sensors in a water network, so that contaminated water can be detected as quickly as possible. The other problem is blog network, which is to find blogs that contains the maximum amount of news that cascades from different sources in shortest possible time. Their advanced greedy method, called CELF, utilizes the submodularity of the objective function, which reduces the amount of computation needed to be made in each iteration. Their method is 700 times faster than a simple greedy function. 
 Their observation is that, if A is subset of B, the marginal gain of adding a node to B is always less than or equal to the marginal gain of the adding the same node to A. Hence instead of recomputing the gain for all the node in each iteration, we can go through the nodes in decreasing order of their spread and recompute their values, the change is usually very small and most of the time the value on top of the list stays on top. 
-\cite{chen09}proposed several different methods for solving the problem of Influence Maximization. The first group of algorithms, were improvement upon Kempe \cite{kempe03} and Leskovec \cite{leskovec07} greedy method. In their greedy method, they have modified the simulation process. Instead of trying to activate nodes based on the edge probability one by one, they have first created a new Graph $G'$ which is sampled from the original graph based on the edge probability. Now the process of estimating the spread of initial set $S$ is just finding the number of reachable nodes in $G'$ from $S$, this process is repeated many times and the result is the average for all of the $G'$ sampled Graphs. Although this method is much faster than the original greedy method, it cannot compete with Leskovec \cite{leskovec07} CELF method, since in their method only in the first iteration the spread for all the nodes are calculated and from the second iteration onward, due to submodularity only the spread for a few of the nodes are recalculated. Hence, they have combined their new Greedy method with CELF, where in the first iteration they use the sample graphs to calculate the spread and in the following iterations CELF is used. The second class of algorithms they have proposed are a set of heuristics for finding the set of the seed that maximizes the influence. Prior to their work, heuristics have been considered inferior to the Greedy method and while that is true for many of the heuristics, such as degree, random, distance and etc., their proposed heuristic called \textit{DegreeDiscountIC}managed to achieve almost the same spread with the greedy method while outperforming the greedy methods by orders of magnitude. Below is the description of \textit{DegreeDiscountIC} heuristic. 
+\cite{chen09}proposed several different methods for solving the problem of Influence Maximization. The first group of algorithms, were improvement upon Kempe \cite{kempe03} and Leskovec \cite{leskovec07} greedy method. In their greedy method, they have modified the simulation process. Instead of trying to activate nodes based on the edge probability one by one, they have first created a new Graph $G'$ which is sampled from the original graph based on the edge probability. Now the process of estimating the spread of initial set $S$ is just finding the number of reachable nodes in $G'$ from $S$, this process is repeated many times and the result is the average for all of the $G'$ sampled Graphs. Although this method is much faster than the original greedy method, it cannot compete with Leskovec \cite{leskovec07} CELF method, since in their method only in the first iteration the spread for all the nodes are calculated and from the second iteration onward, due to submodularity only the spread for a few of the nodes are recalculated. Hence, they have combined their new Greedy method with CELF, where in the first iteration they use the sample graphs to calculate the spread and in the following iterations CELF is used. The second class of algorithms they have proposed are a set of heuristics for finding the set of the seed that maximizes the influence. Prior to their work, heuristics have been considered inferior to the Greedy method and while that is true for many of the heuristics, such as degree, random, distance and etc., their proposed heuristic called \textit{DegreeDiscountIC}managed to achieve almost the same spread with the greedy method while outperforming the greedy methods by orders of magnitude. Details of the algorithm \textit{DegreeDiscountIC} is explained in section 3 %TODO REF
+It is one of the methods implemented . 
 
+Other notable heuristic method is of Saito and Kimura \cite{kimura06}. They have investigated the scalability issue of IC model simulations. They have argued that the current simulation model in ICM requires many iterations and each iteration took a lot of processing time and power. They have proposed two natural special cases of the ICM such that a good estimate of this quantity can be efficiently computed. They define the Shortest-Path Model(SPM) which is a special case of the ICM such that each node $v$has the chance to become active only at step = $d(A,v)$ , where if $A$ is the initial set, $d(A,v)$ is the distance of $A$ to node $v$. This means that each node is activated only through the shortest paths from the initial active set. The other model they have proposed named SP1M, which is each node v has the chance to become active only at steps t = d(A,v) and t =d(A,v) + 1. Through these two models they have proposed methods for calculating the spread of an initial set A. They have proved that the result achieved using this method is also within a bound of the best solution. In their experiments, they have assigned a uniform probably to each edge with two different values p = 0.1 and p =0.01. The experiments showed that the estimation of the spread for ICM increases as p increases while the processing times for the SPM and SP1M hardly change. 
 
 \cite{cheng13} Have addressed both the accuracy and scalability of the solutions using the greedy methods. They have pointed out the main bottle neck in methods based on \cite{kempe03} are in the Monte Carlo simulation steps. They have proven that the objective function is not entirely sub-modular due to the randomness in the simulations, and hence to compensate for that many Monte Carlo simulations have to be run in each step of the algorithm which greatly reduces the performance. Present the proof here ....\\
 They proposed a new method called StaticGreedy which computes a series of snapshots at the beginning of the algorithm and reuses those for every step of the greedy algorithm.  They have defined two terms, snapshots and simulations which can be both used for the Monte Carlo simulations. \\
@@ -264,12 +266,10 @@ Two main difference between this method and the previous ones are :
 \item
 Monte Carlo simulations are conducted in static snapshot manner, which are sampled before the greedy process of selecting seed nodes
 \item
-The same set of snapshots are reused in every iteration to estimate the influence spread I(S), which explains the meaning of ''static''
+The same set of snapshots are reused in every iteration to estimate the influence spread $I(S)$, which explains the meaning of ''static''
 \end{itemize}
 
 They have performed experiment and compared their methods with the normal Greedy methods. None of the other greedy methods are any match with StaticGreedy in terms of speed and scalability. 
-Saito and Kimura \cite{kimura06} have also investigated the scalability issue of ICM simulations. They have argued that the current simulation model in ICM requires many iterations and each iteration took a lot of processing time and power. They have proposed two natural special cases of the ICM such that a good estimate of this quantity can be efficiently computed. They define the Shortest-Path Model(SPM) which is a special case of the ICM such that each node v has the chance to become active only at step = d(A,v) , where if A is the initial set d(A,v) is the distance of A to node v. This means that each node is activated only through the shortest paths from the initial active set. The other model they have proposed named SP1M, which is each node v has the chance to become active only at steps t = d(A,v) and t =d(A,v) + 1. Through these two models they have proposed methods for calculating the spread of an initial set A. They have proved that the result achieved using this method is also within a bound of the best solution. In their experiments, they have assigned a uniform probably to each edge with two different values p = 0.1 and p =0.01. The experiments showed that the estimation of the spread for ICM increases as p increases while the processing times for the SPM and SP1M hardly change. They have also \\
-
 
 \subsection{Learning Influence Probabilities}
 \cite{goyal10} have tackled the problem of forming the social graph whose edges have the probability of a user
@@ -286,19 +286,52 @@ specially with DT and CT models. CT outperformed DT by a very small amount, but 
 In another paper, Goyal et al \cite{goyal11} have also tackled the problem of influence maximization directly. Instead of first learning the edge probabilities and then finding the optimum seed set, they have proposed a method to directly find the optimal seed set based on the action log .
 
 \section{Big data and Network Influence Maximization}
-The original greedy method proposed by Kempe \cite{kempe03} has been improved upon and several methods were proposed that improved the speed of the algorithm considerably. However, non of the proposed methods are scalable and they can only operate on small to medium sized graphs. Currently, there are companies and organizations that have graphs of millions to billions of nodes of even more edges, and the greedy method cannot be applied to any of these graphs. Even on most powerful clusters running the method for one iteration will might take hours rendering the method completely useless. While heuristic methods are fairly fast and feasible but they do not provide a very good solution and even calculating the spread for these big graphs is not a trivial task. In this section, I will explain briefly the frameworks and methods that I have used to implement influence maximization algorithms. Some of methods are fairly simple heuristics and some are based on the methods discussed in previous sections with tweaks that make it possible to implement it on big graphs. Changes have to be made to the original algorithms inorder to implement the methods using the current graph frameworks built for processing extremely large graphs. These frameworks are imposing certain set of restrictions that will make applying some classes of algorithms more difficult. Bulk Synchronous Processing is the base of all the large scale graph frameworks where they are using the method of \textit{Think Like a Vertex}. Although this has many benefits but when it comes to classical IC and LT models, some difficulties will rise. In BSP model, usually algorithms that only need local data are implemented a lot simpler, but in influence maximization we need global access to the network and to find out how many new nodes were affected by adding a node to the initial seed. The whole process is a randomized simulation that should be run hundreds or thousands of time to get a better and more accurate result. Large scale data processing usually suffers in this area, because initializing jobs given huge amount of data whether it is in graph format or others, take up some time and that is something that should be avoided . 
+The original greedy method proposed by Kempe \cite{kempe03} has been improved upon and several methods were proposed that improved the speed of the algorithm considerably. However, non of the proposed methods are scalable and they can only operate on small to medium sized graphs. Currently, there are companies and organizations that have graphs of millions to billions of nodes of even more edges, and the greedy method cannot be applied to any of these graphs. Even on most powerful clusters running the method for one iteration will might take hours rendering the method completely useless. While heuristic methods are fairly fast and feasible but they do not provide a very good solution and even calculating the spread for these big graphs is not a trivial task. Not to mention some of the heuristic methods that involve fairly simple computations on the graph, such as shortest path and all pair shortest path, that are not very feasible to run on big scale graphs and no efficient algorithms have been proposed. //
+In this section, I will explain briefly the frameworks and methods that I have used to implement influence maximization algorithms. Some of methods are fairly simple heuristics and some are based on the methods discussed in previous sections with tweaks that make it possible to implement it on big graphs. Changes have to be made to the original algorithms inorder to implement the methods using the current graph frameworks built for processing extremely large graphs. These frameworks are imposing certain set of restrictions that will make applying some classes of algorithms more difficult. Bulk Synchronous Processing is the base of all the large scale graph frameworks where they are using the method of \textit{Think Like a Vertex}. Although this has many benefits but when it comes to classical IC and LT models, some difficulties will rise. In BSP model, usually algorithms that only need local data are implemented a lot simpler, but in influence maximization we need global access to the network and to find out how many new nodes were affected by adding a node to the initial seed. The whole process is a randomized simulation that should be run hundreds or thousands of time to get a better and more accurate result. Large scale data processing usually suffers in this area, because initializing jobs given huge amount of data whether it is in graph format or others, take up some time and that is something that should be avoided . 
 The main challenges when implementing the methods using BSP models are hence, finding ways to avoid the iterative and simulation like implementation and trying to generalize the whole simulation cycle into one BSP job.
  Step one, given a graph with vertices without values and edges donating probabilities, output a graph with vertices marked as initial seed and edges untouched. 
 In step two, given the output of step one return the expected spread of the initial seed, which is an integer indicating how many nodes where activated when running the IC model.
 There are two classes of algorithm, Greedy which are iterative and heuristic based which only decide on choosing the best nodes given local information of a vertex. below is the implementation of some different methods.
-\subsection{Simple Implementation}
-Based on \cite{kempe03} \textbf{Independent Cascade} method, I have implemented a simple \textbf{BSP} method. However, as discussed earlier, iteration based algorithms are very time consuming to run in big data. The algorithm presented below, is limited version of the method. It removes the need for the simulation and it only runs it once. 
+While there are many frameworks suitable for extremely large graphs, I have chosen Graphx based on Spark's framework. Its advantage over other frameworks such as Giraph is that it can both implement BSP like and iterative algorithms efficiently. 
+\subsection{Monte Carlo Simulation}
+On the baseline of most of the methods, lies the \textit{Monte Carlo Simulation}. It represent the Independent Cascade propagation process. Given an initial seed, it will calculate the expected spread, by running the process thousands of times and report the average spread for the initial active set. The distributed method differs from the original implementation in the way the propagation is spread through vertices. In single machine computation, for each vertex in the graph, if the vertex is active it will try to influence all of its neighbors only once and the process continues until no new vertices become active. In distributed implementation, all of the vertices will try to activate their neighbors at once. 
 \begin{algorithm}[ht!]
-\floatname{algorithm}{IndependentCascade}
+\caption{Monte Carlo Simulation}
+\label{alg:simulation}
+\floatname{algorithm}{Algorithm}
+\begin{algorithmic}
+\Require $S$ = initial seed, $R$ = \# of iterations
+\State $s_i=0$ for all $0<i<R$
+\For {$i$ = 1 to $R$}
+	\State $A=S$ 
+	\For {each $v \in A$}
+		\If {$v_{state} \neq tried$}
+			\For {for each $u \in v_{neighbors}$}
+				\State try to activate $u$
+				\If {$u_{state} = active $}
+					\State $A=A\cup \{u\}$
+				\EndIf
+			\EndFor
+			\State $v_{state} = tried$
+		\EndIf
+	\EndFor
+	\State $s_i=|A|$	
+\EndFor
+\State Output $avg(s)$
+\end{algorithmic}
+\end{algorithm}
+Each vertex carries information about its state. As can be seen from the algorithm, in each iteration of the simulation, every active vertex will try to activate its neighbors, and then change its state to \textit{tried} so it doesn't try to activate again in the next iterations. If a vertex is activated, its state is changed to \textit{active} and it is added to the active set. The process continues until all of the vertices in active set $A$ have tried activating the neighbors and no new vertex is added. The spread of that iteration of the simulation is then stored as the size of the active set $A$ . The final result is the average of all the spreads for every simulation iteration. This is a time consuming procedure because of the number of iterations in the simulation. But this algorithm is not the being used in any of the main methods for finding the initial seeds and it is rather for estimating the spread of a seed. I am only using the procedure to have a baseline of how good an initial seed is and running it even with few number of iterations should give an acceptable estimate.
+
+\subsection{Single Cycle Influence Maximization}
+Based on \cite{kempe03} \textbf{Independent Cascade} method, \textit{Single Cycle Influence Maximization} is a simpler and less accurate version of the original algorithm. Implemented using the \textbf{BSP} paradigm, it finds the vertices with maximum influence spread in one iteration, by simulating the Independent Cascade process for all the vertices at once.
+\begin{algorithm}[ht!]
+\floatname{algorithm}{Algorithm}
+\caption{Single Cycle Influence Maximization}
+\label{alg:singleccycleIM}
 \begin{algorithmic}
 \If {superstep == 0}
 	\State add your own id to list of influencedBy an increase vertex value by one
-	\State try to activate all neighbors 
+	\State try to activate all neighbors by sending its own id
 \Else
 	\State receive message from every one (message is the id of the vertex)
 	\For {each message received}
@@ -309,28 +342,25 @@ Based on \cite{kempe03} \textbf{Independent Cascade} method, I have implemented 
 			\State add to influecedBy list
 			\State notify source vertex
 			\State vote to halt
-		\EndIf
-		
+		\EndIf	
 	\EndFor
 \EndIf
 \end{algorithmic}
-\caption{Simple Method}
 \end{algorithm}
-
-Every vertex starts by sending its own id to all of its neighbors along the edge, this is a probabilistic process, governed by the edge weight between the two nodes. Every node will then check all the incoming messages. There are two types of messages, a message which is the id of another vertex, which means the vertex has successfully activated the current vertex. As soon as a vertex encounters such a message, it will send another message directly to the original vertex indicating that it has been activated. Once this message is seen by the initiating vertex, the vertex will increment its internal counter by 1. All the vertices keep track of which of their neighbors they have already tried to activate so the activation process does not happen more than once for each neighbor. While trying to activate a neighbor by sending its own id, every vertex will also send the vertex id of vertices that it has been affected by so far. After the algorithm is finished running, each vertex knows how many other vertices it has managed to activate. We report the top $k$ vertices as the solution to the problem. Draw backs of this method are :
+Each vertex contains information about the number of nodes it has affected, and the list of nodes it is affected by. The algorithm is written as point of view of a vertex, that means every vertex executes these steps until the master decides the computation has ended; which either when all of the vertices have voted to halt or a limit for number of iterations is reached. Each vertex sends its own id at the first super step to all of its neighbors, the reason the vertex id is being sent and not just a simple \textbf{Boolean} value is that each vertex has to know who has activated it and store their id and send a message back to them. In the first iteration, when vertices activate their neighbors, any successful activation will be carried on with the affected vertex. For example, if vertex $v_2$ was activated by vertex $v_1$ and now it is trying to activate vertex $v_3$ it will send both its own id $v_2$ and id of the vertex that activated it $v_1$ and subsequently when $v_3$ tries to activate its neighbors it will send its own id as well as $v_1$ and $v_2$. When a vertex is activated it will send a message back to the source of the activation, informing it that it has been activated and the source can now increment its total spread by 1. At the end of the procedure, each vertex has a value indicating its expected spread. The top $k$ vertices are reported as the best initial seed. While this method is fast and performs well on very large graphs it has some draw backs:
 \begin{itemize}
-\item Activation of a new node is done through only one single random process, based on edge weight
-\item All nodes are trying to activate others independent of other nodes, depending on network structure this could have some affect on the final result
-\item Since each vertex, is sending it's own id and id of vertices that it has been affected by, it might create network traffic. But it is safe to assume that real big data graphs are sparse and generally a vertex effect cannot go beyond a limited number of hops.
-
+\item Activation of a new node is done through only one single random process, based on edge weight.
+\item All nodes are trying to activate others, independent of other nodes, depending on network structure this could have some affect on the final result
+\item Since each vertex, is sending it's own id and id of vertices that it has been affected by, it might create network traffic.
 \end{itemize}
 
-\cite{leskovec07} et al. observed that the element on the top of the list hard ever changes, and in those few occasions that it does it is due the randomness and probability of edges, so in very large scale networks can we simply ignore this fact and just chose the top k nodes by running the algorithm once on the data set . This is of course a very naive implementation . But a good test case, trade of between the quality of the solution and the time it takes to find the `best` solution is an interesting factor here. 
+Point one indicates that the result may vary between different runs, because instead other the Monte Carlo Simulation consisting of thousands of iterations, we are only running the simulation once. In the original greedy algorithm, in each iteration one vertex is added the current initial set and the spread is calculated based on the new initial set and the vertex that increases the spread the most is chosen to be added next, but here all of the vertices are operating in silos, disregarding the network effect. Consider an example where two neighbor vertices, individually has the highest spread among all vertices, \ref{alg:singleccycleIM} will report both of them in the final result, but in reality having two neighboring nodes is not a very good idea, since nodes affected by one are usually affected by the neighbor as well. The last point about network traffic, while in worst case scenarios might be extremely inefficient and in some cases bring the whole cluster down, but that is hardly the case in real big graphs, since first of all most of the big graphs are extremely sparse and the propagation probabilities are so small that a vertex id hardly has to travel more than a few nodes. The idea for this method originates from the observation that Leskovec et al. \cite{leskovec07} made. They have stated, vertices with the best spread in the a iteration of the algorithm usually will have the best spread in the consecutive iterations and in those few occasions that it does it is due the randomness and probability of edges, so in very large scale networks can we simply ignore this fact and just chose the top $k$ nodes by running the algorithm once on the data set . This is of course a very naive implementation . But a good test case, trade of between the quality of the solution and the time it takes to find the `best` solution is an interesting factor here. 
 
 \subsection{Token Based Implementation}
-A variation of \textbf{Simple Implementation}method, where the simulation aspect of the \textbf{Independent Cascade} is implemented. In this algorithm, each vertex, instead of trying to activate its neighbors only once, it will try many times. Vertices, will keep many tokens with unique ids. Each token can be tracked back to the vertex it self. In each superstep a vertex will try to activate its neighbors once with every token. If a node is activates using a token, it will notify the originating vertex. The vertex will increment its internal counter for that specific token. Once no new nodes are activated, the program ends and all the vertices will report the average of token counters as their expected spread. Top $k$ nodes then can be selected as the initial seed.
+A variation of \textbf{Simple Implementation}method, where the simulation aspect of the \textbf{Independent Cascade} is implemented. In this algorithm, each vertex, instead of trying to activate its neighbors only once, it will try many times. Vertices, will keep many tokens with unique ids. Each token can be tracked back to the vertex it self. In each superstep a vertex will try to activate its neighbors once with every token. If a node is activates using a token, it will notify the original source vertex. The vertex will increment its internal counter for that specific token. Once no new nodes are activated, the program ends and all the vertices will report the average of token counters as their expected spread. Top $k$ nodes then can be selected as the initial seed.
 \begin{algorithm}[ht!]
-\floatname{algorithm}{IndependentCascade}
+\floatname{algorithm}{Algorithm}
+\caption{Token Based Influence Maximization}
 \begin{algorithmic}
 \If {superstep == 0}
 	\State add your own id to list of influencedBy an increase all token counter values by one
@@ -353,45 +383,42 @@ A variation of \textbf{Simple Implementation}method, where the simulation aspect
 	\EndFor
 \EndIf
 \end{algorithmic}
-\caption{Token Based}
 \end{algorithm}
+The number of tokens for each vertex determines the accuracy the algorithm, while having thousands of token will basically yield the same result as the actual Monte Carlo Simulation, but in real graphs this is not practical because that means each vertex has to carry a lot of extra information. Choosing the best number of tokens hence is a trade off between a better solution and a faster algorithm. In the (TODO ref) Experiment section, it is discussed how the number of tokens is being chosen. 
 
-\subsection{Single Discount Heuristic}
-It is similar to Degree Heuristic with the exception that, if for a node v, one of its neighbor is already a seed we will not count that edge towards v's degree i.e reducing the degree by one.
-
-\subsection{Random Seed}
-Chose seeds randomly, this is again for comparison only
-
-\subsection{Degree Heuristic}
-A simple implementation where nodes with highest degree are selected as seed.
+\subsection{Edge Sampling}
+Inspired on \cite{chen09} and \cite{cheng13} method. In \textit{Edge Sampling} method the Independent Cascade process is tackled differently. This method is still using one or a few Monte Carlo Simulations, so in theory it is not as accurate as the Greedy methods, but it can achieve very good results and the number of Simulations can be easily extended as the procedure is very fast. In each iteration of the simulation, instead of having each vertex try to activate its neighbors based on edge probability, a subgraph $G'$ is being sample from the original graph $G$ based on the edge probabilities. Each edge $e$ will remain in the subgraph $G'$ with probability of $e_w$, where $e_w$ is the weight of the edge. $G'$ is now a graph with many unconnected components, in this new graph we can define each vertex $v$'s estimated spread that belong to connected component $C$ as $v_{spread} = C$, the reason for that is since the edges are already sampled by their probabilities, that means any existing edge will definitely propagate the message . Here we can report the top $k$ vertices as the solution. \\
+As discussed in Single Cycle Influence Maximization section, one draw back of blindly choosing the vertices with the highest estimated spread was that, vertices that are neighbors or are in the same connected components, will have negative effects on the final spread since having both in the initial seed is redundant, in this method how ever since we know each vertex belongs to which connected components, instead of reporting the top $k$ vertices, we can report one vertex from the top $k$ connected components, that is the connected components with highest number vertices in them. The algorithm can also decrease the noise of the randomness by using many sample subgraphs and averaging the best vertices from all of the samples. The algorithm's definition is presented below.
 \begin{algorithm}[ht!]
-\floatname{algorithm}{IndependentCascade}
+\caption{Edge Sampling}
+\label{alg:edgesampling}
+\floatname{algorithm}{Algorithm}
 \begin{algorithmic}
-\If {$superstep == 0$}
-	\State calculate your degree
-	\State send your degree and ID to MaxAggregator
-\ElsIf {superstep $\leq k$}
-	\State $maxVertex=MaxAggregator.value()$
-	\If{$this = maxVertex$}
-		\State set this to ACTIVE
-		\State vote to halt
-	\Else
-		\State send your degree and ID to MaxAggregator
-	\EndIf
-\Else
-	\State vote to halt
-\EndIf
+\Require $R$ = \# of iterations
+\Require $k$ = seed size
+\State $v_{total}=0$ for all $v \in G$
+\For {$i$ = 1 to $R$}
+	\State sample $G'$ from $G$ based on edge probabilities
+	\State $C =$ connected components if $G'$
+	\For {every vertex $v \in G'$}
+       	\State $v_{total} = v_{total} + |C_v|$ where $v \in C_v$
+	\EndFor
+\EndFor
+\For {every vertex $v \in G$}
+	\State $v_{spread}=v_{total}/R$
+\EndFor
+\State Output top $k$ vertices based on their spread
 \end{algorithmic}
-\caption{Degree Heuristic}
 \end{algorithm}
 
-\subsection{Kimura and Saito (Tractable models for information diffusion in social networks )}
+%\subsection{Kimura and Saito (Tractable models for information diffusion in social networks )}
 
-\subsection{Efficient Influence Maximization in Social Networks(Degree Discount)}
-Here's the detail of Wei Chen's Degree Discount IC Algorithm. It does not require simulation, it simply is based on a heuristic which is derived from the degree of a node but it is affected by its neighbor. 
-Here's the Algorithm \newline
+\subsection{Degree Discount Heuristic}
+In previous section, Chen et al. \cite{chen09} heuristic for choosing the best vertices for initial seed were discussed. Their method has several advantages that make it easy to implement, and very fast and scalable. This method does not require a simulation as it is a simple heuristic based on the degree of each vertex. According to Chen et al. it yields an extremely good result which is in par with greedy methods. Since the method is simply working vertices individually it is ideal for a BSP graph framework.
 \begin{algorithm}[ht!]
-\floatname{algorithm}{IndependentCascade}
+\floatname{algorithm}{Algorithm}
+\caption{Degree Discount}
+\label{alg:degreedicount}
 \begin{algorithmic}
 \State $S=\emptyset$
 \For{each vertex $v$}
@@ -409,18 +436,13 @@ Here's the Algorithm \newline
 \EndFor
 \State output $S$
 \end{algorithmic}
-\caption{Degree Discount}
 \end{algorithm}
 
-\subsection{Edge Sampling}
-Based on \cite{cheng13} method. Here static graphs are being sampled from the main one based on the edge probability. For each sampled graph, all the connected components are found and for each vertex the size of its connected components is considered as the spread. This process is run many times and the best vertices which has the highest average spread are chosen as the initial seed. It is different from StaticGreedy in a sense that static greedy algorithm was operating on vertices one by one and chose the best one and add them .
-\subsection{Social Influence Analysis in Large-scale Networks}
-\subsection{Influence Maximization in Giraph}
-\subsection{Influence Maximization in Spark}
-\subsection{Influence Maximization in GraphLab}
-\subsection{Comparison}
-Compare all three on similar datasets. Start with single node implementation and comparison. Smaller graphs and then very large graphs.
-\subsection{Other challenges and open questions}
+\subsection{Other Heuristics}
+\textbf{Random}: $k$ Random vertices are selected as the solution. This is used as a baseline for other methods to see if they perform better than just choosing nodes at random. \\
+\textbf{Degree}: Degree of a vertex is defined as the number of edges connected to a vertex. In this method, the vertices with the highest degree are chosen as the initial seed. \\ 
+\textbf{Single Discount}: Improved version of Degree heuristic. After a vertex is chosen as the seed, it is removed from the graph, that means all of its neighbors' degree are reduced by one. This yields a better result that Degree heuristic, since it lower the chance of neighboring vertices to be selected as the initial seed. \\ 
+\textbf {Page Rank} : Based on the popular Page Rank algorithm %TODO explain page rank
 
 \section{Experiments}
 \subsection{Data set}
