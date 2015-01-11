@@ -71,10 +71,9 @@ object Simulation extends Logging {
     var iter = 0
     var sum = 0
 
-
     while (iter < iterations) {
-      sum += Pregel(icGraph, initialMessage, activeDirection = EdgeDirection.Out)(
-        vertexProgram, sendMessage, messageCombiner)
+      sum += Pregel(icGraph, initialMessage,
+        activeDirection = EdgeDirection.Out)(vertexProgram, sendMessage, messageCombiner)
         .vertices.filter(vd => vd._2 == ACTIVE || vd._2 == TRIED)
         .collect().length
       iter += 1
@@ -110,18 +109,14 @@ object Simulation extends Logging {
       .collect()
       .toList
 
-
     println("Number of Initial Active Nodes " + activeNodes.length)
-    val graph = EdgeListTransformer
-      .transform(GraphLoader.edgeListFile(sc, inputGraphFile), prob)
+    val graph = EdgeListTransformer.transform(GraphLoader.edgeListFile(sc, inputGraphFile), prob)
 
     val spread = run(graph, activeNodes, iterations)
     println("Total Spread: " + spread)
 
     var totalTime = System.currentTimeMillis - start
     println("Total Time : " + totalTime.toDouble / 1000)
-
-
   }
 
 }

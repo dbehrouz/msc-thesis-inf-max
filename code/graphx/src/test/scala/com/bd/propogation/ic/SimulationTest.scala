@@ -128,7 +128,7 @@ class SimulationTest extends AssertionsForJUnit {
   }
 
   @Test def runWithSimpleTree() {
-    val size = 100
+    val size = 10
 
     val spread = Simulation.run(simpleTree(size), List(1L), 1)
     if (size != spread.toInt) {
