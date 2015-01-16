@@ -21,3 +21,7 @@ spark-submit --class "com.bd.InfluenceMax" --master local[*] target/spark-graphx
 To run cc(connected components) methods:
 
 spark-submit --class "com.bd.InfluenceMax" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar cc data/hep.txt 40 10 0.01 output-cc
+
+To run Degree Discount methods:
+
+spark-submit --class "com.bd.InfluenceMax" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar degreediscount data/hep.txt 40 10 0.01 output-dd

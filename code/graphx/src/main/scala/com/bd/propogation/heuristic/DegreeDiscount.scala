@@ -2,8 +2,9 @@ package com.bd.propogation.heuristic
 
 import com.bd.SeedFinder
 import org.apache.spark.SparkContext
-import org.apache.spark.graphx.{EdgeDirection, Pregel, VertexId, Graph}
+import org.apache.spark.graphx.{Graph, VertexId}
 import org.apache.spark.rdd.RDD
+import scala.util.control.Breaks._
 
 /**
  * @author Behrouz Derakhshan
@@ -17,15 +18,47 @@ object DegreeDiscount extends SeedFinder {
   }
 
   override def run(graph: Graph[Long, Double], seedSize: Int, iterations: Int, sc: SparkContext): RDD[VertexId] = {
-    var degreeGraph = Graph(graph.outDegrees.mapValues((vid, d) => (d, 0, 0)), graph.edges)
+    // vertex (d, dd, t)
+    val newVertices = graph.vertices.leftJoin(graph.outDegrees.mapValues((vid, d) => (d, d.toDouble, 0))) {
+      case (vid, val1, None) => (0, 0.0, 0)
+      case (vid, val1, val2) => val2.get
+    }
+    var degreeGraph = Graph(newVertices, graph.edges)
     var seed = List[VertexId]()
     for (i <- 1 to seedSize) {
-      val v = degreeGraph.vertices.top(1)(Ordering.by(_._2._1)).map(_._1).toList(0)
-      seed = v :: seed
-      Pregel(degreeGraph, initialMessage, activeDirection = EdgeDirection.Out)(
-        vprog = (id, attr, msg) => math.min(attr, msg),
-        sendMsg = sendMessage,
-        mergeMsg = (a, b) => math.min(a, b))
+      val vList = degreeGraph.vertices.top(seedSize)(Ordering.by(_._2._2)).map(_._1).toList
+      var chosen: Long = 0L
+      breakable {
+        for (v <- vList) {
+          if (!seed.contains(v)) {
+            chosen = v
+            break
+          }
+        }
+      }
+      seed = chosen :: seed
+      val neighbors = sc.broadcast(degreeGraph.edges.filter {
+        e => e.srcId == chosen
+      }.map {
+        _.srcId
+      }.collect.toList)
+
+      degreeGraph = degreeGraph.mapVertices {
+        (vid, attr) => {
+          if (neighbors.value.contains(vid)) {
+            val d = attr._1
+            val t = attr._3 + 1
+            val dd = d - 2 * t - (d - t) * t * 0.01
+            (d, dd, t)
+          } else {
+            attr
+          }
+        }
+      }
+      println("iteration " + i + " ended")
     }
+    sc.parallelize(seed)
   }
 }
+
+
