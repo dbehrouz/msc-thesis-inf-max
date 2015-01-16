@@ -10,7 +10,6 @@ import org.apache.spark.rdd.RDD
  */
 object RandomMethod extends SeedFinder {
   override def run(graph: Graph[Long, Double], seedSize: Int, iterations: Int, sc: SparkContext): RDD[VertexId] = {
-    val count = graph.vertices.count
-    graph.vertices.sample(false, seedSize.toFloat / count.toFloat).map(_._1)
+    sc.parallelize(graph.vertices.takeSample(false, seedSize).map(_._1))
   }
 }

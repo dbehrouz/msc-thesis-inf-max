@@ -16,13 +16,15 @@ import org.apache.spark.rdd.RDD
  */
 object EdgeSampling extends SeedFinder {
   def run(graph: Graph[Long, Double], seedSize: Int, iterations: Int, sc: SparkContext): RDD[VertexId] = {
+
     var vs = graph.mapVertices((id, attr) => 0L).vertices
+
     for (i <- 1 to iterations) {
       // sample based on probability
       val sampledGraph = graph.subgraph(epred = e => math.random < e.attr)
 
       // vertex id, component id
-      val cc = sampledGraph.connectedComponents().vertices.persist(StorageLevels.MEMORY_ONLY)
+      val cc = ConnectedComponents.runCC(sampledGraph).vertices.persist(StorageLevels.MEMORY_ONLY)
 
       // Group by component id
       // a map of component ids to size of component

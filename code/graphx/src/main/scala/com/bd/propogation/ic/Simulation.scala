@@ -54,7 +54,7 @@ object Simulation extends Logging {
 
     def sendMessage(edge: EdgeTriplet[Long, Double]) = {
       if (edge.srcAttr == ACTIVE) {
-        if (math.random < edge.attr) {
+        if (math.random <= edge.attr) {
           Iterator((edge.dstId, ACTIVE))
         } else {
           Iterator.empty
@@ -69,13 +69,13 @@ object Simulation extends Logging {
     val initialMessage = SKIP
 
     var iter = 0
-    var sum = 0
+    var sum = 0L
 
     while (iter < iterations) {
       sum += Pregel(icGraph, initialMessage,
         activeDirection = EdgeDirection.Out)(vertexProgram, sendMessage, messageCombiner)
         .vertices.filter(vd => vd._2 == ACTIVE || vd._2 == TRIED)
-        .collect().length
+        .count
       iter += 1
       if (iter % 50 == 0) {
         println("iter : " + iter)
