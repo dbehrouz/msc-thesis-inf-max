@@ -446,16 +446,12 @@ Compared to other heuristic methods that will be discussed in the next section, 
 \section{Experiments}
 \subsection{Data set}
 \subsubsection{ArXiv collaboration network data set}
-Two data sets from the e-print arXiv is chosen for testing. Same two data sets have been used in \cite{kempe03} and \cite{chen09}. The data set contains academic collaboration for scientific research papers. In this data set, vertices represent researchers and edges define a collaboration between two researchers on writing a scientific paper. There are in total two networks, one from the ''High Energy Physics - Theory'' section with papers from 1991 to 2003, which contains 15,233 nodes and 58,981 edges. The other network is form the fuller paper list of ''Physics'' section, which contains 37,154 nodes and 231,584 edges. The data sets in graph formats were made available for public by \cite{chen09}. It can be found at http://research.microsoft.com/en-us/people/weic/graphdata.zip . The size of this data set is small, the main purpose for including this data set is to have a benchmark and try to test the result of the methods implemented and proposed here with the state of the art methods. A lot of the experiments on maximizing network influence were made on these two networks.
+Two data sets from the e-print arXiv is chosen for testing. Same two data sets have been used in \cite{kempe03} and \cite{chen09}. The data set contains academic collaboration for scientific research papers. In this data set, vertices represent researchers and edges define a collaboration between two researchers on writing a scientific paper. Two data sets have been chosen, they have been used by several other researchers in the field of influence maximization and can provide a good comparison for the quality of the methods. The data sets are very small comparing two the data sets currently considered as Big Data, but since there aren't many previous research done in Big Data, I have used these two to test the accuracy of the methods on smaller data set and compare them to the state of the art influence maximization algorithm in smaller scale. There are in total two networks : 
 \begin{itemize}
-\item 
-
+\item High Energy Physics - Theory : contains papers from 1991 to 2003, with 15,233 nodes and 58,981 edges.
+\item Physics : contains all papers in  physics from the same year range as physics - theory, with 37,154 nodes and 231,584 edges.
 \end{itemize}
-
-
-
-
-
+The data sets in graph formats were made available for public by \cite{chen09}. It can be found at http://research.microsoft.com/en-us/people/weic/graphdata.zip. It is in \textbf{Edge List Format} where each line of the file, contains two values which the source and destination of an edge. A sample of the data set is shown in appendix A (TODO add appendix)
 \section{Conclusion}
 In conclusion
 \pagebreak
