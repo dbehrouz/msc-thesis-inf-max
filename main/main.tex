@@ -407,12 +407,12 @@ As discussed in Single Cycle Influence Maximization section, one draw back of bl
 \State Output top $k$ vertices based on their spread
 \end{algorithmic}
 \end{algorithm}
-
+As with other methods, some modifications have to be made to make this method more suitable in parallel frameworks. The connected components can be efficiently calculated in parallel using \textbf{BSP} model. It is already implemented as part of \textit{GraphX} library. To further optimize the algorithm, changed have been made to the connected component algorithm of \textit{GraphX}. Since for each vertex, we only need the size of the its corresponding connected component, we can modify the original algorithm to instead of reporting the connected component id, it will report the size of the connected component. The result of the new connected component algorithm would then be the list of vertices, each vertex carrying its id and corresponding connected components size. In this method, the connected component size is equal to the expected spread for each algorithm. The algorithm starts by initializing the list of all vertices. Every vertex's expected spread is 0 at the beginning. In each iteration of the simulation, the sizes are updated based on component size. The update can be done simply by doing a join. Vertex joins are very efficient in \textit{GraphX}, can be done very quickly. Increasing the number of simulations will increase the accuracy, but it also slows down the process. In the next sections, these trade offs will be discussed and the result of the algorithm will be presented.
 %\subsection{Kimura and Saito (Tractable models for information diffusion in social networks )}
 
 \subsection{Degree Discount Heuristic}
 \label{subsec:degreediscount}
-In previous section, Chen et al. \cite{chen09} heuristic for choosing the best vertices for initial seed were discussed. Their method has several advantages that make it easy to implement, and very fast and scalable. This method does not require a simulation as it is a simple heuristic based on the degree of each vertex. According to Chen et al. it yields an extremely good result which is in par with greedy methods. Since the method is simply working vertices individually it is ideal for a BSP graph framework.
+In previous section, Chen et al. \cite{chen09} heuristic for choosing the best vertices for initial seed were discussed. Their method has several advantages that make it easy to implement, and very fast and scalable. This method does not require a simulation as it is a simple heuristic based on the degree of each vertex. According to Chen et al. it yields an extremely good result which is in par with greedy methods. Since the method is simply working vertices individually it is ideal for a BSP graph framework. 
 \begin{algorithm}[ht!]
 \floatname{algorithm}{Algorithm}
 \caption{Degree Discount}
@@ -435,30 +435,24 @@ In previous section, Chen et al. \cite{chen09} heuristic for choosing the best v
 \State output $S$
 \end{algorithmic}
 \end{algorithm}
+Compared to other heuristic methods that will be discussed in the next section, this method is more difficult to implement in a \textbf{BSP} model. The number of iterations the algorithm runs depends on the seed size. Basically, after initializing all the vertices, in each iteration the best vertex is chosen and added to the seed set. After that, the values for the neighbors of the selected vertex will be changed based on the formula presented in the algorithm. This means for a seed set of size $k$, the algorithm runs for $k$ iterations. This will make the implementation in \textbf{BSP} a bit more difficult. But with \textit{GraphX} the state of the graph can be easily tracked, local changes can efficiently be applied. Hence the time complexity of the algorithm is linear and it increases linearly with the number of expected seeds
 
 \subsection{Other Heuristics}
 \textbf{Random}: $k$ Random vertices are selected as the solution. This is used as a baseline for other methods to see if they perform better than just choosing nodes at random. \\
 \textbf{Degree}: Degree of a vertex is defined as the number of edges connected to a vertex. In this method, the vertices with the highest degree are chosen as the initial seed. \\ 
 \textbf{Single Discount}: Improved version of Degree heuristic. After a vertex is chosen as the seed, it is removed from the graph, that means all of its neighbors' degree are reduced by one. This yields a better result that Degree heuristic, since it lower the chance of neighboring vertices to be selected as the initial seed. \\ 
-\textbf {Page Rank} : Based on the popular Page Rank algorithm %TODO explain page rank
+\textbf {Page Rank} : Based on the popular Page Rank algorithm \cite{page99}, the algorithm was originally used in Google's search engine, to rank websites based on their importance. 
 
 \section{Experiments}
 \subsection{Data set}
 \subsubsection{ArXiv collaboration network data set}
-Two data sets from the e-print arXiv is chosen for testing. Same two data sets have been used in \cite{kempe03} and \cite{chen09}. The data set contains academic collaboration for scientific research papers. There are in total two networks, one from the ''High Energy Physics - Theory'' section with papers from 1991 to 2003, which contains 15,233 nodes and 58,981 edges. The other network is form the fuller paper list of ''Physics'' section, which contains 37,154 nodes and 231,584 edges. The data sets in graph formats were made available for public by \cite{chen09}. It can be found at http://research.microsoft.com/en-us/people/weic/graphdata.zip . The size of this data set is small, the main purpose for including this data set is to have a benchmark and try to test the result of the methods implemented and proposed here with the state of the art methods. A lot of the experiments on maximizing network influence were made on these two networks.
+Two data sets from the e-print arXiv is chosen for testing. Same two data sets have been used in \cite{kempe03} and \cite{chen09}. The data set contains academic collaboration for scientific research papers. In this data set, vertices represent researchers and edges define a collaboration between two researchers on writing a scientific paper. There are in total two networks, one from the ''High Energy Physics - Theory'' section with papers from 1991 to 2003, which contains 15,233 nodes and 58,981 edges. The other network is form the fuller paper list of ''Physics'' section, which contains 37,154 nodes and 231,584 edges. The data sets in graph formats were made available for public by \cite{chen09}. It can be found at http://research.microsoft.com/en-us/people/weic/graphdata.zip . The size of this data set is small, the main purpose for including this data set is to have a benchmark and try to test the result of the methods implemented and proposed here with the state of the art methods. A lot of the experiments on maximizing network influence were made on these two networks.
+\begin{itemize}
+\item 
 
-Present several data sets that the experiments will be based on .
-Except specified, the Vertex and Edge data types are as follow.
-Vertex Data Type  :
-\begin{itemize}
-\item ID : Long
-\item Value : Long (0 inactive, 1 active, 2 Done computing which is only used during the computation and essentially means the node is active)
 \end{itemize}
-Edge Data Type : 
-\begin{itemize}
-\item ID : Long
-\item Value : Float, probability of activating the incident vertex)
-\end{itemize}
+
+
 
 
 
