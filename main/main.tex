@@ -381,7 +381,7 @@ A variation of \textbf{Simple Implementation}method, where the simulation aspect
 \EndIf
 \end{algorithmic}
 \end{algorithm}
-The number of tokens for each vertex determines the accuracy the algorithm, while having thousands of token will basically yield the same result as the actual Monte Carlo Simulation, but in real graphs this is not practical because that means each vertex has to carry a lot of extra information. Choosing the best number of tokens hence is a trade off between a better solution and a faster algorithm. In the (TODO ref) Experiment section, it is discussed how the number of tokens is being chosen. 
+The number of tokens for each vertex determines the accuracy the algorithm, while having thousands of token will basically yield the same result as the actual Monte Carlo Simulation, but in real graphs this is not practical because that means each vertex has to carry a lot of extra information. Choosing the best number of tokens hence is a trade off between a better solution and a faster algorithm. In the (TODO ref) Experiment section, it is discussed how the number of tokens is being chosen. Similar to previous method, depending on the structure of the graph, this method may produce a lot of network overhead, due to the amount of communication that is being done between between nodes. Also it will require a bigger storage since each vertex has to store the spread for many different simulations. So choosing the number of the simulation, not only slows down the process, but it will also increases the risk of a crash in the system, due to size and network overhead.
 
 \subsection{Edge Sampling}
 Inspired on \cite{chen09} and \cite{cheng13} method. In \textit{Edge Sampling} method the Independent Cascade process is tackled differently. This method is still using one or a few Monte Carlo Simulations, so in theory it is not as accurate as the Greedy methods, but it can achieve very good results and the number of Simulations can be easily extended as the procedure is very fast. In each iteration of the simulation, instead of having each vertex try to activate its neighbors based on edge probability, a subgraph $G'$ is being sample from the original graph $G$ based on the edge probabilities. Each edge $e$ will remain in the subgraph $G'$ with probability of $e_w$, where $e_w$ is the weight of the edge. $G'$ is now a graph with many unconnected components, in this new graph we can define each vertex $v$'s estimated spread that belong to connected component $C$ as $v_{spread} = C$, the reason for that is since the edges are already sampled by their probabilities, that means any existing edge will definitely propagate the message . Here we can report the top $k$ vertices as the solution. \\
@@ -408,7 +408,6 @@ As discussed in Single Cycle Influence Maximization section, one draw back of bl
 \end{algorithmic}
 \end{algorithm}
 As with other methods, some modifications have to be made to make this method more suitable in parallel frameworks. The connected components can be efficiently calculated in parallel using \textbf{BSP} model. It is already implemented as part of \textit{GraphX} library. To further optimize the algorithm, changed have been made to the connected component algorithm of \textit{GraphX}. Since for each vertex, we only need the size of the its corresponding connected component, we can modify the original algorithm to instead of reporting the connected component id, it will report the size of the connected component. The result of the new connected component algorithm would then be the list of vertices, each vertex carrying its id and corresponding connected components size. In this method, the connected component size is equal to the expected spread for each algorithm. The algorithm starts by initializing the list of all vertices. Every vertex's expected spread is 0 at the beginning. In each iteration of the simulation, the sizes are updated based on component size. The update can be done simply by doing a join. Vertex joins are very efficient in \textit{GraphX}, can be done very quickly. Increasing the number of simulations will increase the accuracy, but it also slows down the process. In the next sections, these trade offs will be discussed and the result of the algorithm will be presented.
-%\subsection{Kimura and Saito (Tractable models for information diffusion in social networks )}
 
 \subsection{Degree Discount Heuristic}
 \label{subsec:degreediscount}
@@ -443,15 +442,36 @@ Compared to other heuristic methods that will be discussed in the next section, 
 \textbf{Single Discount}: Improved version of Degree heuristic. After a vertex is chosen as the seed, it is removed from the graph, that means all of its neighbors' degree are reduced by one. This yields a better result that Degree heuristic, since it lower the chance of neighboring vertices to be selected as the initial seed. \\ 
 \textbf {Page Rank} : Based on the popular Page Rank algorithm \cite{page99}, the algorithm was originally used in Google's search engine, to rank websites based on their importance. 
 
-\section{Experiments}
-\subsection{Data set}
-\subsubsection{ArXiv collaboration network data set}
+
+\section{Data set}
+\subsection{ArXiv collaboration network data set}
 Two data sets from the e-print arXiv is chosen for testing. Same two data sets have been used in \cite{kempe03} and \cite{chen09}. The data set contains academic collaboration for scientific research papers. In this data set, vertices represent researchers and edges define a collaboration between two researchers on writing a scientific paper. Two data sets have been chosen, they have been used by several other researchers in the field of influence maximization and can provide a good comparison for the quality of the methods. The data sets are very small comparing two the data sets currently considered as Big Data, but since there aren't many previous research done in Big Data, I have used these two to test the accuracy of the methods on smaller data set and compare them to the state of the art influence maximization algorithm in smaller scale. There are in total two networks : 
 \begin{itemize}
 \item High Energy Physics - Theory : contains papers from 1991 to 2003, with 15,233 nodes and 58,981 edges.
 \item Physics : contains all papers in  physics from the same year range as physics - theory, with 37,154 nodes and 231,584 edges.
 \end{itemize}
 The data sets in graph formats were made available for public by \cite{chen09}. It can be found at http://research.microsoft.com/en-us/people/weic/graphdata.zip. It is in \textbf{Edge List Format} where each line of the file, contains two values which the source and destination of an edge. A sample of the data set is shown in appendix A (TODO add appendix)
+
+\section{Experiments}
+In this section all the experiments are explained in details. Experiments include the methods and the data sets described in the previous sections. 
+\subsection{Experiment Setup}
+Experiments are run on two different computation platform. For smaller data sets, to test the accuracy and speed of the methods the experiments are run on a single machine. Bigger data sets are run on an EMR cluster. The details are presented below. 
+
+\begin{itemize}
+\item Single node setup : \\
+A Macbook Pro with 2,4 GHz Intel Core i5 processor and 8 GB of RAM. 
+\item Cluster setup: \\
+10 m1.xlarge Amazon EMR nodes. Each node has (TODO)
+
+\end{itemize}
+They methods are run using Spark 11.0 . (TODO make it better)
+
+\subsection{Results}
+Graphs below show the result running method described in previous section. 
+A graph showing the methods in this paper vs the same methods implemented for single machine from other papers.
+A graph for showing the time.
+
+
 \section{Conclusion}
 In conclusion
 \pagebreak
