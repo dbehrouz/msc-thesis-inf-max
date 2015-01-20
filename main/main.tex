@@ -218,27 +218,54 @@ A function $f$ is \textit{submodular} if it satisfies a natural ''diminishing re
 \begin{center}
 $f(A \cup \{v\}) - f(A) \geq f(S \cup \{v\}) - f(S)$, where $A \subseteq S$
 \end{center}
-The greedy algorithm proposed by Kempe i \cite{kempe03} is as follows 
+The greedy algorithm proposed by Kempe i \cite{kempe03} is described in Algorithm \ref{alg:KempeInfMax1}. 
 \begin{algorithm}[ht!]
-\floatname{algorithm}{Influence Maximization}
+\floatname{algorithm}{Algorithm}
 \caption{Greedy Algorithm}
 \label{alg:KempeInfMax1}
 \begin{algorithmic}
 \Require k,G(V,E)
-\State A = $\emptyset$
+\State S = $\emptyset$
 \For {i = 1 to k}
-	\For {every $v \in V$ and $v \notin A$}
+	\For {every $v \in V$ and $v \notin S$}
 		\State $\delta_v = \sigma(v)$
 	\EndFor
 	\State $v^* = \argmax_v \{\delta_v\}$
-	\State $A = A \cup v^*$
+	\State $S = S \cup v^*$
 \EndFor
 \end{algorithmic}
 \end{algorithm}
+\\
 They have run experiments on co-authorship in physics theory section of arXiv \footnote{www.arxiv.org}. The results show that their greedy algorithm performs better that other methods such as random selection, high-degree or central nodes .
-Both in estimating the spread and also in the greedy method, $\sigma (A)$ has to be calculated, but both of the propagation models are non-deterministic. To overcome this, the model is run many times (10000 times) and the spread is the average of all the runs. The nature of the spread function makes the algorithm highly non scalable. Even on medium sized graphs running the simulation thousands of time will take a lot of time, but on the other hand a good solution is only guaranteed if the simulation is run many times. From Algorithm \ref{alg:KempeInfMax1} it can be observed that $\sigma(v)$ is run for every node in every iteration, this will greatly affect the performance of the greedy method.
+Both in estimating the spread and also in the greedy method, $\sigma (S)$ has to be calculated, but both of the propagation models are non-deterministic. To overcome this, the model is run many times (10000 times) and the spread is the average of all the runs. The nature of the spread function makes the algorithm highly non scalable. Even on medium sized graphs running the simulation thousands of time will take a lot of time, but on the other hand a good solution is only guaranteed if the simulation is run many times. From Algorithm \ref{alg:KempeInfMax1} it can be observed that $\sigma(v)$ is run for every node in every iteration, this will greatly affect the performance of the greedy method.
 Leskovec et .al \cite{leskovec07}  in their Cost effective outbreak detection in networks, took upon the task of optimizing the greedy method used in propagation in graph networks. Although they did not work on solving the problem of maximizing influence they have proven their method can be adapted to the problem of maximizing the influence using the greedy algorithm. They studied two problems from different domains which share similarities. The first problem is find the best placement of sensors in a water network, so that contaminated water can be detected as quickly as possible. The other problem is blog network, which is to find blogs that contains the maximum amount of news that cascades from different sources in shortest possible time. Their advanced greedy method, called CELF, utilizes the submodularity of the objective function, which reduces the amount of computation needed to be made in each iteration. Their method is 700 times faster than a simple greedy function. 
-Their observation is that, if A is subset of B, the marginal gain of adding a node to B is always less than or equal to the marginal gain of the adding the same node to A. Hence instead of recomputing the gain for all the node in each iteration, we can go through the nodes in decreasing order of their spread and recompute their values, the change is usually very small and most of the time the value on top of the list stays on top. 
+Their observation is that, if A is subset of B, the marginal gain of adding a node to B is always less than or equal to the marginal gain of the adding the same node to A. Hence instead of recomputing the gain for all the node in each iteration, we can go through the nodes in decreasing order of their spread and recompute their values, the change is usually very small and most of the time the value on top of the list stays on top. Algorithm \ref{alg:celf} describes CELF method .
+\begin{algorithm}[ht!]
+\floatname{algorithm}{Algorithm}
+\caption{CELF}
+\label{alg:celf}
+\begin{algorithmic}
+\Require G(V,E) : Graph G, with Vertex set V and Edge set E
+\Require k: Initial Set Size
+\State S = $\emptyset$
+\For {i = 1 to k}
+	\State set $\delta_v = \sigma(v)$ for $v \in V \setminus S$
+	\While {TRUE do}
+		\State $u =  \argmax_{v \in V \setminus S}\delta_v$ 
+		\If {$I(u) = 0$}
+			\State $\delta_u = \sigma( S \cup \{u\}) - \sigma(S)$
+			\State $I(u)=1$
+		\EndIf
+		\If {$\delta_u \geq max_{v \in V \setminus (S \cup \{u\})}\delta_v$}
+			\State $S = S \cup \{u\}$
+			\State break
+		\EndIf
+	\EndWhile 
+\EndFor
+\State Output $S$
+\end{algorithmic}
+\end{algorithm}
+As can be seen from the algorithm description, the difference between CELF and the normal Greedy method, is that in CELF, $\delta(v)$ is pre-calculated for all the vertices first, then starting from the biggest value, in each iteration $\delta(u)$ is recalculated for vertex $u$ if the value is still higher than the next vertex in the list, then node $u$ is added to $S$ otherwise the next vertex is chosen. As in the previous algorithm, $\sigma(v)$ is the expected spread of the node $v$ under the \textit{Independent Cascade model}.
 \cite{chen09}proposed several different methods for solving the problem of Influence Maximization. The first group of algorithms, were improvement upon Kempe \cite{kempe03} and Leskovec \cite{leskovec07} greedy method. In their greedy method, they have modified the simulation process. Instead of trying to activate nodes based on the edge probability one by one, they have first created a new Graph $G'$ which is sampled from the original graph based on the edge probability. Now the process of estimating the spread of initial set $S$ is just finding the number of reachable nodes in $G'$ from $S$, this process is repeated many times and the result is the average for all of the $G'$ sampled Graphs. Although this method is much faster than the original greedy method, it cannot compete with Leskovec \cite{leskovec07} CELF method, since in their method only in the first iteration the spread for all the nodes are calculated and from the second iteration onward, due to submodularity only the spread for a few of the nodes are recalculated. Hence, they have combined their new Greedy method with CELF, where in the first iteration they use the sample graphs to calculate the spread and in the following iterations CELF is used. The second class of algorithms they have proposed are a set of heuristics for finding the set of the seed that maximizes the influence. Prior to their work, heuristics have been considered inferior to the Greedy method and while that is true for many of the heuristics, such as degree, random, distance and etc., their proposed heuristic called \textit{DegreeDiscountIC}managed to achieve almost the same spread with the greedy method while outperforming the greedy methods by orders of magnitude. Details of the algorithm \textit{DegreeDiscountIC} is explained in section 3 \ref{subsec:degreediscount}.
 
 Other notable heuristic method is of Saito and Kimura \cite{kimura06}. They have investigated the scalability issue of IC model simulations. They have argued that the current simulation model in ICM requires many iterations and each iteration took a lot of processing time and power. They have proposed two natural special cases of the ICM such that a good estimate of this quantity can be efficiently computed. They define the Shortest-Path Model(SPM) which is a special case of the ICM such that each node $v$has the chance to become active only at step = $d(A,v)$ , where if $A$ is the initial set, $d(A,v)$ is the distance of $A$ to node $v$. This means that each node is activated only through the shortest paths from the initial active set. The other model they have proposed named SP1M, which is each node v has the chance to become active only at steps t = d(A,v) and t =d(A,v) + 1. Through these two models they have proposed methods for calculating the spread of an initial set A. They have proved that the result achieved using this method is also within a bound of the best solution. In their experiments, they have assigned a uniform probably to each edge with two different values p = 0.1 and p =0.01. The experiments showed that the estimation of the spread for ICM increases as p increases while the processing times for the SPM and SP1M hardly change. 
@@ -264,9 +291,35 @@ Monte Carlo simulations are conducted on static snapshots, which are sampled bef
 The same set of snapshots are reused in every iteration to estimate the influence spread $I(S)$, which explains the meaning of ''static''
 \end{itemize}
 
-They have performed experiment and compared their methods with the normal Greedy methods. None of the other greedy methods are any match with StaticGreedy in terms of speed and scalability. 
-
-Zhuo et .al \cite{zhuo13} propsed a new Greedy algorithm called \textit{Upper Bound based Lazy Forward algorithm(UBLF)}. They have tried to bound the number of Monte Carlo simulation calls, similar to \cite{leskovec07}'s CELF algorithm. CELF, increased speed of the original algorithm by a factor 700 on average case, the bottleneck in the algorithm is the however in the first iteration, where for each vertex the spread has to be estimated, that means Monte Carlo simulations have to be run for all the vertices in the first iteration, and it was argued before that, while that is reasonably fast and will give good result on small networks, it will not perform well on medium sized graphs let alone graphs of Big Data scale. To that extent, even running the simulations for all the vertices once is not feasible. Zhuo et .al provided a mathematically proofed upper bound for spread function of any initial set. In \textit{UBLF} then, instead of running simulations for each vertex in the first iteration, they find the upper bound which can be found in constant time. Having the initial values for all the nodes, they used the same technique as CELF, and instead of the calculating the expected spread for all the nodes, they started calculating the spread for vertices in order of their initial estimated spread, if the estimated spread was still bigger than the rest of nodes, the nodes was chosen and added to the seed set. Computation continues until desired number of initial seeds are achieved. Below is the description of \textit{UBLF} algorithm. For mathematical proof of the method refer to \cite{zhuo13}.
+They have performed experiment and compared their methods with the normal Greedy methods. None of the other greedy methods are any match with StaticGreedy in terms of speed and scalability. \\
+\begin{algorithm}[ht!]
+\floatname{algorithm}{Algorithm}
+\caption{UBLF}
+\label{alg:ublf}
+\begin{algorithmic}
+\Require G(V,E) : Graph G, with Vertex set V and Edge set E
+\Require PP : Propagation probability matrix of G
+\Require k: Initial Set Size
+\State S = $\emptyset$ and $\delta = (I - PP)^{-1} .1$ 
+\For {i = 1 to k}
+	\State set $I(v) = 0$ for $v \in V \setminus S$
+	\While {TRUE do}
+		\State $u =  \argmax_{v \in V \setminus S}\delta_v$ 
+		\If {$I(u) = 0$}
+			\State $\delta_u = \sigma( S \cup \{u\}) - \sigma(S)$
+			\State $I(u)=1$
+		\EndIf
+		\If {$\delta_u \geq max_{v \in V \setminus (S \cup \{u\})}\delta_v$}
+			\State $S = S \cup \{u\}$
+			\State break
+		\EndIf
+	\EndWhile 
+\EndFor
+\State Output $S$
+\end{algorithmic}
+\end{algorithm}
+Zhuo et .al \cite{zhuo13} propsed a new Greedy algorithm called \textit{Upper Bound based Lazy Forward algorithm(UBLF)}. They have tried to bound the number of Monte Carlo simulation calls, similar to \cite{leskovec07}'s CELF algorithm. CELF, increased speed of the original algorithm by a factor 700 on average case, the bottleneck in the algorithm is the however in the first iteration, where for each vertex the spread has to be estimated, that means Monte Carlo simulations have to be run for all the vertices in the first iteration, and it was argued before that, while that is reasonably fast and will give good result on small networks, it will not perform well on medium sized graphs let alone graphs of Big Data scale. To that extent, even running the simulations for all the vertices once is not feasible. Zhuo et .al provided a mathematically proofed upper bound for spread function of any initial set. In \textit{UBLF} then, instead of running simulations for each vertex in the first iteration, they find the upper bound which can be found in constant time. Having the initial values for all the nodes, they used the same technique as CELF, and instead of the calculating the expected spread for all the nodes, they started calculating the spread for vertices in order of their initial estimated spread, if the estimated spread was still bigger than the rest of nodes, the nodes was chosen and added to the seed set. Computation continues until desired number of initial seeds are achieved. Algorithm \ref{alg:ublf} describes \textit{UBLF} algorithm. For mathematical proof of the method refer to \cite{zhuo13}.
+The matrix $PP$ is constructed from the graph, where each value $(u,v)$ in the matrix corresponds to the edge $e=(u,v)$; value of the edge that connects $u$ to $v$. $S$ consists of the seed set, the output of the algorithm i.e. nodes with highest influence propagation and $I$ is the \textit{identity matrix}. Before starting the iterative process, vector $\delta$ is calculated. In each iteration of the algorithm, vertices with the maximum $\delta$ are chosen, if Monte Carlo simulation is not yet run for them, the algorithm will run the MC simulation, if the value of $\delta_u$ is still greater than the node with second highest $\delta$ then $u$ is added to to the set $S$ . The process continues for $k$ iteration, where $k$ is the desired size of the output. $\sigma(v)$ is the expected spread of $v$ under the \textit{IC} model.
 
 \subsection{Learning Influence Probabilities}
 \label{subsec:learninginfprob}
@@ -282,32 +335,7 @@ These two can also be used with a more sophisticated approach card Partial Credi
 weight to each node based on the size of the active neighborhood . Experimental evaluations show good results 
 specially with DT and CT models. CT outperformed DT by a very small amount, but it is much more resource intensive. \\
 In another paper, Goyal et al \cite{goyal11} have also tackled the problem of influence maximization directly. Instead of first learning the edge probabilities and then finding the optimum seed set, they have proposed a method to directly find the optimal seed set based on the action log .
-\begin{algorithm}[ht!]
-\floatname{algorithm}{Influence Maximization}
-\caption{UBLF}
-\label{alg:ublf}
-\begin{algorithmic}
-\Require G(V,E) : Graph G, with Vertex set V and Edge set E
-\Require PP : Propagation probability matrix of G
-\Require k: Initial Set Size
-\State A = $\emptyset$ and $\delta = (I - PP)^{-1} .1$ 
-\For {i = 1 to k}
-	\State set $I(v) = 0$ for $v \in V \setminus S$
-	\While {TRUE do}
-		\State $u =  \argmax_{v \in V \setminus S}\delta_v$ 
-		\If {$I(u) = 0$}
-			\State $\delta_u = MC( S \cup \{u\}) - MC(S)$
-			\State $I(u)=1$
-		\EndIf
-		\If {$\delta_u \geq max_{v \in V \setminus (S \cup \{u\})}\delta_v$}
-			\State $S = S \cup \{u\}$
-			\State break
-		\EndIf
-	\EndWhile 
-\EndFor
-\State Output $S$
-\end{algorithmic}
-\end{algorithm}
+
 \newpage
 
 \section{Big Data and Network Influence Maximization}
