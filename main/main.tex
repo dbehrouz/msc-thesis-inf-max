@@ -266,6 +266,8 @@ The same set of snapshots are reused in every iteration to estimate the influenc
 
 They have performed experiment and compared their methods with the normal Greedy methods. None of the other greedy methods are any match with StaticGreedy in terms of speed and scalability. 
 
+Zhuo et .al \cite{zhuo13} propsed a new Greedy algorithm called \textit{Upper Bound based Lazy Forward algorithm(UBLF)}. They have tried to bound the number of Monte Carlo simulation calls, similar to \cite{leskovec07}'s CELF algorithm. CELF, increased speed of the original algorithm by a factor 700 on average case, the bottleneck in the algorithm is the however in the first iteration, where for each vertex the spread has to be estimated, that means Monte Carlo simulations have to be run for all the vertices in the first iteration, and it was argued before that, while that is reasonably fast and will give good result on small networks, it will not perform well on medium sized graphs let alone graphs of Big Data scale. To that extent, even running the simulations for all the vertices once is not feasible. Zhuo et .al provided a mathematically proofed upper bound for spread function of any initial set. In \textit{UBLF} then, instead of running simulations for each vertex in the first iteration, they find the upper bound which can be found in constant time. Having the initial values for all the nodes, they used the same technique as CELF, and instead of the calculating the expected spread for all the nodes, they started calculating the spread for vertices in order of their initial estimated spread, if the estimated spread was still bigger than the rest of nodes, the nodes was chosen and added to the seed set. Computation continues until desired number of initial seeds are achieved. Below is the description of \textit{UBLF} algorithm. For mathematical proof of the method refer to \cite{zhuo13}.
+
 \subsection{Learning Influence Probabilities}
 \label{subsec:learninginfprob}
 \cite{goyal10} have tackled the problem of forming the social graph whose edges have the probability of a user
@@ -280,7 +282,32 @@ These two can also be used with a more sophisticated approach card Partial Credi
 weight to each node based on the size of the active neighborhood . Experimental evaluations show good results 
 specially with DT and CT models. CT outperformed DT by a very small amount, but it is much more resource intensive. \\
 In another paper, Goyal et al \cite{goyal11} have also tackled the problem of influence maximization directly. Instead of first learning the edge probabilities and then finding the optimum seed set, they have proposed a method to directly find the optimal seed set based on the action log .
-
+\begin{algorithm}[ht!]
+\floatname{algorithm}{Influence Maximization}
+\caption{UBLF}
+\label{alg:ublf}
+\begin{algorithmic}
+\Require G(V,E) : Graph G, with Vertex set V and Edge set E
+\Require PP : Propagation probability matrix of G
+\Require k: Initial Set Size
+\State A = $\emptyset$ and $\delta = (I - PP)^{-1} .1$ 
+\For {i = 1 to k}
+	\State set $I(v) = 0$ for $v \in V \setminus S$
+	\While {TRUE do}
+		\State $u =  \argmax_{v \in V \setminus S}\delta_v$ 
+		\If {$I(u) = 0$}
+			\State $\delta_u = MC( S \cup \{u\}) - MC(S)$
+			\State $I(u)=1$
+		\EndIf
+		\If {$\delta_u \geq max_{v \in V \setminus (S \cup \{u\})}\delta_v$}
+			\State $S = S \cup \{u\}$
+			\State break
+		\EndIf
+	\EndWhile 
+\EndFor
+\State Output $S$
+\end{algorithmic}
+\end{algorithm}
 \newpage
 
 \section{Big Data and Network Influence Maximization}
