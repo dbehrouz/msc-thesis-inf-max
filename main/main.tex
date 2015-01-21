@@ -497,6 +497,19 @@ Compared to other heuristic methods that will be discussed in the next section, 
 \textbf{Single Discount}: Improved version of Degree heuristic. After a vertex is chosen as the seed, it is removed from the graph, that means all of its neighbors' degree are reduced by one. This yields a better result that Degree heuristic, since it lower the chance of neighboring vertices to be selected as the initial seed. \\ 
 \textbf {Page Rank} : Based on the popular Page Rank algorithm \cite{page99}, the algorithm was originally used in Google's search engine, to rank websites based on their importance. 
 
+\subsection{Graph cuts?}
+TODO
+create a graph graph cuts, each components will be transformed into a node, run influence maximization on the new graph, from each connected component chose the best nodes.
+
+\subsection{Preprocessing of the graph}
+Before running any of the algorithms above, several pre processing methods can be applied to the input graph, in order to decrease performance time without noticeably affecting the quality of the result. 
+TODO , pruning the graph : 
+1. Removing all connected components of size 1, this is a must because it absolutely has no effect on the final result, 
+2. maybe pruning CCs that have less than N nodes
+3. pruning CCs that has a collective edge weights of less than a threshold
+4. pruning vertices that their neighbors have very high degree
+
+
 
 \section{Data set}
 \subsection{ArXiv collaboration network data set}
