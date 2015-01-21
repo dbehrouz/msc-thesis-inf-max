@@ -1,6 +1,6 @@
 package com.bd.propogation.ic
 
-import com.bd.util.EdgeListTransformer
+import com.bd.util.{GraphUtil, EdgeListTransformer}
 import org.apache.spark.graphx._
 import org.apache.spark.{SparkContext, SparkConf, Logging}
 
@@ -110,7 +110,7 @@ object Simulation extends Logging {
       .toList
 
     println("Number of Initial Active Nodes " + activeNodes.length)
-    val graph = EdgeListTransformer.transform(GraphLoader.edgeListFile(sc, inputGraphFile), prob)
+    val graph = GraphUtil.undirected(EdgeListTransformer.transform(GraphLoader.edgeListFile(sc, inputGraphFile), prob))
 
     val spread = run(graph, activeNodes, iterations)
     println("Total Spread: " + spread)

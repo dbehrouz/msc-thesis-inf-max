@@ -1,6 +1,6 @@
 To run the simulation :
 
-spark-submit --class "com.bd.propogation.ic.Simulation" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/hep.txt output-degree/ 100 0.01
+spark-submit --class "com.bd.propogation.ic.Simulation" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/hep.txt output-edgesampling/ 100 0.01
 
 To run Independent Cascade Greedy method:
 

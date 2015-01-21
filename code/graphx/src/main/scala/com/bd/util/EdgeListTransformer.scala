@@ -8,13 +8,13 @@ import org.apache.spark.graphx._
 object EdgeListTransformer {
   // gets a graph in edge list format and return with edge repetition translated as
   // edge weight
-  def transform(graph: Graph[Int, Int], prob: Double = -1) = {
-//    val edges = graph.edges.groupBy {
-//      e => (e.srcId, e.dstId)
-//    }.map {
-//      l => new Edge[Double](l._1._1, l._1._2, l._2.size * prob)
-//    }
-    Graph(graph.vertices.map(l => (l._1, 0L)), graph.edges.mapValues(e => prob))
+  def transform(graph: Graph[Int, Int], prob: Double = 0.01) = {
+    val edges = graph.edges.groupBy {
+      e => (e.srcId, e.dstId)
+    }.map {
+      l => new Edge[Double](l._1._1, l._1._2, l._2.size * prob)
+    }
+    Graph(graph.vertices.map(l => (l._1, 0L)), edges)
   }
 
 }
