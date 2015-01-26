@@ -328,14 +328,7 @@ Goyal et al. \cite{goyal10} have also tackled the problem of forming the social 
 influencing the other based on a log of actions. Based on the General Threshold model that simultaneously 
 generalizes the Linear Threshold and Independent Cascade models. Based on an action log of past behavior of the users, formatted as Actions(User,Action, Time) where each entry indicates, an action made by a user at a specified time. 
 Graph $G = (V,E,T)$ is constructed based on the relationship of users in the graph, where $T$ indicates the time a specific edge was added to the graph(i.e. a relation was formed between two users). Hence, the objective function is defined as $p : E \leftarrow [0,1] x [0,1]$ assigning both directions of each edge (u,v) in E the probabilities : $p_{v,u}$ and $p_{u,v}$.
-Three different solution models were proposed. Static Model in which all the probabilities remain the same all the time. Continues Time (CT) model where probability at each time step is based on the neighbors formation and Discrete Time which is approximation to CT model since CT model is very resource and time consuming. 
-The models can be calculated with 2 scans of the data sets. The probability of v activating u $p_{v,u}$ can be calculated in two ways : 
-Bernoulli distribution :  $p_{v,u}$ =  $A_{v2u}$ / ${A_v}$ \\
-Jaccard Index : $p_{v,u}$ =  $A_{v2u}$ / $A_{u|v}$ \\ 
-These two can also be used with a more sophisticated approach card Partial Credits (PC) which will assign a 
-weight to each node based on the size of the active neighborhood . Experimental evaluations show good results 
-specially with DT and CT models. CT outperformed DT by a very small amount, but it is much more resource intensive. \\
-
+Using simple counting methods, they have scanned the data set, and estimated the edge probability $p_{v,u}$ based on the action of node $v$ and the subsequent action made $u$. If these two actions happened within a predefined time, the probability of $v$ influencing $u$ was increased. They have also proposed more advanced methods of estimating the probability $p_{v,u}$ which is outside of the scope of this thesis.
 In another paper, Goyal et al \cite{goyal11} have also tackled the problem of influence maximization directly. Instead of first learning the edge probabilities and then finding the optimum seed set, they have proposed a method to directly find the optimal seed set based on the action log .
 
 \newpage
