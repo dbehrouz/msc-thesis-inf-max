@@ -50,10 +50,9 @@ Giraph which is open source project by on Google's Pregel framework. It is built
 \item 
 GraphX is open source project built on top of Spark
 \end{itemize}
-
-In this thesis, I will study the performance penalty of running state of the art algorithms for network propagation, more specifically the Independent Cascade method (which will be explained in the next section) . And propose and implement distributed methods for the algorithm written for GraphLab, GraphX and Giraph and comparison between each frameworks will be made. 
-The rest of this document is organized as follow; in section 2, Big Data frameworks, graph frameworks, influence maximization methods are studies. In section 3, a distributed algorithm and implementation methods are presented. In section 4, comparison of the distributed and single node implementations as well as the difference between each graph framework are studied . In section 5 conclusion blah blah
-In the next sections, different Big Data platforms are studied in details. Graph processing frameworks are explained extensively. And current and state of the art algorithms for network propagation and influence maximization are studied. 
+Many other graph frameworks for processing large scale data exists, but the core difference between most of them and Giraph and GraphX are; first of all both Giraph and GraphX are open source, so developers have access to the code and can modify and observe the code to better understand and made changes that suites their needs. In the next sections, these frameworks are more closely studied and their features are presented in details. \\
+The aim of this thesis is to study in detail the problem of influence maximization in social networks, current state of art algorithm for the problem. Disadvantages of the methods, specially regarding the scalability are discussed and different methods are proposed to solve the issue, using large scale graph processing system. \\
+The rest of this document is organized as follow; in section 2 Big Data framework, their history and the current state are discussed, two of the very common frameworks, i.e. Hadoop and Spark are studied in detail. In section 3, different large scale graph processing frameworks are compared and Giraph which is based on Hadoop's MapReduce and GraphX which is based on Spark are explained in great detail. Section 4, contains the history of influence maximization problem, different methods that have been proposed so far, their advantages and disadvantages are discussed. In section 5, scalability issue of influence maximization is studied, and several methods either novel or based on previous methods are proposed and the implementation details are discussed. Section 6 concludes the thesis, and future works, problems that were not covered in the document are discussed
 
 \newpage
 
@@ -132,7 +131,7 @@ Spark contains a Machine learning framework named MLib and graph processing fram
 Spark works very well with iterative algorithms, it doesn't have MapReduce limitation which is the result of each job has to be written to disk. Spark has in memory computation which will speed up the process. 
 % Spark Word Count Problem in Java and Scala
 
-\section{Big Graph}
+\section{Large Scale Graph Processing Framework}
 What is it, where does it come from, why is it important to have frameworks capable of processing massive graphs
 
 \subsection{Giraph}
@@ -184,9 +183,12 @@ On a cluster level, a graph is distributed into several connected components and
 Although it has many advantages over MapReduce, it is still has many limitations, in one Giraph job many iterations can be done, but if graphs should go through several transformation that would require multiple Giraph jobs, which means that the data has be written to HDFS after each job which adds overhead. A lot of the Machine learning and graph algorithms and problems are iterative in nature, which will cause Giraph to have severe performance issues in some of these cases. 
 % Sample code 
 \subsection{GraphX}
-% Where did it come from
-% Advantages over Giraph and traditional MapReduce and Spark
-% Limitations 
+GraphX is a light API written on top of Spark. It uses the powerfull RDD abstractions as the basis of its computation, by storing vertices and edges in separate RDDs. Similar to Spark, it works well for iterative algorithms and it comes packaged with many of the algorithm such as, PageRank, Label Propagation, Connected Components and ... . GraphX, also includes an API for pregel framework.  Several important components of GraphX are :
+\begin{itemize}
+\item VertexRDD : an RDD object consist of a vertex id and a customization data type. It carries some features in comparison to the traditional RDD, such ensuring vertex ids are unique, optimized joins among different vertex groups and etc. It offers several methods for mapping values, filtering vertices(while preserving their id) and finding difference of two vertex groups.
+\item EdgeRDD : similar to VertexRDD, it is a subclass of RDD, which organizes the edges into blocks based on some predefined partitioning strategies. It supports three extra methods; \textit{mapValues} which maps the values while preserving the structure, \textit{reverse} which reverse the edge directions while preserving the attributes, and \textit{innerJoin} which joins two EdgeRDD objects, using the source and destination ids as keys. 
+\end{itemize}
+The key feature of GraphX comes from the way vertices and edges are stored. GraphX employs different partitioning strategies for storing vertices and edges and while each one have their own advantages and disadvantages, the overall goal is reduce the amount of communication along edges and have all the vertices close to each other in one computation node to avoid network traffics. The details of GraphX and how it behaves under the hood are beyond the scope of this document. Xin et al. \cite{xin13} described GraphX in detail and GraphX website  \footnote{https://spark.apache.org/graphx/} includes more information about the internal architecture of the system.
 
 \newpage
 
