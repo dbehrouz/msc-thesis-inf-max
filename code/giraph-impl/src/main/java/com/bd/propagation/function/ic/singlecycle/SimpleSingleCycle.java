@@ -8,9 +8,6 @@ import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.LongWritable;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Arrays;
 
 /**
  * @author Behrouz Derakhshan

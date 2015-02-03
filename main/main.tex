@@ -535,6 +535,38 @@ A Macbook Pro with 2,4 GHz Intel Core i5 processor and 8 GB of RAM.
 \end{itemize}
 They methods are run using Spark 11.0 . (TODO make it better)
 
+\subsection{Methods \& Implementation details}
+List of influence propagation methods used in the experiments
+\begin{itemize}
+\item \textbf{Single Cycle}: Based on \textit{Single Cycle Influence Maximization} algorithm. This method is implemented using \textit{Apache Giraph} for ease of implementation.
+\item \textbf{Multi-attempt Single Cycle}: Based on \textit{Token Based Influence Maximization} algorithm. Similar to single cycle, this method is also implemented in \textit{Apache Giraph}
+\item \textbf{PageRank}: Based on popular \textit{Page rank} algorithm developed by Google. Implemented using \textit{Spark's Graphx}.
+\item \textbf{Degree}: Simple method, that chooses nodes with highest degree. Implemented using \textit{Spark's Graphx}.
+\item \textbf{Degree Discount}: Based on \textit{Degree Discount} heuristic, discussed in previous section. This method is also implemented using \textit{Spark's Graphx}.
+\item \textbf{Edge Sampling}: Based on \textit{Edge Sampling}algorithm, this method is implemented using \textit{Spark's Graphx}.
+\item \textbf{Random}: Choose initial seed randomly. This is used as base comparison. 
+\end{itemize}
+
+Some of the methods proved to be easier to implement using certain framework. There are subtle differences between, Graphx's pregel API and Giraph's pregel API. Giraphx's pregel requires the user to supply three methods : 
+\begin{itemize}
+\item Vertex program : Responsible for modifying the value of vertices. It receives the messages for each vertex and run them separately for each vertex. The return type, is the same as the vertex data type and cannot be changed.
+\item Send message : Inputs an \textit{EdgeTriplet} data type, which contains the source, and destination vertices along with their attributes, and edge data type. It returns an \textit{Iterator} which specifies the message and the destination the message should be send to.
+\item Merge messages: Merge messages intended for a destination vertex. It receives two messages of the same type and return the combined message that should have the same data type as the input messages.
+\end{itemize}
+
+Although, these three methods work along side each other, they are separated and do not have access to the internal values of each other. This makes it very difficult and non efficient to implements some of methods, for example: Single Cycle and Multi-attemp Single Cycle. These two algorithm, are designed to act upon the message they receive immediately and based on value of each message, they have to decide either to send a message to neighboring vertices or not. This is unfortunately not possible in Graphx. \\
+Giraph's pregel API is designed differently. It consists of the following methods, some of which are optional and do not need to be supplied by the user :
+\begin{itemize}
+\item compute : The most important method. It has to be supplied by the user. The input to the method, is the vertex and all messages intended for that vertex. User can modify the value of vertex, send messages to other vertices , and etc .
+\item initialize : Called once at the beginning of the program. Generally used, for defining any aggregators or other global operations that will be used during the run time of the program.
+\item preSuperStep : Called before every super step. It is not mandatory, but it is generally used to update global values before the super step begins.
+\item postSuperStep: Similar to previous method, with the difference that it is run after super step has ended.
+\item sendMessage: Method for sending messages to other vertices. It requires the id of the destination vertex and the intended message. This method is generally not overridden, and it is simply intended to send a message to another vertex. It can be called many times from the compute method. Giraph takes care of synchronization process, generally all the messages are send once all the compute methods for all the vertices are executed.
+\end{itemize}
+
+Giraph provides more freedom to run algorithms in pregel framework, as it leaves the responsibility of sending messages to the user rather than enforcing it to be send in every iteration. This makes, Giraph ideal for implementing the first two methods, because the decision to either send or not send a message depends on the content of the message itself.
+
+
 \subsection{Results}
 Graphs below show the result running method described in previous section. 
 A graph showing the methods in this paper vs the same methods implemented for single machine from other papers.
@@ -542,7 +574,10 @@ A graph for showing the time.
 
 
 \section{Conclusion}
-In this document, the problem of influence maximization was discussed. One of the main issues in solutions to problem is the scalability. Due to the nature of the solutions proposed, none can perform well for large scale graphs. Over the past decade, with wide spread usage of internet data collection has been the focus of many big firms. Social networks and online store are gathering data about millions of users everyday. The information about users are stored in graph data structures that sometimes consists of millions (even billions) of nodes and  many more edges. Applying some of the solutions proposed for influence maximization to graphs of these scales are impossible and even on the strongest super computers will take days or even months to see the result. Here, I have identified why the solutions are not scalable and proposed some new or modified solutions to work with graphs of this scale. Several frameworks for processing large scale data have been created over the past couple of years, most notably are Hadoop and Spark. Both of which are designed to run on commodity computers, and are highly scalable. They both have a built in frameworks for processing graphs; Giraph which is on top of Hadoop and Graphx on top of Spark. Methods described in this document, are implemented using these two frameworks. In last section, several experiments on different data sets were performed and the results were presented. 
+In this document, the problem of influence maximization was discussed. One of the main issues in solutions to problem is the scalability. Due to the nature of the solutions proposed, none can perform well for large scale graphs. Over the past decade, with wide spread usage of internet data collection has been the focus of many big firms. Social networks and online store are gathering data about millions of users everyday. The information about users are stored in graph data structures that sometimes consists of millions (even billions) of nodes and  many more edges. Applying some of the solutions proposed for influence maximization to graphs of these scales are impossible and even on the strongest super computers will take days or even months to see the result. Here, I have identified why the solutions are not scalable and proposed some new or modified solutions to work with graphs of this scale. Several frameworks for processing large scale data have been created over the past couple of years, most notably are Hadoop and Spark. Both of which are designed to run on commodity computers, and are highly scalable. They both have a built in frameworks for processing graphs; Giraph which is on top of Hadoop and Graphx on top of Spark. Methods described in this document, are implemented using these two frameworks. In last section, several experiments on different data sets were performed and the results were presented. \\
+Theoretically, it was proven by \cite{kempe03} that the greedy method provides the best solution to the influence maximization problem, but the inefficiency of the method for some types of graphs excels its quality and justifies the sacrifice of quality for performance. Several of the methods discussed here, run very fast and they are not affected by the size of the input graph. In some of the data sets that it was possible to run the greedy methods, some of these scalable methods provided comparable solution in term of quality with the greedy algorithm, and result showed that even on small data sets, greedy method will take extremely long amount of time, making it virtually impossible to run the greedy method on large scale graphs that are very common today. \\
+Influence maximization is very large topic and in this paper only the basic problem was covered. Several challenges were left out of this thesis, and many other challenges still remains. Finding a more deterministic function or a probabilistic function that does not rely on the Monte Carlo simulation is one of the areas that has been and still being studied. Topic based influence maximization, i.e. users influencing each other differently with regards to different topics is another area that was not covered in the thesis. Influence degradation, is also another interesting topic that involves dynamic influence probabilities that will change with time are some of the other interesting areas that worth exploring.
+
 \pagebreak
 
 

@@ -1,10 +1,15 @@
 To run the simulation :
 
-spark-submit --class "com.bd.propogation.ic.Simulation" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/hep.txt output-pg/ 100 0.01
+spark-submit --class "com.bd.propogation.ic.Simulation" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/hep.txt output-edgesampling/ 100 0.01
 
 To run Independent Cascade Greedy method:
 
 spark-submit --class "com.bd.InfluenceMax" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar greedyic data/hep.txt 40 1 0.01 output-greedyic
+
+To run Single Cycle method:
+
+spark-submit --class "com.bd.InfluenceMax" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar singlecycle data/hep.txt 40 1 0.01 output-singlecycle
+
 
 To run Edge Sampling Method
 
