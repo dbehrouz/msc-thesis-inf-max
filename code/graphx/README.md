@@ -1,6 +1,6 @@
 To run the simulation :
 
-spark-submit --class "com.bd.propogation.ic.Simulation" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/hep.txt output-edgesampling/ 100 0.01
+spark-submit --class "com.bd.propogation.ic.Simulation" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/hep.txt output-pg/ 100 0.01
 
 To run Independent Cascade Greedy method:
 
@@ -25,3 +25,12 @@ spark-submit --class "com.bd.InfluenceMax" --master local[*] target/spark-graphx
 To run Degree Discount methods:
 
 spark-submit --class "com.bd.InfluenceMax" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar degreediscount data/hep.txt 40 10 0.01 output-dd
+
+To run Pagerank methods:
+
+spark-submit --class "com.bd.InfluenceMax" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar pagerank data/hep.txt 40 10 0.01 output-pg
+
+
+Run Driver :
+
+spark-submit --class "com.bd.Driver" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar degree data/hep.txt 100 10 0.01 output-degree/

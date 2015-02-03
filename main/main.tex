@@ -542,7 +542,7 @@ A graph for showing the time.
 
 
 \section{Conclusion}
-In conclusion
+In this document, the problem of influence maximization was discussed. One of the main issues in solutions to problem is the scalability. Due to the nature of the solutions proposed, none can perform well for large scale graphs. Over the past decade, with wide spread usage of internet data collection has been the focus of many big firms. Social networks and online store are gathering data about millions of users everyday. The information about users are stored in graph data structures that sometimes consists of millions (even billions) of nodes and  many more edges. Applying some of the solutions proposed for influence maximization to graphs of these scales are impossible and even on the strongest super computers will take days or even months to see the result. Here, I have identified why the solutions are not scalable and proposed some new or modified solutions to work with graphs of this scale. Several frameworks for processing large scale data have been created over the past couple of years, most notably are Hadoop and Spark. Both of which are designed to run on commodity computers, and are highly scalable. They both have a built in frameworks for processing graphs; Giraph which is on top of Hadoop and Graphx on top of Spark. Methods described in this document, are implemented using these two frameworks. In last section, several experiments on different data sets were performed and the results were presented. 
 \pagebreak
 
 

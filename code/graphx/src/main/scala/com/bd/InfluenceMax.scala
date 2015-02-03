@@ -1,6 +1,6 @@
 package com.bd
 
-import com.bd.propogation.heuristic.{DegreeDiscount, Degree}
+import com.bd.propogation.heuristic.{PageRankMethod, DegreeDiscount, Degree}
 import com.bd.propogation.ic.{ConnectedComponents, RandomMethod, GreedyIC, EdgeSampling}
 import com.bd.util.{GraphUtil, EdgeListTransformer}
 import org.apache.spark.api.java.StorageLevels
@@ -34,6 +34,8 @@ object InfluenceMax extends Logging {
       RandomMethod.run(graph, seedSize, iterations, sc)
     } else if ("cc".equals(method)) {
       ConnectedComponents.run(graph, seedSize, iterations, sc)
+    } else if ("pagerank".equals(method)) {
+      PageRankMethod.run(graph, seedSize, iterations, sc)
     }
     else {
       throw new IllegalArgumentException
