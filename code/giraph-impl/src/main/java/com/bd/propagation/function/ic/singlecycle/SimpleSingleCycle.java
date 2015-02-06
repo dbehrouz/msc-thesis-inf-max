@@ -51,7 +51,7 @@ public class SimpleSingleCycle extends BasicComputation<LongWritable, SingleAtte
             LongWritable targetVertex = edge.getTargetVertexId();
             if (targetVertex.get() != message.get()) {
                 float weight = edge.getValue().get();
-                if (Math.random() < weight) {
+                if (Math.random() < (weight * 0.01)) {
                     sendMessage(edge.getTargetVertexId(), message);
                 }
             }

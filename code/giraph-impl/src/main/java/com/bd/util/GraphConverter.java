@@ -99,10 +99,10 @@ public class GraphConverter {
     }
 
     static class Edge {
-        Long weight;
+        float weight;
         Long v2;
 
-        Edge(Long v2, Long weight) {
+        Edge(Long v2, float weight) {
             this.v2 = v2;
             this.weight = weight;
         }

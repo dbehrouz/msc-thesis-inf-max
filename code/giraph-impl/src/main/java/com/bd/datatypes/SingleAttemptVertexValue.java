@@ -73,6 +73,6 @@ public class SingleAttemptVertexValue implements Writable {
 
     @Override
     public String toString() {
-        return "Size: " + getInfluenceSize() + ", influencedBy: " + StringUtils.join(vertexIds, ':');
+        return getInfluenceSize().toString();
     }
 }
