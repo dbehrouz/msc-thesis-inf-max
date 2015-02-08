@@ -1,5 +1,6 @@
 package com.bd.datatypes;
 
+import com.bd.propagation.function.ic.singlecycle.MultiAttemptSingleCycle;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
@@ -14,8 +15,8 @@ import java.util.List;
  * @author Behrouz Derakhshan
  */
 public class MultiAttemptVertexValue implements Writable {
-    private Long[] influenceSize;
-    private List<Text> vertexIds;
+    private Long[] influenceSize = new Long[MultiAttemptSingleCycle.ATTEMPTS];
+    private List<Text> vertexIds = new LinkedList<>();
 
     public MultiAttemptVertexValue() {
     }
@@ -26,11 +27,12 @@ public class MultiAttemptVertexValue implements Writable {
 
     public MultiAttemptVertexValue(Long[] influenceSize, List<Text> vertexIds) {
         this.influenceSize = influenceSize;
+        java.util.Arrays.fill(influenceSize, 0L);
         this.vertexIds = vertexIds;
     }
 
     public void increment(int index) {
-        influenceSize[index]++;
+        influenceSize[index] = influenceSize[index] + 1;
     }
 
     public void setVertexIds(List<Text> vertexIds) {
@@ -49,7 +51,7 @@ public class MultiAttemptVertexValue implements Writable {
         return vertexIds;
     }
 
-    public float getAverageSpread() {
+    public Float getAverageSpread() {
         Long sum = 0L;
         for (Long l : influenceSize) {
             sum += l;
@@ -64,6 +66,7 @@ public class MultiAttemptVertexValue implements Writable {
     public void write(DataOutput dataOutput) throws IOException {
         dataOutput.writeInt(influenceSize.length);
         for (Long l : influenceSize) {
+            //System.out.println("WRITE: "  + l);
             dataOutput.writeLong(l);
         }
         dataOutput.writeInt(vertexIds.size());
@@ -77,7 +80,9 @@ public class MultiAttemptVertexValue implements Writable {
     public void readFields(DataInput dataInput) throws IOException {
         int size = dataInput.readInt();
         for (int i = 0; i < size; i++) {
-            influenceSize[i] = dataInput.readLong();
+            Long val = dataInput.readLong();
+            //System.out.println("READ: "  + val);
+            influenceSize[i] = val == null ? 0 : val;
         }
         size = dataInput.readInt();
         vertexIds = new LinkedList<>();
@@ -90,6 +95,11 @@ public class MultiAttemptVertexValue implements Writable {
 
     @Override
     public String toString() {
+        return getAverageSpread().toString();
+    }
+
+    public String toFullString() {
         return "Average Spread: " + getAverageSpread() + ", influencedBy: " + StringUtils.join(vertexIds, ':');
+
     }
 }

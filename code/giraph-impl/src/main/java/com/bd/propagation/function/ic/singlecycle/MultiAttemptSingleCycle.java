@@ -1,7 +1,6 @@
 package com.bd.propagation.function.ic.singlecycle;
 
 import com.bd.datatypes.MultiAttemptVertexValue;
-import com.bd.propagation.Constants;
 import org.apache.giraph.edge.Edge;
 import org.apache.giraph.graph.BasicComputation;
 import org.apache.giraph.graph.Vertex;
@@ -20,7 +19,7 @@ import java.io.IOException;
  * is averaged for all the attemps
  */
 public class MultiAttemptSingleCycle extends BasicComputation<LongWritable, MultiAttemptVertexValue, FloatWritable, Text> {
-    public static final int attempt = 100;
+    public static final int ATTEMPTS = 100;
     public static final Text INFLUENCED = new Text("INFLUENCED");
 
     @Override
@@ -29,22 +28,22 @@ public class MultiAttemptSingleCycle extends BasicComputation<LongWritable, Mult
         if (getSuperstep() == 0) {
 
             // adding my self to the list of influencedBy
-            vertex.setValue(new MultiAttemptVertexValue(attempt));
+            vertex.setValue(new MultiAttemptVertexValue(ATTEMPTS));
 
             // at the start try to activate all around you with your label
-            for (int i = 0; i < attempt; i++) {
+            for (int i = 0; i < ATTEMPTS; i++) {
                 vertex.getValue().getVertexIds().add(new Text(vertex.getId().get() + "_" + i));
                 activate(vertex, vertex.getId().get() + "_" + i);
             }
 
         } else {
             for (Text message : messages) {
-                Long vertexId = getVertex(message.toString());
+                String vertexId = getVertex(message.toString());
                 int index = getIndex(message.toString());
                 // if message is of type INFLUENCED it means
                 // another vertex was influenced by this vertex
                 // so increment its counter
-                if (message.equals(INFLUENCED)) {
+                if (vertexId.equals(INFLUENCED.toString())) {
                     vertex.getValue().increment(index);
                 } else if (!vertex.getValue().getVertexIds().contains(message)) {
                     vertex.getValue().getVertexIds().add(message);
@@ -53,15 +52,15 @@ public class MultiAttemptSingleCycle extends BasicComputation<LongWritable, Mult
                     // message is vertex id
                     // here we are informing the initial vertex that we have received your label
                     // so that it can update it's count
-                    sendMessage(new LongWritable(vertexId), new Text(INFLUENCED.toString() + "_" + index));
+                    sendMessage(new LongWritable(Long.parseLong(vertexId)), new Text(INFLUENCED.toString() + "_" + index));
                 }
             }
             vertex.voteToHalt();
         }
     }
 
-    private Long getVertex(String message) {
-        return Long.parseLong(message.split("_")[0]);
+    private String getVertex(String message) {
+        return message.split("_")[0];
     }
 
     private int getIndex(String message) {
@@ -71,9 +70,9 @@ public class MultiAttemptSingleCycle extends BasicComputation<LongWritable, Mult
     private void activate(Vertex<LongWritable, MultiAttemptVertexValue, FloatWritable> vertex, String message) {
         for (Edge<LongWritable, FloatWritable> edge : vertex.getEdges()) {
             LongWritable targetVertex = edge.getTargetVertexId();
-            if (targetVertex.toString().equals(message)) {
+            if (!targetVertex.toString().equals(message)) {
                 float weight = edge.getValue().get();
-                if (Math.random() < weight) {
+                if (Math.random() < (weight * 0.01)) {
                     sendMessage(edge.getTargetVertexId(), new Text(message));
                 }
             }

@@ -1,6 +1,5 @@
 package com.bd.mapreduce;
 
-import javafx.util.Pair;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
@@ -14,6 +13,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class TopN {
         }
 
         Long N;
-        List<Pair> pairList = new LinkedList<>();
+        List<AbstractMap.SimpleEntry> pairList = new LinkedList<>();
 
         @Override
         public void setup(Context context) throws IOException, InterruptedException {
@@ -40,51 +40,41 @@ public class TopN {
         @Override
         protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
             Long vertexId = Long.parseLong(value.toString().split("\\t")[0]);
-            Long reach = Long.parseLong(value.toString().split("\\t")[1]);
-
-            pairList = insert(pairList, new Pair<Long, Long>(vertexId, reach));
-            System.out.println(pairList);
+            Float reach = Float.parseFloat(value.toString().split("\\t")[1]);
+            pairList = insert(pairList, new AbstractMap.SimpleEntry(vertexId, reach));
             if (pairList.size() > N) {
                 pairList.remove(pairList.size() - 1);
             }
         }
 
         protected void cleanup(Mapper.Context context) throws IOException, InterruptedException {
-            System.out.println("IN MAPPER CONTEXT");
-            System.out.println(pairList);
-            for (Pair p : pairList) {
+            for (AbstractMap.SimpleEntry p : pairList) {
                 context.write(NullWritable.get(), new Text(p.getKey() + "," + p.getValue()));
             }
         }
     }
 
-    static private List<Pair> insert(List<Pair> pairList, Pair pair) {
+    static private List<AbstractMap.SimpleEntry> insert(List<AbstractMap.SimpleEntry> pairList, AbstractMap.SimpleEntry pair) {
         for (int i = 0; i < pairList.size(); i++) {
             if (smaller(pairList.get(i), pair)) {
                 pairList.add(i, pair);
                 return pairList;
             }
         }
+        pairList.add(pair);
         return pairList;
     }
 
-    static private Boolean smaller(Pair<Long, Long> p1, Pair<Long, Long> p2) {
+    static private Boolean smaller(AbstractMap.SimpleEntry<Long, Float> p1, AbstractMap.SimpleEntry<Long, Float> p2) {
         if (p1.getValue() < p2.getValue()) {
             return true;
         }
         return false;
-
-
     }
 
     static class TopNReducer extends Reducer<NullWritable, Text, NullWritable, Text> {
-
-        public TopNReducer() {
-
-        }
-
         Long N;
-        List<Pair> pairList = new LinkedList<>();
+        List<AbstractMap.SimpleEntry> pairList = new LinkedList<>();
 
         @Override
         public void setup(Context context) throws IOException, InterruptedException {
@@ -93,19 +83,18 @@ public class TopN {
 
         @Override
         protected void reduce(NullWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-            System.out.println("REDUCER");
             for (Text value : values) {
                 System.out.println(value);
                 Long vertexId = Long.parseLong(value.toString().split(",")[0]);
-                Long reach = Long.parseLong(value.toString().split(",")[1]);
+                Float reach = Float.parseFloat(value.toString().split(",")[1]);
 
-                pairList = insert(pairList, new Pair<>(vertexId, reach));
+                pairList = insert(pairList, new AbstractMap.SimpleEntry<>(vertexId, reach));
                 if (pairList.size() > N) {
                     pairList.remove(pairList.size() - 1);
                 }
 
             }
-            for (Pair p : pairList) {
+            for (AbstractMap.SimpleEntry p : pairList) {
                 context.write(NullWritable.get(), new Text(p.getKey() + "," + p.getValue()));
             }
         }
