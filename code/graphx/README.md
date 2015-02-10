@@ -38,4 +38,8 @@ spark-submit --class "com.bd.InfluenceMax" --master local[*] target/spark-graphx
 
 Run Driver :
 
-spark-submit --class "com.bd.Driver" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar degree data/hep.txt 100 10 0.01 output-degree/
+spark-submit --class "com.bd.Driver" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/hep.txt 100 10 0.01 output
+
+Run SimDriver :
+
+spark-submit --class "com.bd.SimDriver" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/hep.txt output-degree/ 100 0.01
