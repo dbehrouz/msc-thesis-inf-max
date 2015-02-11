@@ -42,4 +42,4 @@ spark-submit --class "com.bd.Driver" --master local[*] target/spark-graphx-1.0.0
 
 Run SimDriver :
 
-spark-submit --class "com.bd.SimDriver" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/hep.txt output-degree/ 100 0.01
+spark-submit --class "com.bd.SimDriver" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/hep.txt 10 0.01

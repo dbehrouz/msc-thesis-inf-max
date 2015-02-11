@@ -15,7 +15,7 @@ object SimDriver {
   def main(args: Array[String]) {
     val conf = new SparkConf().setAppName("IC Simulation")
     val sc = new SparkContext(conf)
-    val outputs = List("output-pagerank/", "output-random/")
+    val outputs = List("output-singlecycle/", "output-multicycle/")
 
     for (o <- outputs) {
       run(o, args(0), args(1).toInt, args(2).toDouble, sc)

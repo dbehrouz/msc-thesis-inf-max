@@ -19,8 +19,8 @@ lines(degree, type="l" , lty=2,)
 lines(degreediscount, type="l" , lty=3)
 lines(pagerank, type="l" , lty=4)
 lines(random, type="l" , lty=5)
-lines(multicycle, type="l" , lty=1, pch=1)
-lines(singlecycle, type="l" , lty=1, pch=2)
+lines(multicycle, type="l" , lty=6)
+lines(singlecycle, type="l" , lty="24")
 
 
-legend(5,95,c("edgesampling","degree","degreediscount","pagerank","random"), lty =c(1,2,3,4,5),cex=0.7)
+legend(5,95,c("edgesampling","degree","degreediscount","pagerank","random","multicycle","singlecycle"), lty =c(1,2,3,4,5,6,24),cex=0.7)
