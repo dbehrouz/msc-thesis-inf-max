@@ -568,11 +568,43 @@ Giraph provides more freedom to run algorithms in pregel framework, as it leaves
 
 
 \subsection{Results}
-Graphs below show the result running method described in previous section. 
-A graph showing the methods in this paper vs the same methods implemented for single machine from other papers.
-A graph for showing the time.
+In this section, both the result and running time of different methods on each data set are provided. Figures below show the result of running the 6 different algorithm on collaboration network data set. In each of graphs, the results are drawn against the random method, to make the comparison easier between each method. In previous sections, it was discussed that the function that computes the spread is not deterministic and it is just an estimation based on several Monte-Carlo simulations. That explains the noise in graph. As it can be observed from the figures, that spread is not always strictly increasing as the seed size increases and that is due to the randomness of the process. Increasing the number of simulations will make the graph smoother. Running several experiments using different number of simulations, has shown that the effect seems to be minimal on the actual result. Specially, when the size of a data set is massive, the changes in the spread function have minimal impact on the final result. Because of this, I have chosen to set the number of simulations in all the experiments to 100 .
+\begin{figure}[ht!]
 
+\centering
+\includegraphics[width=100mm]{figures/hep/degree-degreediscount.png}
+\caption{Degree and Degree-Discount methods}
+\label{hep:degdiscount}
+\end{figure}
+Figure \ref{hep:degdiscount} the final spread for \textit{degree method}(on the left) and \textit{degree-discount method} (on the right). These two methods have produced the best result among all the other methods. Structure of the graph as well as the fact that they do not rely on the simulation process have contributed to their advantage over the other methods.
 
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=100mm]{figures/hep/page-edgesample.png}
+\caption{Pagerank and Edgesampling methods}
+\label{hep:pageedge}
+\end{figure}
+Figure \ref{hep:pageedge} shows the spread of \textit{Page rank method} (on the left) and \textit{Edge sampling method} (on the right). Similar to degree and degree discount methods, page rank seems to be a good heuristic for the hep data set, as it behaves similarly to both of other two heuristics methods. \textit{Edge sampling} however, although produces a much better result than random seed selection, still does not match with the heuristic methods. There are two reasons why edge sampling does not perform as good as the other methods. First, it heavily depends on the simulation process and number of simulations, to find the seed using edge sampling method only 100 simulations, which although have minimal impact but still can cause the final spread to be smaller than expected. Secondly, it also depends on the graph structure, this method generally performs well, when the graph has fewer connected components of bigger sizes, edge sampling has a better chance of finding influential nodes. In network collaboration data set, sampling edges with a probability of 0.01, in most of the resulted in nearly all of the connected components of having a size of 1. This has produced a biased result as a lot of the more influential nodes after the sampling will end up having no edges attached to them and essentially yielding the same spread as disconnected vertices before the sample. One solution to this problem would be to increase the number of simulation. Edge sampling method is expected to perform better on graphs of massive scale with millions or even billions of edges. 
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=100mm]{figures/hep/multi-singlecycle.png}
+\caption{Multi-attempt Single Cycle and Single Cycle methods}
+\label{hep:multisingle}
+\end{figure}
+Figure \ref{hep:multisingle} shows \textit{Multi-attempt Single Cycle method} (on the left) and \text{Single Cycle method} (on the right). Similar to Edge sampling, they are expected to perform better on graphs of bigger scale.
+
+ \begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/hep/times.png}
+\caption{Running time of different methods on collaboration network data set}
+\label{hep:times}
+\end{figure}
+
+Figure \ref{hep:times} shows the running time for each of different methods. As expected the running times are constant and do not change as the seed size increases. This is on the contrary to the greedy method, where finding even an extra seed requires an entire scan of the data set and running the simulation process for each individual vertices. This graphs, shows the advantage these methods have over the traditional greedy method and justifies their use despite of the lesser solution quality.
+
+\pagebreak
+\pagebreak
 \section{Conclusion}
 In this document, the problem of influence maximization was discussed. One of the main issues in solutions to problem is the scalability. Due to the nature of the solutions proposed, none can perform well for large scale graphs. Over the past decade, with wide spread usage of internet data collection has been the focus of many big firms. Social networks and online store are gathering data about millions of users everyday. The information about users are stored in graph data structures that sometimes consists of millions (even billions) of nodes and  many more edges. Applying some of the solutions proposed for influence maximization to graphs of these scales are impossible and even on the strongest super computers will take days or even months to see the result. Here, I have identified why the solutions are not scalable and proposed some new or modified solutions to work with graphs of this scale. Several frameworks for processing large scale data have been created over the past couple of years, most notably are Hadoop and Spark. Both of which are designed to run on commodity computers, and are highly scalable. They both have a built in frameworks for processing graphs; Giraph which is on top of Hadoop and Graphx on top of Spark. Methods described in this document, are implemented using these two frameworks. In last section, several experiments on different data sets were performed and the results were presented. \\
 Theoretically, it was proven by \cite{kempe03} that the greedy method provides the best solution to the influence maximization problem, but the inefficiency of the method for some types of graphs excels its quality and justifies the sacrifice of quality for performance. Several of the methods discussed here, run very fast and they are not affected by the size of the input graph. In some of the data sets that it was possible to run the greedy methods, some of these scalable methods provided comparable solution in term of quality with the greedy algorithm, and result showed that even on small data sets, greedy method will take extremely long amount of time, making it virtually impossible to run the greedy method on large scale graphs that are very common today. \\
