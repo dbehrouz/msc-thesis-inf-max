@@ -1,25 +1,18 @@
 package com.bd.propogation.ic
 
-import org.apache.log4j.{Level, Logger}
-import org.apache.spark.SparkContext
+import com.bd.SparkTestBase
 import org.apache.spark.graphx.{Edge, Graph}
-import org.apache.spark.rdd.RDD
-import org.junit.{After, Before, Test}
-import org.scalatest.junit.AssertionsForJUnit
+import org.junit.Test
 
 /**
  * @author Behrouz Derakhshan
  */
-class SimulationTest extends AssertionsForJUnit {
-
-  var sc: SparkContext = _
+class SimulationTest extends SparkTestBase {
 
   def fullyConnectedGraph(size: Long): Graph[Long, Double] = {
     val vertexArray = createVertices(size)
     val edgeArray = fullyConnected(vertexArray)
-    val vertexRDD: RDD[(Long, Long)] = sc.parallelize(vertexArray)
-    val edgeRDD: RDD[Edge[Double]] = sc.parallelize(edgeArray)
-    Graph(vertexRDD, edgeRDD)
+    graph(vertexArray,edgeArray)
   }
 
 
@@ -27,12 +20,6 @@ class SimulationTest extends AssertionsForJUnit {
     nCCGraph(size, 2)
   }
 
-  def graph(vertexArray: List[(Long, Long)],
-            edgeArray: List[Edge[Double]]): Graph[Long, Double] = {
-    val vertexRDD: RDD[(Long, Long)] = sc.parallelize(vertexArray)
-    val edgeRDD: RDD[Edge[Double]] = sc.parallelize(edgeArray)
-    Graph(vertexRDD, edgeRDD)
-  }
 
   def nCCGraph(size: Long, n: Int): Graph[Long, Double] = {
     val vertexArray = createVertices(size)
@@ -51,15 +38,6 @@ class SimulationTest extends AssertionsForJUnit {
     val vertexArray = createVertices(size)
     val edgeArray = simpleConnected(vertexArray)
     graph(vertexArray, edgeArray)
-  }
-
-
-  def createVertices(size: Long): List[(Long, Long)] = {
-    var vertices: List[(Long, Long)] = List()
-    for (i <- 1L to size) {
-      vertices ::=(i, i)
-    }
-    vertices
   }
 
   def fullyConnected(vertices: List[(Long, Long)]): List[Edge[Double]] = {
@@ -84,19 +62,6 @@ class SimulationTest extends AssertionsForJUnit {
       }
     }
     edges
-  }
-
-  @Before def setUp() {
-    SparkUtil.silenceSpark()
-    sc = new SparkContext("local[*]", "Unit Tests")
-
-  }
-
-  @After def tearDown() {
-    sc.stop()
-    sc = null
-    // To avoid Akka rebinding to the same port, since it doesn't unbind immediately on shutdown
-    System.clearProperty("spark.master.port")
   }
 
   @Test def runWithFullPropagation() {
@@ -136,20 +101,5 @@ class SimulationTest extends AssertionsForJUnit {
     }
   }
 
-  object SparkUtil {
-    def silenceSpark() {
-      setLogLevels(Level.WARN, Seq("spark", "org.eclipse.jetty", "akka"))
-    }
-
-    def setLogLevels(level: Level, loggers: TraversableOnce[String]) = {
-      loggers.map {
-        loggerName =>
-          val logger = Logger.getLogger(loggerName)
-          val prevLevel = logger.getLevel()
-          logger.setLevel(level)
-          loggerName -> prevLevel
-      }.toMap
-    }
-  }
 
 }
