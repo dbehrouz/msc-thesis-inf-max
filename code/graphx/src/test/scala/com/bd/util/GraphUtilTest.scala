@@ -39,7 +39,6 @@ class GraphUtilTest extends SparkTestBase {
     if (undirectedGraph.edges.count != 8) {
       fail("Expected edge count = " + 8 + ", actual = " + undirectedGraph.edges.count)
     }
-    undirectedGraph.edges.collect.foreach(println)
     assert(undirectedGraph.edges.filter(_.attr == 1.0).count == 8)
   }
 
