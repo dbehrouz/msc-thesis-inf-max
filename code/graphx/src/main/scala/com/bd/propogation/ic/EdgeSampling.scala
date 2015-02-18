@@ -19,7 +19,7 @@ object EdgeSampling extends SeedFinder {
 
   def run(graph: Graph[Long, Double], seedSize: Int, iterations: Int, sc: SparkContext): RDD[VertexId] = {
 
-    var vs = graph.mapVertices((id, attr) => 0L).vertices.collect.toMap
+    var vs = graph.mapVertices((id, attr) => 0L).vertices
 
     for (i <- 1 to iterations) {
       // sample based on probability
@@ -42,18 +42,18 @@ object EdgeSampling extends SeedFinder {
       cc.unpersist(blocking = false)
     }
     graph.unpersist(blocking = false)
-    sc.parallelize(vs.toSeq.sortBy(-_._2).take(seedSize).map(_._1))
+    sc.parallelize(vs.top(seedSize)(Ordering.by(_._2)).map(_._1))
   }
 
   def findSizes(cc: VertexRDD[VertexId], sc: SparkContext): Broadcast[Map[VertexId, Long]] = {
     sc.broadcast(cc.groupBy(_._2).map(c => (c._1, c._2.size.toLong)).collect().toList.toMap)
   }
 
-  def mapVertices(cc: VertexRDD[VertexId], ccSize: Broadcast[Map[VertexId, Long]], sc: SparkContext): Map[VertexId, Long] = {
-    cc.mapValues(value => ccSize.value.get(value).get).collect.toMap
+  def mapVertices(cc: VertexRDD[VertexId], ccSize: Broadcast[Map[VertexId, Long]], sc: SparkContext): VertexRDD[Long] = {
+    cc.mapValues(value => ccSize.value.get(value).get)
   }
 
-  def addVertices(vs: Map[VertexId, Long], vs2: Map[VertexId, Long]): Map[VertexId, Long] = {
-    vs ++ vs2.map { case (k, v) => k -> (v + vs.getOrElse(k, 0L))}
+  def addVertices(vs: VertexRDD[Long], vs2: VertexRDD[Long]): VertexRDD[Long] = {
+    vs.innerJoin(vs2) { case (id, v1, v2) => v1 + v2}
   }
 }
