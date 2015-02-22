@@ -23,9 +23,10 @@ class EdgeSamplingTest extends SparkTestBase {
   }
 
   @Test def mapVertices() {
-    val broadcastedMap = sc.broadcast(Map(1L -> 4L, 5L -> 3L))
-    val mappedValues = EdgeSampling.mapVertices(cc, broadcastedMap, sc)
-    // assert(Map(1L -> 4L, 2L -> 4L, 3L -> 4L, 4L -> 4L, 5L -> 3L, 6L -> 3L, 7L -> 3L) == mappedValues)
+    val broadcastMap = sc.broadcast(Map(1L -> 4L, 5L -> 3L))
+    val mappedValues = EdgeSampling.mapVertices(cc, broadcastMap, sc)
+    val expected = List((1L, 4L), (3L, 4L), (6L, 3L), (2L, 4L), (4L, 4L), (7L, 3L), (5L, 3L))
+    assert(expected.sortBy(_._1) == mappedValues.collect.toList.sortBy(_._1))
   }
 
   @Test def addVertices() {
@@ -33,7 +34,7 @@ class EdgeSamplingTest extends SparkTestBase {
     val newVertices = VertexRDD(sc.parallelize(List((1L, 4L), (2L, 4L), (3L, 4L), (4L, 4L), (5L, 3L), (6L, 3L), (7L, 3L))))
     val finalVertices = EdgeSampling.addVertices(vertices, newVertices)
     finalVertices.foreach(println)
-    //assert(Map(1L -> 5L, 2L -> 6L, 3L -> 7L, 4L -> 8L, 5L -> 8L, 6L -> 9L, 7L -> 10L) == finalVertices)
+    assert(List((1L, 5L), (2L, 6L), (3L, 7L), (4L, 8L), (5L, 8L), (6L, 9L), (7L, 10L)) == finalVertices.collect.toList.sortBy(_._1))
 
   }
 

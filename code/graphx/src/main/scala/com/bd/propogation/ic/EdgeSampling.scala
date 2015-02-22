@@ -31,7 +31,7 @@ object EdgeSampling extends SeedFinder {
       // Group by component id
       // a map of component ids to size of component
       // broad cast this variable
-      val ccSize = findSizes(cc, sc)
+      val ccSize = findSizes(cc, sc) // (map(cc_id,cc_size))
 
       val vs2 = mapVertices(cc, ccSize, sc)
       vs = addVertices(vs, vs2)
