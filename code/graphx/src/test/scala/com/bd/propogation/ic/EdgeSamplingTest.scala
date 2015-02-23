@@ -16,17 +16,10 @@ class EdgeSamplingTest extends SparkTestBase {
     cc = VertexRDD(sc.parallelize(List((1L, 1L), (2L, 1L), (3L, 1L), (4L, 1L), (5L, 5L), (6L, 5L), (7L, 5L))))
   }
 
-  @Test def findCCSize() {
-
-    val mappedValues = EdgeSampling.findSizes(cc, sc)
-    assert(Map(1L -> 4L, 5L -> 3L) == mappedValues.value)
-  }
-
   @Test def mapVertices() {
-    val broadcastMap = sc.broadcast(Map(1L -> 4L, 5L -> 3L))
-    val mappedValues = EdgeSampling.mapVertices(cc, broadcastMap, sc)
-    val expected = List((1L, 4L), (3L, 4L), (6L, 3L), (2L, 4L), (4L, 4L), (7L, 3L), (5L, 3L))
-    assert(expected.sortBy(_._1) == mappedValues.collect.toList.sortBy(_._1))
+    val mappedValues = EdgeSampling.mapVertices(cc, sc)
+    val expected = List((1L, 4L), (2L, 4L), (3L, 4L), (4L, 4L), (5L, 3L), (6L, 3L), (7L, 3L))
+    assert(expected == mappedValues.collect.toList.sortBy(_._1))
   }
 
   @Test def addVertices() {
