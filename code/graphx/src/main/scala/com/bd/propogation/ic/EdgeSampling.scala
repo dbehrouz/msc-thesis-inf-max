@@ -1,10 +1,10 @@
 package com.bd.propogation.ic
 
 import com.bd.SeedFinder
+import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.graphx.{Graph, VertexId, VertexRDD}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.{HashPartitioner, SparkContext}
 
 
 /**
@@ -26,7 +26,7 @@ object EdgeSampling extends SeedFinder {
 
       // vertex id, component id
       val cc = ConnectedComponents.runCC(sampledGraph).vertices
-      
+
       // TODO : improve by using partitioner
       val vs2 = mapVertices(cc, sc)
 
