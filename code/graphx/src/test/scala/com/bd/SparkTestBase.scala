@@ -16,6 +16,8 @@ class SparkTestBase extends AssertionsForJUnit {
   @Before def setUp() {
     SparkUtil.silenceSpark()
     sc = new SparkContext("local[*]", "Unit Tests")
+    Logger.getRootLogger.setLevel(Level.ERROR)
+
 
   }
 
@@ -49,17 +51,17 @@ class SparkTestBase extends AssertionsForJUnit {
   }
 
 
-  def createVertices(size: Long): List[(Long, Long)] = {
-    var vertices: List[(Long, Long)] = List()
-    for (i <- 1L to size) {
+  def createVertices(size: Int): List[(Long, Int)] = {
+    var vertices: List[(Long, Int)] = List()
+    for (i <- 1 to size) {
       vertices ::=(i, i)
     }
     vertices
   }
 
-  def graph(vertexArray: List[(Long, Long)], edgeArray: List[Edge[Double]]): Graph[Long, Double] = {
-    val vertexRDD: RDD[(Long, Long)] = sc.parallelize(vertexArray)
-    val edgeRDD: RDD[Edge[Double]] = sc.parallelize(edgeArray)
+  def graph(vertexArray: List[(Long, Int)], edgeArray: List[Edge[Int]]): Graph[Int, Int] = {
+    val vertexRDD: RDD[(Long, Int)] = sc.parallelize(vertexArray)
+    val edgeRDD: RDD[Edge[Int]] = sc.parallelize(edgeArray)
     Graph(vertexRDD, edgeRDD)
   }
 

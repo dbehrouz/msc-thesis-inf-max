@@ -14,12 +14,12 @@ class ConnectedComponentsTest extends SparkTestBase {
     // create graph
     // 4 edges of weight 1
     val size = 4
-    val weight = 1.0
+    val weight = 1
     val vertices = createVertices(size)
-    var edges: List[Edge[Double]] = List()
-    edges ::= Edge(1L, 2L, weight)
-    edges ::= Edge(1L, 3L, weight)
-    edges ::= Edge(1L, 4L, weight)
+    var edges: List[Edge[Int]] = List()
+    edges ::= Edge(1, 2, weight)
+    edges ::= Edge(1, 3, weight)
+    edges ::= Edge(1, 4, weight)
     val undirectedGraph = GraphUtil.undirected(graph(vertices, edges))
     val cc = ConnectedComponents.runCC(undirectedGraph).vertices
     assert(cc.collect.toList.count(_._2 == 1L) == 4)

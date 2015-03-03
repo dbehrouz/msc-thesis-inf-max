@@ -1,0 +1,19 @@
+Yarn Settings :
+export SPARK_EXECUTOR_INSTANCES=5
+export SPARK_EXECUTOR_CORES=4
+export SPARK_EXECUTOR_MEMORY=8G
+export SPARK_DRIVER_MEMORY=5G
+
+Run Yarn Shell :
+/home/hadoop/spark/bin/spark-shell --master yarn-cluster
+
+On EMR spark-sumit is in : /home/hadoop/spark/bin/
+
+Live Journal Data :
+wget https://snap.stanford.edu/data/soc-LiveJournal1.txt.gz
+unzip soc-LiveJournal1.txt.gz
+hadoop dfs -copyFromLocal soc-LiveJournal1.txt /data/livejournal/
+
+
+Run Driver :
+./spark/bin/spark-submit --class "com.bd.Driver" --master yarn-cluster spark-graphx-1.0.0-SNAPSHOT.jar /data/livejournal 50000 10 0.01 /data/output degree

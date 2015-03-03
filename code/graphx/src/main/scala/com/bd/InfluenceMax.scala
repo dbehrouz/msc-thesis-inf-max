@@ -1,9 +1,8 @@
 package com.bd
 
-import com.bd.propogation.heuristic.{PageRankMethod, DegreeDiscount, Degree}
+import com.bd.propogation.heuristic.{Degree, DegreeDiscount, PageRankMethod}
 import com.bd.propogation.ic._
-import com.bd.util.{GraphUtil, EdgeListTransformer}
-import org.apache.spark.api.java.StorageLevels
+import com.bd.util.GraphUtil
 import org.apache.spark.graphx._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{Logging, SparkConf, SparkContext}
@@ -59,7 +58,7 @@ object InfluenceMax extends Logging {
     val output = args(5)
     println("Output Directory: " + output)
 
-    val graph = GraphUtil.undirected(EdgeListTransformer.transform(GraphLoader.edgeListFile(sc, inputGraphFile), prob)).persist(StorageLevels.MEMORY_ONLY)
+    val graph = GraphUtil.undirected(GraphLoader.edgeListFile(sc, inputGraphFile), prob).cache()
     val result = runAlgorithm(method, graph, seedSize, iterations, sc)
 
     result.saveAsTextFile(output)

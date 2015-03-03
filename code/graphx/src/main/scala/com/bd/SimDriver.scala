@@ -3,7 +3,7 @@ package com.bd
 import java.io.File
 
 import com.bd.propogation.ic.Simulation
-import com.bd.util.{EdgeListTransformer, GraphUtil}
+import com.bd.util.GraphUtil
 import org.apache.spark.graphx.GraphLoader
 import org.apache.spark.{SparkConf, SparkContext}
 
@@ -35,7 +35,7 @@ object SimDriver {
           .toList
 
         println("Number of Initial Active Nodes " + activeNodes.length)
-        val graph = GraphUtil.undirected(EdgeListTransformer.transform(GraphLoader.edgeListFile(sc, inputGraphFile), prob))
+        val graph = GraphUtil.undirected(GraphLoader.edgeListFile(sc, inputGraphFile), prob)
 
         val spread = Simulation.run(graph, activeNodes, iterations)
         println("Total Spread: " + spread)

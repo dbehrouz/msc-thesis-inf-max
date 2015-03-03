@@ -1,6 +1,7 @@
 package com.bd.propogation.ic
 
 import com.bd.SparkTestBase
+import com.bd.util.GraphUtil
 import org.apache.spark.graphx.{Edge, Graph}
 import org.junit.Test
 
@@ -9,23 +10,23 @@ import org.junit.Test
  */
 class SimulationTest extends SparkTestBase {
 
-  def fullyConnectedGraph(size: Long): Graph[Long, Double] = {
+  def fullyConnectedGraph(size: Int): Graph[Int, Int] = {
     val vertexArray = createVertices(size)
     val edgeArray = fullyConnected(vertexArray)
     graph(vertexArray,edgeArray)
   }
 
 
-  def twoCCGraph(size: Long): Graph[Long, Double] = {
+  def twoCCGraph(size: Int): Graph[Int, Int] = {
     nCCGraph(size, 2)
   }
 
 
-  def nCCGraph(size: Long, n: Int): Graph[Long, Double] = {
+  def nCCGraph(size: Int, n: Int): Graph[Int, Int] = {
     val vertexArray = createVertices(size)
     val batchSize = (size / n).toInt
     var start = 0
-    var allEdges: List[Edge[Double]] = List()
+    var allEdges: List[Edge[Int]] = List()
     for (i <- 1 to n) {
       val end = if (start + batchSize >= size) size.toInt else start + batchSize
       allEdges = allEdges ::: fullyConnected(vertexArray.slice(start, end))
@@ -34,18 +35,18 @@ class SimulationTest extends SparkTestBase {
     graph(vertexArray, allEdges)
   }
 
-  def simpleTree(size: Long): Graph[Long, Double] = {
+  def simpleTree(size: Int): Graph[Int, Int] = {
     val vertexArray = createVertices(size)
     val edgeArray = simpleConnected(vertexArray)
     graph(vertexArray, edgeArray)
   }
 
-  def fullyConnected(vertices: List[(Long, Long)]): List[Edge[Double]] = {
-    var edges: List[Edge[Double]] = List()
+  def fullyConnected(vertices: List[(Long, Int)]): List[Edge[Int]] = {
+    var edges: List[Edge[Int]] = List()
     for (v <- vertices) {
       for (u <- vertices) {
         if (v != u) {
-          edges ::= Edge(v._1, u._1, 1.0)
+          edges ::= Edge(v._1, u._1, 1)
         }
       }
     }
@@ -53,12 +54,12 @@ class SimulationTest extends SparkTestBase {
   }
 
 
-  def simpleConnected(vertices: List[(Long, Long)]): List[Edge[Double]] = {
-    var edges: List[Edge[Double]] = List()
+  def simpleConnected(vertices: List[(Long, Int)]): List[Edge[Int]] = {
+    var edges: List[Edge[Int]] = List()
     val sorted = vertices.map(_._1).sorted
     for (v <- sorted) {
       if (v != sorted.length) {
-        edges ::= Edge(v, v + 1, 1.0)
+        edges ::= Edge(v, v + 1, 1)
       }
     }
     edges
@@ -66,7 +67,7 @@ class SimulationTest extends SparkTestBase {
 
   @Test def runWithFullPropagation() {
     val size = 100
-    val spread = Simulation.run(fullyConnectedGraph(size), List(2L), 1)
+    val spread = Simulation.run(GraphUtil.mapTypes(fullyConnectedGraph(size)), List(2L), 1)
     if (size != spread.toInt) {
       fail("Expected spread = " + size + ", actual = " + spread)
     }
@@ -74,7 +75,7 @@ class SimulationTest extends SparkTestBase {
 
   @Test def runWithTwoConnectedComponents() {
     val size = 100
-    val spread = Simulation.run(twoCCGraph(size), List(1L, 51L), 1)
+    val spread = Simulation.run(GraphUtil.mapTypes(twoCCGraph(size)), List(1L, 51L), 1)
     if (size != spread.toInt) {
       fail("Expected spread = " + size + ", actual = " + spread)
     }
@@ -84,8 +85,8 @@ class SimulationTest extends SparkTestBase {
     val size = 1000
     val cc = 100
     val graph = nCCGraph(size, cc)
-    val spread = Simulation.run(graph,
-      graph.connectedComponents.vertices.map(_._2).distinct.collect.toList,
+    val spread = Simulation.run(GraphUtil.mapTypes(graph),
+      graph.connectedComponents().vertices.map(_._2).distinct().collect().toList,
       1)
     if (size != spread.toInt) {
       fail("Expected spread = " + size + ", actual = " + spread)
@@ -95,7 +96,7 @@ class SimulationTest extends SparkTestBase {
   @Test def runWithSimpleTree() {
     val size = 10
 
-    val spread = Simulation.run(simpleTree(size), List(1L), 1)
+    val spread = Simulation.run(GraphUtil.mapTypes(simpleTree(size)), List(1L), 1)
     if (size != spread.toInt) {
       fail("Expected spread = " + size + ", actual = " + spread)
     }

@@ -17,9 +17,7 @@ import org.apache.spark.rdd.RDD
  */
 object EdgeSampling extends SeedFinder {
   def run(graph: Graph[Long, Double], seedSize: Int, iterations: Int, sc: SparkContext): RDD[VertexId] = {
-
-    var vs = graph.vertices.map(v => (v._1.toLong, 0L))
-
+    var vs = graph.mapVertices((v, value) => 0L).vertices
     for (i <- 1 to iterations) {
       // sample based on probability
       val sampledGraph = graph.subgraph(epred = e => math.random < e.attr)
@@ -30,7 +28,7 @@ object EdgeSampling extends SeedFinder {
       // TODO : improve by using partitioner
       val vs2 = mapVertices(cc, sc)
 
-      vs = addVertices(vs, vs2).cache()
+      vs = addVertices(vs, vs2)
 
       println("Iteration : " + i)
       sampledGraph.unpersistVertices(blocking = false)
@@ -41,17 +39,20 @@ object EdgeSampling extends SeedFinder {
     sc.parallelize(vs.top(seedSize)(Ordering.by(_._2)).map(_._1))
   }
 
-  def mapVertices(cc: VertexRDD[VertexId], sc: SparkContext): RDD[(Long, Long)] = {
-    cc.groupBy(_._2).flatMap { v =>
+  def mapVertices(cc: VertexRDD[VertexId], sc: SparkContext): VertexRDD[Long] = {
+    VertexRDD(cc.groupBy(_._2).flatMap { v =>
       var res: List[(Long, Long)] = List()
       for (i <- v._2) {
         res = (i._1, v._2.size.toLong) :: res
       }
       res
-    }
+    })
   }
 
-  def addVertices(vs: RDD[(Long, Long)], vs2: RDD[(Long, Long)]): RDD[(Long, Long)] = {
-    vs.join(vs2).map(joined => (joined._1, joined._2._1 + joined._2._2))
+  def addVertices(vs: VertexRDD[Long], vs2: VertexRDD[Long]): VertexRDD[Long] = {
+    //    vs.join(vs2).map(joined => (joined._1, joined._2._1 + joined._2._2))
+    vs.innerJoin(vs2) {
+      (id, v1, v2) => v1 + v2
+    }
   }
 }

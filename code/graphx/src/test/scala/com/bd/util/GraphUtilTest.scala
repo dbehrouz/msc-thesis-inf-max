@@ -27,13 +27,13 @@ class GraphUtilTest extends SparkTestBase {
     // create graph
     // 4 edges of weight 1
     val size = 5
-    val weight = 1.0
+    val weight = 1
     val vertices = createVertices(size)
-    var edges: List[Edge[Double]] = List()
-    edges ::= Edge(1L, 2L, weight)
-    edges ::= Edge(1L, 3L, weight)
-    edges ::= Edge(1L, 4L, weight)
-    edges ::= Edge(1L, 5L, weight)
+    var edges: List[Edge[Int]] = List()
+    edges ::= Edge(1, 2, weight)
+    edges ::= Edge(1, 3, weight)
+    edges ::= Edge(1, 4, weight)
+    edges ::= Edge(1, 5, weight)
 
     val undirectedGraph = GraphUtil.undirected(graph(vertices, edges))
     if (undirectedGraph.edges.count != 8) {
@@ -46,15 +46,15 @@ class GraphUtilTest extends SparkTestBase {
     // create graph
     // 6 edges of weight 1
     val size = 3
-    val weight = 1.0
+    val weight = 1
     val vertices = createVertices(size)
-    var edges: List[Edge[Double]] = List()
-    edges ::= Edge(1L, 2L, weight)
-    edges ::= Edge(1L, 2L, weight)
-    edges ::= Edge(1L, 2L, weight)
-    edges ::= Edge(1L, 3L, weight)
-    edges ::= Edge(1L, 3L, weight)
-    edges ::= Edge(2L, 3L, weight)
+    var edges: List[Edge[Int]] = List()
+    edges ::= Edge(1, 2, weight)
+    edges ::= Edge(1, 2, weight)
+    edges ::= Edge(1, 2, weight)
+    edges ::= Edge(1, 3, weight)
+    edges ::= Edge(1, 3, weight)
+    edges ::= Edge(2, 3, weight)
 
     val edgeList = GraphUtil.undirected(graph(vertices, edges)).edges.collect().toList
     assert(edgeList.size == 6)
@@ -71,6 +71,4 @@ class GraphUtilTest extends SparkTestBase {
     assert(filtered.size == 1)
     filtered(0).attr
   }
-
-
 }
