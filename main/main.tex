@@ -54,142 +54,6 @@ Many other graph frameworks for processing large scale data exists, but the core
 The aim of this thesis is to study in detail the problem of influence maximization in social networks, current state of art algorithm for the problem. Disadvantages of the methods, specially regarding the scalability are discussed and different methods are proposed to solve the issue, using large scale graph processing system. \\
 The rest of this document is organized as follow; in section 2 Big Data framework, their history and the current state are discussed, two of the very common frameworks, i.e. Hadoop and Spark are studied in detail. In section 3, different large scale graph processing frameworks are compared and Giraph which is based on Hadoop's MapReduce and GraphX which is based on Spark are explained in great detail. Section 4, contains the history of influence maximization problem, different methods that have been proposed so far, their advantages and disadvantages are discussed. In section 5, scalability issue of influence maximization is studied, and several methods either novel or based on previous methods are proposed and the implementation details are discussed. Section 6 concludes the thesis, and future works, problems that were not covered in the document are discussed
 
-\newpage
-
-\section{Big Data}
-Information and data has always been gathered for analysis and improvement or invention of new or existing technologies. It had helped governments to better govern countries, it had helped companies to better understand their costumers, and it had helped researchers and scientists to solve problems. With introduction of World Wide Web(http://webfoundation.org/about/vision/history-of-the-web/) exchange and collection of data has become a lot simpler. Big firms and companies started to collect user's information, browsing behavior and etc . Petabytes of data are being stored and exchanged everyday, and these data contain valuable information that is being used for solving a lot of problems using data mining and machine learning methods. 
-Processing this amount of data, has never been an easy tasks and prior to introduction of new BigData technologies, this processing and analyzing has been always done using expensive Server systems that are able to process millions to billions of bytes of data in a second. 
-Google Inc. revolutionary papers has drastically changed field. \cite{ghemawat03} introduced \textbf{The Google's Distributed System}; a file system built for storing terabytes of data. It is scalable, meaning more storage can be easily added, and it is being deployed on commodity hardware, meaning it does not require any sophisticated and expensive piece of hardware to use. Dean et. al \cite{dean04} introduced \textbf{MapReduce} a framework for processing large amount of data, again it is scalable and it can be deployed on commodity hardware. 
-Although the source code either of these two technologies were never released by Google, but based the publications \textbf{Doug Cutting} created the open source project \textit{Hadoop} which implements both MapReduce (Hadoop's MapReduce) and Google File System (Hadoop Distributed File System or HDFS for short). Since then, Hadoop has become BigData standard, several new technologies and project have been added to it.
-
-\subsection{Hadoop}
-Hadoop is consists of two major parts. 
-\textbf{MapReduce} which is a parallel programming paradigm. It is designed to run on distributed systems with many commodity computers. It involves three main steps, namely \textit{Map}, \textit{Reduce} and \textit{Shuffle}. The first two are defined by the user. Map operations are run in parallel and they process the data individually, data is divided into different portions and each one is processed by a mapper. The result of the mappers are send to a Reduce task(or several) where the results are combined. A shuffle operation is usually performed on the result of the Map tasks so that similar data are all send to the same nodes. Below is a simple algorithm for counting words in a series of documents. 
-
-\begin{algorithm}
-\begin{algorithmic}
-\Function{map}{String name, String document}
-\State {//name: document name}
-\State{//document: document contents}
-   \For {each word w in document}
-      		\State emit (w, 1)
-   \EndFor
-\EndFunction
-\State 
-\Function {reduce}{String word, Iterator partialCounts}
-\State{//word: a word}
-\State{//partialCounts: a list of aggregated partial counts}
-  \State sum = 0
-  \For{ each pc in partialCounts}
-    \State sum += ParseInt(pc)
-    \State emit (word, sum)
-\EndFor
-\EndFunction
-\end{algorithmic}
-\end{algorithm}
-
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=130mm]{figures/mapreduce.jpg}
-\caption{MapReduce paradigm}
-\end{figure}
-
-The popularity of Hadoop's MapReduce framework rises from the fact that many complexities of the system is being handled automatically by the framework. In most typical use cases, the user only needs to provide the method for Mappers and Reducers. Framework will take care of compiling and distributing the code to all the nodes, and running them in parallel. As previously mentioned it is fault tolerant, it means if during the processing a task fails, it will restart the task again, if a node encounters a problem the framework will move the computation to another node. It is scalable, which means the program does not need to know how many nodes are involved in the system. The program will scale to many nodes depending on the size of the input data and amount of available resources. There are however many advanced options that users can do to further optimize the program, but they are generally not required for simple tasks. The other feature of MapReduce and Hadoop in general is that it is available in many different languages. Java, Python, C++, Scala and many more. 
-
-Newer versions of Hadoop and MapReduce employs more sophistcated Resource manager and Scheduler called YARN(TODO REFERENCE) . YARN essentially, provides container for running different applications and it is not limited to MapReduce. Spark, Storm and and even simple Java programs can be run on YARN. YARN is more or a less cluster manager program and overviews the resource and allocates resources to different jobs being submitted to it. It has become available as part of Hadoop 2.0 technology Stack .
-
-\textbf{Hadoop Distributed File System (HDFS)}
-HDFS is a distributed file system, designed to run on commodity hardware. It provides high throughput access to application data and it fault tolerant. Though initially designed for Hadoop's MapReduce framework, it has been used in many different application.
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=130mm]{figures/hdfsarchitecture.png}
-\caption{HDFS Architecture}
-\end{figure}
-
-It is fault tolerant, meaning if a node in a cluster fails, the data is not gone. HDFS employs a feature called \textit{Data Replication}, which indicates the number of type each object is being replicated. NameNode keeps track of where are all the same instances of the data is stored and in case a node fails it knows where to look for it. HDFS emphasizes on moving computation is much cheaper than moving data, it is true since HDFS is designed to store BigData sets, Tera or even PetaBytes of data, hence in conjunction with MapReduce, instead of moving the data around, the computation is done on the node containing the data. It is design for high throughput  rather than low latency so it is not ideal for streaming application, although several improvements are being made to further decrease the latency and making it suitable for real time streaming application. Similar to MapReduce it is design to work across heterogeneous hardware and software platforms. Meaning the nodes in the cluster do not have to be identical and even running the same operating system. Hadoop runs on JVM hence it is OS agnostic. 
-
-
-\subsection{Spark}
-Apache Spark \cite{zaharia10} was originally developed in AMPLab at UC Berkeley. The main idea was to solve MapReduce's problems. In contrast to MapReduce's 2 stage program (Map and Reduce), Spark employs an iterative paradigm. It allows users to load data into memory and perform many operations on the data, this is ideal for a lot of Machine learning problems. The underlying frameworks work on entities called Resilient Distributed Datasets (RDDs) \cite{zaharia12}. RDD  is a read only and partitioned collection of data. It can be created from storage or other RDDs. There two types operation on RDDs, transformations and actions. Transformations are operations that will create a new RDD from the existing one, for example \textit{filter}is a transformation operation. The power of RDDs lie in their internal structure, they do not need to be materialized all the time. If a RDD is created using a transformation, it will hold information about how the transformation was made and only apply them to the data once the user requests that through an action or caching the data set. Actions are operations that will materialize the dataset. Users can also ask the RDD to be stored in memory if they know they are going to use its value many times. These characteristics of RDD makes the perfect tool for performing iterative applications. Many machine learning algorithms require iterative calls to the same dataset. This is one of MapReduce's deficiency since every algorithm and job has to be written in terms of Map and Reduces. Spark with the help of RDDs allow many of the well known machine learning algorithms to be applied to without much change to actual algorithm. With success of Spark, it had become part of the Hadoop framework. Recent versions can now on top of Yarn and they have integration with HDFS and other Hadoop components. 
-A typical Spark program is consists of a driver program that launches multiple workers. Worker programs are run on data nodes. upon execution of a program, Spark will try to send the computation to where the data is, hence minimizing the network traffic. Spark tracks where the RDDs and their partitions are.
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=130mm]{figures/sparkprogram.png}
-\caption{Spark Program}
-\end{figure}
-
- User's can control RDDs behavior by persisting it, or caching it. Tests performed on Spark showed that it is 100x times faster than MapReduce and it is able to run application that are not even possible to run using MapReduce. Spark is fault tolerant by means of RDDs. Since RDDs track the changes made to them, they can be recreated. So if a node containing some partitions of RDDs are lost they can be recreated using the these information. 
- 
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=130mm]{figures/rdd.png}
-\caption{Spark stages and RDDs}
-\end{figure}
-Figure above shows how Spark computes job stages. Boxes with solid outlines are RDDs. Partitions are shaded rectangles, in black if they are cached. To run an action on RDD G, the scheduler builds stages at wide dependencies and pipelines narrow transformations inside each stage. In this case, stage 1 does not need to run since B is cached, so we run 2 and then 3. If any of the stages fail, the computation will restart from the last healthy RDD. Also if a node containing some specific partitions of an RDD fails, the RDD will be transferred to another node and the computation will be restarted. 
-
-Spark contains a Machine learning framework named MLib and graph processing framework named GraphX . 
-Spark works very well with iterative algorithms, it doesn't have MapReduce limitation which is the result of each job has to be written to disk. Spark has in memory computation which will speed up the process. 
-% Spark Word Count Problem in Java and Scala
-\newpage
-
-\section{Large Scale Graph Processing Framework}
-What is it, where does it come from, why is it important to have frameworks capable of processing massive graphs
-
-\subsection{Giraph}
-Apache Giraph is an iterative graph processing framework, built on top of Apache Hadoop. It is the open source version of Pregel by Google \cite{malewicz10} . Its input is a graph consists of vertices and edges. Each vertex and edge contains value as well, hence the input to a \textbf{Giraph} program besides from the structure of the vertices and edges includes their initial values. The project is now being actively developed by several companies. It is being used in many real case scenarios. For example, Facebook is using it to analyze the graphs formed by users and their connection with their friends. Similar to Pregel, the computation model of Giraph is Bulk Synchronous Parallel \cite{valiant90}. A BSP computation model consists of three physical components : 
-\begin{itemize}
-\item
-A component capable of local processing
-\item
-A network for transferring messages
-\item
-A hardware which synchronizes the components
-\end{itemize}
-BSP programs are run in parallel on each processing components and then the messages are transferred between these nodes. All of the computations are done in steps and after each step is done all the components should wait until every other component have finished its processing and sends messages to other components. \\
-The architecture fits very well with BigGraph computations in a way that vertices will process data individually and send messages along the edges (or directly) to other vertices in each step. The process can be parallelized then so that all or as many vertices as possible will perform computation at the same time and send messages and at the end of each step (which is called a super step in BSP) they will wait to synchronize with other vertices. 
-The computation will continue until all vertices are inactive or no more messages were sent during a step. This figure shows the general process in BSP models : 
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=130mm]{figures/bsp.png}
-\caption{Bulk Synchronous Parallel}
-\end{figure}
-
-Based on BSP, Giraph first distribute all the vertices to different nodes, users can define the partitioning behavior so it would suite the specific kind of algorithm they are going to run. Generally the idea is to have vertices that are connected on the same node, since most of the communications are done through edges and hence this would minimize the network traffic across the cluster. Computation then begins in a series of super steps, in each one messages from the previous super step are gathered by each vertex, the vertex will do its computation and send new messages to other vertices, at the end of the each superstep, all the vertices are synchronized, counters that keep track of the status of the cluster are updated, users can also define counters and aggregators. For example, finding the vertex with the maximum value in each iteration or etc. Giraph has a series of built in aggregators and users can define their own. At the end of the computation vertices can send a command to master node telling it that they'd like to halt and done computing, their state is changed to in active and it will stay like that unless new messages are sent to those vertices. When all the vertices are in active the computation will halt and the result will be reported.
-Figure below shows how computation is done in Giraph . (TODO, source or create your own graph)
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=130mm]{figures/giraphdataflow.png}
-\caption{Giraph Work Flow}
-\end{figure}
-A typical Giraph program is carried out in several steps, each one called a \textit{superstep} . Initially all vertices are in an \textit{active} state, and each iteration an active vertex will call its compute method which is defined by the user and generally carries out the Giraph algorithm. A typical Compute method:
-\begin{itemize}
-\item
-receives messages sent to the vertex in the previous superstep
-\item
-computes using the messages, and the vertex and outgoing edge values, which may result in modifications to the values, and
-\item
-may send messages to other vertices.
-\end{itemize}
-
-The figure below shows supersteps involved with computing the single source shortest path for a simple graph.(TODO, make your own proper reference)
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=130mm]{figures/giraphsuperstep.jpg}
-\caption{Single Source Shortest Path}
-\end{figure}
-
-The input is a chain graph with three vertices (black) and two edges (green). The values of edges are 1 and 3 respectively. The algorithm computes distances from the leftmost vertex. The initial values of vertices are 0, $\infty$ and $\infty$ (top row). Distance upper bounds are sent as messages (blue), resulting in updates to vertex values (successive rows going down). The execution lasts three supersteps (separated by red lines).
-
-On a cluster level, a graph is distributed into several connected components and each one is stored in one of the computation nodes. Each cluster, has a master node that coordinates the other nodes. It will decide on which components should be stored on each device and it stored reference and tables of information about the vertices and edges and where they resides. It will ensure the supersteps are synchronized, i.e. it makes sure all vertices have finished their computation in the current superstep before starting the next superstep. It will monitor the status of the components and decide when to end the program by checking if there are any active vertices or not. 
-Although it has many advantages over MapReduce, it is still has many limitations, in one Giraph job many iterations can be done, but if graphs should go through several transformation that would require multiple Giraph jobs, which means that the data has be written to HDFS after each job which adds overhead. A lot of the Machine learning and graph algorithms and problems are iterative in nature, which will cause Giraph to have severe performance issues in some of these cases. 
-% Sample code 
-\subsection{GraphX}
-GraphX is a light API written on top of Spark. It uses the powerfull RDD abstractions as the basis of its computation, by storing vertices and edges in separate RDDs. Similar to Spark, it works well for iterative algorithms and it comes packaged with many of the algorithm such as, PageRank, Label Propagation, Connected Components and ... . GraphX, also includes an API for pregel framework.  Several important components of GraphX are :
-\begin{itemize}
-\item VertexRDD : an RDD object consist of a vertex id and a customization data type. It carries some features in comparison to the traditional RDD, such ensuring vertex ids are unique, optimized joins among different vertex groups and etc. It offers several methods for mapping values, filtering vertices(while preserving their id) and finding difference of two vertex groups.
-\item EdgeRDD : similar to VertexRDD, it is a subclass of RDD, which organizes the edges into blocks based on some predefined partitioning strategies. It supports three extra methods; \textit{mapValues} which maps the values while preserving the structure, \textit{reverse} which reverse the edge directions while preserving the attributes, and \textit{innerJoin} which joins two EdgeRDD objects, using the source and destination ids as keys. 
-\end{itemize}
-The key feature of GraphX comes from the way vertices and edges are stored. GraphX employs different partitioning strategies for storing vertices and edges and while each one have their own advantages and disadvantages, the overall goal is reduce the amount of communication along edges and have all the vertices close to each other in one computation node to avoid network traffics. The details of GraphX and how it behaves under the hood are beyond the scope of this document. Xin et al. \cite{xin13} described GraphX in detail and GraphX website  \footnote{https://spark.apache.org/graphx/} includes more information about the internal architecture of the system.
 
 \newpage
 
@@ -330,6 +194,142 @@ generalizes the Linear Threshold and Independent Cascade models. Based on an act
 Graph $G = (V,E,T)$ is constructed based on the relationship of users in the graph, where $T$ indicates the time a specific edge was added to the graph(i.e. a relation was formed between two users). Hence, the objective function is defined as $p : E \leftarrow [0,1] x [0,1]$ assigning both directions of each edge (u,v) in E the probabilities : $p_{v,u}$ and $p_{u,v}$.
 Using simple counting methods, they have scanned the data set, and estimated the edge probability $p_{v,u}$ based on the action of node $v$ and the subsequent action made $u$. If these two actions happened within a predefined time, the probability of $v$ influencing $u$ was increased. They have also proposed more advanced methods of estimating the probability $p_{v,u}$ which is outside of the scope of this thesis.
 In another paper, Goyal et al \cite{goyal11} have also tackled the problem of influence maximization directly. Instead of first learning the edge probabilities and then finding the optimum seed set, they have proposed a method to directly find the optimal seed set based on the action log .
+
+
+\section{Big Data}
+Information and data has always been gathered for analysis and improvement or invention of new or existing technologies. It had helped governments to better govern countries, it had helped companies to better understand their costumers, and it had helped researchers and scientists to solve problems. With introduction of World Wide Web(http://webfoundation.org/about/vision/history-of-the-web/) exchange and collection of data has become a lot simpler. Big firms and companies started to collect user's information, browsing behavior and etc . Petabytes of data are being stored and exchanged everyday, and these data contain valuable information that is being used for solving a lot of problems using data mining and machine learning methods. 
+Processing this amount of data, has never been an easy tasks and prior to introduction of new BigData technologies, this processing and analyzing has been always done using expensive Server systems that are able to process millions to billions of bytes of data in a second. 
+Google Inc. revolutionary papers has drastically changed field. \cite{ghemawat03} introduced \textbf{The Google's Distributed System}; a file system built for storing terabytes of data. It is scalable, meaning more storage can be easily added, and it is being deployed on commodity hardware, meaning it does not require any sophisticated and expensive piece of hardware to use. Dean et. al \cite{dean04} introduced \textbf{MapReduce} a framework for processing large amount of data, again it is scalable and it can be deployed on commodity hardware. 
+Although the source code either of these two technologies were never released by Google, but based the publications \textbf{Doug Cutting} created the open source project \textit{Hadoop} which implements both MapReduce (Hadoop's MapReduce) and Google File System (Hadoop Distributed File System or HDFS for short). Since then, Hadoop has become BigData standard, several new technologies and project have been added to it.
+
+\subsection{Hadoop}
+Hadoop is consists of two major parts. 
+\textbf{MapReduce} which is a parallel programming paradigm. It is designed to run on distributed systems with many commodity computers. It involves three main steps, namely \textit{Map}, \textit{Reduce} and \textit{Shuffle}. The first two are defined by the user. Map operations are run in parallel and they process the data individually, data is divided into different portions and each one is processed by a mapper. The result of the mappers are send to a Reduce task(or several) where the results are combined. A shuffle operation is usually performed on the result of the Map tasks so that similar data are all send to the same nodes. Below is a simple algorithm for counting words in a series of documents. 
+
+\begin{algorithm}
+\begin{algorithmic}
+\Function{map}{String name, String document}
+\State {//name: document name}
+\State{//document: document contents}
+   \For {each word w in document}
+      		\State emit (w, 1)
+   \EndFor
+\EndFunction
+\State 
+\Function {reduce}{String word, Iterator partialCounts}
+\State{//word: a word}
+\State{//partialCounts: a list of aggregated partial counts}
+  \State sum = 0
+  \For{ each pc in partialCounts}
+    \State sum += ParseInt(pc)
+    \State emit (word, sum)
+\EndFor
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/mapreduce.jpg}
+\caption{MapReduce paradigm}
+\end{figure}
+
+The popularity of Hadoop's MapReduce framework rises from the fact that many complexities of the system is being handled automatically by the framework. In most typical use cases, the user only needs to provide the method for Mappers and Reducers. Framework will take care of compiling and distributing the code to all the nodes, and running them in parallel. As previously mentioned it is fault tolerant, it means if during the processing a task fails, it will restart the task again, if a node encounters a problem the framework will move the computation to another node. It is scalable, which means the program does not need to know how many nodes are involved in the system. The program will scale to many nodes depending on the size of the input data and amount of available resources. There are however many advanced options that users can do to further optimize the program, but they are generally not required for simple tasks. The other feature of MapReduce and Hadoop in general is that it is available in many different languages. Java, Python, C++, Scala and many more. 
+
+Newer versions of Hadoop and MapReduce employs more sophistcated Resource manager and Scheduler called YARN(TODO REFERENCE) . YARN essentially, provides container for running different applications and it is not limited to MapReduce. Spark, Storm and and even simple Java programs can be run on YARN. YARN is more or a less cluster manager program and overviews the resource and allocates resources to different jobs being submitted to it. It has become available as part of Hadoop 2.0 technology Stack .
+
+\textbf{Hadoop Distributed File System (HDFS)}
+HDFS is a distributed file system, designed to run on commodity hardware. It provides high throughput access to application data and it fault tolerant. Though initially designed for Hadoop's MapReduce framework, it has been used in many different application.
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/hdfsarchitecture.png}
+\caption{HDFS Architecture}
+\end{figure}
+
+It is fault tolerant, meaning if a node in a cluster fails, the data is not gone. HDFS employs a feature called \textit{Data Replication}, which indicates the number of type each object is being replicated. NameNode keeps track of where are all the same instances of the data is stored and in case a node fails it knows where to look for it. HDFS emphasizes on moving computation is much cheaper than moving data, it is true since HDFS is designed to store BigData sets, Tera or even PetaBytes of data, hence in conjunction with MapReduce, instead of moving the data around, the computation is done on the node containing the data. It is design for high throughput  rather than low latency so it is not ideal for streaming application, although several improvements are being made to further decrease the latency and making it suitable for real time streaming application. Similar to MapReduce it is design to work across heterogeneous hardware and software platforms. Meaning the nodes in the cluster do not have to be identical and even running the same operating system. Hadoop runs on JVM hence it is OS agnostic. 
+
+
+\subsection{Spark}
+Apache Spark \cite{zaharia10} was originally developed in AMPLab at UC Berkeley. The main idea was to solve MapReduce's problems. In contrast to MapReduce's 2 stage program (Map and Reduce), Spark employs an iterative paradigm. It allows users to load data into memory and perform many operations on the data, this is ideal for a lot of Machine learning problems. The underlying frameworks work on entities called Resilient Distributed Datasets (RDDs) \cite{zaharia12}. RDD  is a read only and partitioned collection of data. It can be created from storage or other RDDs. There two types operation on RDDs, transformations and actions. Transformations are operations that will create a new RDD from the existing one, for example \textit{filter}is a transformation operation. The power of RDDs lie in their internal structure, they do not need to be materialized all the time. If a RDD is created using a transformation, it will hold information about how the transformation was made and only apply them to the data once the user requests that through an action or caching the data set. Actions are operations that will materialize the dataset. Users can also ask the RDD to be stored in memory if they know they are going to use its value many times. These characteristics of RDD makes the perfect tool for performing iterative applications. Many machine learning algorithms require iterative calls to the same dataset. This is one of MapReduce's deficiency since every algorithm and job has to be written in terms of Map and Reduces. Spark with the help of RDDs allow many of the well known machine learning algorithms to be applied to without much change to actual algorithm. With success of Spark, it had become part of the Hadoop framework. Recent versions can now on top of Yarn and they have integration with HDFS and other Hadoop components. 
+A typical Spark program is consists of a driver program that launches multiple workers. Worker programs are run on data nodes. upon execution of a program, Spark will try to send the computation to where the data is, hence minimizing the network traffic. Spark tracks where the RDDs and their partitions are.
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/sparkprogram.png}
+\caption{Spark Program}
+\end{figure}
+
+ User's can control RDDs behavior by persisting it, or caching it. Tests performed on Spark showed that it is 100x times faster than MapReduce and it is able to run application that are not even possible to run using MapReduce. Spark is fault tolerant by means of RDDs. Since RDDs track the changes made to them, they can be recreated. So if a node containing some partitions of RDDs are lost they can be recreated using the these information. 
+ 
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/rdd.png}
+\caption{Spark stages and RDDs}
+\end{figure}
+Figure above shows how Spark computes job stages. Boxes with solid outlines are RDDs. Partitions are shaded rectangles, in black if they are cached. To run an action on RDD G, the scheduler builds stages at wide dependencies and pipelines narrow transformations inside each stage. In this case, stage 1 does not need to run since B is cached, so we run 2 and then 3. If any of the stages fail, the computation will restart from the last healthy RDD. Also if a node containing some specific partitions of an RDD fails, the RDD will be transferred to another node and the computation will be restarted. 
+
+Spark contains a Machine learning framework named MLib and graph processing framework named GraphX . 
+Spark works very well with iterative algorithms, it doesn't have MapReduce limitation which is the result of each job has to be written to disk. Spark has in memory computation which will speed up the process. 
+% Spark Word Count Problem in Java and Scala
+\newpage
+
+\section{Large Scale Graph Processing Framework}
+What is it, where does it come from, why is it important to have frameworks capable of processing massive graphs
+
+\subsection{Giraph}
+Apache Giraph is an iterative graph processing framework, built on top of Apache Hadoop. It is the open source version of Pregel by Google \cite{malewicz10} . Its input is a graph consists of vertices and edges. Each vertex and edge contains value as well, hence the input to a \textbf{Giraph} program besides from the structure of the vertices and edges includes their initial values. The project is now being actively developed by several companies. It is being used in many real case scenarios. For example, Facebook is using it to analyze the graphs formed by users and their connection with their friends. Similar to Pregel, the computation model of Giraph is Bulk Synchronous Parallel \cite{valiant90}. A BSP computation model consists of three physical components : 
+\begin{itemize}
+\item
+A component capable of local processing
+\item
+A network for transferring messages
+\item
+A hardware which synchronizes the components
+\end{itemize}
+BSP programs are run in parallel on each processing components and then the messages are transferred between these nodes. All of the computations are done in steps and after each step is done all the components should wait until every other component have finished its processing and sends messages to other components. \\
+The architecture fits very well with BigGraph computations in a way that vertices will process data individually and send messages along the edges (or directly) to other vertices in each step. The process can be parallelized then so that all or as many vertices as possible will perform computation at the same time and send messages and at the end of each step (which is called a super step in BSP) they will wait to synchronize with other vertices. 
+The computation will continue until all vertices are inactive or no more messages were sent during a step. This figure shows the general process in BSP models : 
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/bsp.png}
+\caption{Bulk Synchronous Parallel}
+\end{figure}
+
+Based on BSP, Giraph first distribute all the vertices to different nodes, users can define the partitioning behavior so it would suite the specific kind of algorithm they are going to run. Generally the idea is to have vertices that are connected on the same node, since most of the communications are done through edges and hence this would minimize the network traffic across the cluster. Computation then begins in a series of super steps, in each one messages from the previous super step are gathered by each vertex, the vertex will do its computation and send new messages to other vertices, at the end of the each superstep, all the vertices are synchronized, counters that keep track of the status of the cluster are updated, users can also define counters and aggregators. For example, finding the vertex with the maximum value in each iteration or etc. Giraph has a series of built in aggregators and users can define their own. At the end of the computation vertices can send a command to master node telling it that they'd like to halt and done computing, their state is changed to in active and it will stay like that unless new messages are sent to those vertices. When all the vertices are in active the computation will halt and the result will be reported.
+Figure below shows how computation is done in Giraph . (TODO, source or create your own graph)
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/giraphdataflow.png}
+\caption{Giraph Work Flow}
+\end{figure}
+A typical Giraph program is carried out in several steps, each one called a \textit{superstep} . Initially all vertices are in an \textit{active} state, and each iteration an active vertex will call its compute method which is defined by the user and generally carries out the Giraph algorithm. A typical Compute method:
+\begin{itemize}
+\item
+receives messages sent to the vertex in the previous superstep
+\item
+computes using the messages, and the vertex and outgoing edge values, which may result in modifications to the values, and
+\item
+may send messages to other vertices.
+\end{itemize}
+
+The figure below shows supersteps involved with computing the single source shortest path for a simple graph.(TODO, make your own proper reference)
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/giraphsuperstep.jpg}
+\caption{Single Source Shortest Path}
+\end{figure}
+
+The input is a chain graph with three vertices (black) and two edges (green). The values of edges are 1 and 3 respectively. The algorithm computes distances from the leftmost vertex. The initial values of vertices are 0, $\infty$ and $\infty$ (top row). Distance upper bounds are sent as messages (blue), resulting in updates to vertex values (successive rows going down). The execution lasts three supersteps (separated by red lines).
+
+On a cluster level, a graph is distributed into several connected components and each one is stored in one of the computation nodes. Each cluster, has a master node that coordinates the other nodes. It will decide on which components should be stored on each device and it stored reference and tables of information about the vertices and edges and where they resides. It will ensure the supersteps are synchronized, i.e. it makes sure all vertices have finished their computation in the current superstep before starting the next superstep. It will monitor the status of the components and decide when to end the program by checking if there are any active vertices or not. 
+Although it has many advantages over MapReduce, it is still has many limitations, in one Giraph job many iterations can be done, but if graphs should go through several transformation that would require multiple Giraph jobs, which means that the data has be written to HDFS after each job which adds overhead. A lot of the Machine learning and graph algorithms and problems are iterative in nature, which will cause Giraph to have severe performance issues in some of these cases. 
+% Sample code 
+\subsection{GraphX}
+GraphX is a light API written on top of Spark. It uses the powerfull RDD abstractions as the basis of its computation, by storing vertices and edges in separate RDDs. Similar to Spark, it works well for iterative algorithms and it comes packaged with many of the algorithm such as, PageRank, Label Propagation, Connected Components and ... . GraphX, also includes an API for pregel framework.  Several important components of GraphX are :
+\begin{itemize}
+\item VertexRDD : an RDD object consist of a vertex id and a customization data type. It carries some features in comparison to the traditional RDD, such ensuring vertex ids are unique, optimized joins among different vertex groups and etc. It offers several methods for mapping values, filtering vertices(while preserving their id) and finding difference of two vertex groups.
+\item EdgeRDD : similar to VertexRDD, it is a subclass of RDD, which organizes the edges into blocks based on some predefined partitioning strategies. It supports three extra methods; \textit{mapValues} which maps the values while preserving the structure, \textit{reverse} which reverse the edge directions while preserving the attributes, and \textit{innerJoin} which joins two EdgeRDD objects, using the source and destination ids as keys. 
+\end{itemize}
+The key feature of GraphX comes from the way vertices and edges are stored. GraphX employs different partitioning strategies for storing vertices and edges and while each one have their own advantages and disadvantages, the overall goal is reduce the amount of communication along edges and have all the vertices close to each other in one computation node to avoid network traffics. The details of GraphX and how it behaves under the hood are beyond the scope of this document. Xin et al. \cite{xin13} described GraphX in detail and GraphX website  \footnote{https://spark.apache.org/graphx/} includes more information about the internal architecture of the system.
 
 \newpage
 
@@ -504,22 +504,8 @@ TODO , pruning the graph :
 3. pruning CCs that has a collective edge weights of less than a threshold
 4. pruning vertices that their neighbors have very high degree
 
+\newpage
 
-
-\section{Data set}
-\subsection{ArXiv collaboration network data set}
-Two data sets from the e-print arXiv is chosen for testing. Same two data sets have been used in \cite{kempe03} and \cite{chen09}. The data set contains academic collaboration for scientific research papers. In this data set, vertices represent researchers and edges define a collaboration between two researchers on writing a scientific paper. Two data sets have been chosen, they have been used by several other researchers in the field of influence maximization and can provide a good comparison for the quality of the methods. The data sets are very small comparing two the data sets currently considered as Big Data, but since there aren't many previous research done in Big Data, I have used these two to test the accuracy of the methods on smaller data set and compare them to the state of the art influence maximization algorithm in smaller scale. There are in total two networks : 
-\begin{itemize}
-\item High Energy Physics - Theory : contains papers from 1991 to 2003, with 15,233 nodes and 58,981 edges.
-\item Physics : contains all papers in  physics from the same year range as physics - theory, with 37,154 nodes and 231,584 edges.
-\end{itemize}
-The data sets in graph formats were made available for public by \cite{chen09}. It can be found at http://research.microsoft.com/en-us/people/weic/graphdata.zip. It is in \textbf{Edge List Format} where each line of the file, contains two values which the source and destination of an edge. A sample of the data set is shown in appendix A (TODO add appendix)
-
-\subsection{LiveJournal Social Network}
-LiveJournal is a free online community with almost 10 million members, with many of them being active . Similar to other types of social networks, users can form friendship with other members. It consists for 4,847,571 vertices and 68,993,773 edges. Considerably larger than a lot of data sets usually used in influence maximization research, but still not at the same scale as current big data sets used in research and industry.  It is also available in \textbf{Edge List Format} format.
-
-\subsection{Friendster Social Network}
-Friendster is an online gaming network which used to be a social networking site where users form friendship with each other. The original data set, available at http://snap.stanford.edu/ also consists communities formed by users. For the purpose of influence maximization experiments the raw data set suffices. It is considerably larger than any other data set that has ever been used in influence maximization. It consists of 65,608,366 vertices and 1,806,067,135 edges. It can represent common big data sets that are used in research and industry now a days. Similar to ArXiv data set it is available in \textbf{Edge List Format} format where each line in the file contains the source and destination of an edge.
 
 \section{Experiments}
 In this section all the experiments are explained in details. Experiments include the methods and the data sets described in the previous sections. 
@@ -534,6 +520,23 @@ A Macbook Pro with 2,4 GHz Intel Core i5 processor and 8 GB of RAM.
 
 \end{itemize}
 They methods are run using Spark 11.0 . (TODO make it better)
+
+\subsection{Data set}
+Below is an overview of the data sets used in the expermients. All of the data sets are provided an an edge list format. In each line there are two vertices id separated by a tab character. The two vertices are end points of an edge. 
+\subsubsection{ArXiv collaboration network data set}
+Two data sets from the e-print arXiv is chosen for testing. Same two data sets have been used in \cite{kempe03} and \cite{chen09}. The data set contains academic collaboration for scientific research papers. In this data set, vertices represent researchers and edges define a collaboration between two researchers on writing a scientific paper. Two data sets have been chosen, they have been used by several other researchers in the field of influence maximization and can provide a good comparison for the quality of the methods. The data sets are very small comparing two the data sets currently considered as Big Data, but since there aren't many previous research done in Big Data, I have used these two to test the accuracy of the methods on smaller data set and compare them to the state of the art influence maximization algorithm in smaller scale. There are in total two networks : 
+\begin{itemize}
+\item High Energy Physics - Theory : contains papers from 1991 to 2003, with 15,233 nodes and 58,981 edges.
+\item Physics : contains all papers in  physics from the same year range as physics - theory, with 37,154 nodes and 231,584 edges.
+\end{itemize}
+The data sets in graph formats were made available for public by \cite{chen09}. It can be found at http://research.microsoft.com/en-us/people/weic/graphdata.zip. It is in \textbf{Edge List Format} where each line of the file, contains two values which the source and destination of an edge. A sample of the data set is shown in appendix A (TODO add appendix)
+
+\subsubsection{LiveJournal Social Network}
+LiveJournal is a free online community with almost 10 million members, with many of them being active . Similar to other types of social networks, users can form friendship with other members. It consists for 4,847,571 vertices and 68,993,773 edges. Considerably larger than a lot of data sets usually used in influence maximization research, but still not at the same scale as current big data sets used in research and industry.  It is also available in \textbf{Edge List Format} format.
+
+\subsubsection{Friendster Social Network}
+Friendster is an online gaming network which used to be a social networking site where users form friendship with each other. The original data set, available at http://snap.stanford.edu/ also consists communities formed by users. For the purpose of influence maximization experiments the raw data set suffices. It is considerably larger than any other data set that has ever been used in influence maximization. It consists of 65,608,366 vertices and 1,806,067,135 edges. It can represent common big data sets that are used in research and industry now a days. Similar to ArXiv data set it is available in \textbf{Edge List Format} format where each line in the file contains the source and destination of an edge.
+
 
 \subsection{Methods \& Implementation details}
 List of influence propagation methods used in the experiments
@@ -604,6 +607,9 @@ Figure \ref{hep:multisingle} shows \textit{Multi-attempt Single Cycle method} (o
 Figure \ref{hep:times} shows the running time for each of different methods. As expected the running times are constant and do not change as the seed size increases. This is on the contrary to the greedy method, where finding even an extra seed requires an entire scan of the data set and running the simulation process for each individual vertices. This graphs, shows the advantage these methods have over the traditional greedy method and justifies their use despite of the lesser solution quality.
 
 \pagebreak
+
+\section{Discussion}
+
 \pagebreak
 \section{Conclusion}
 In this document, the problem of influence maximization was discussed. One of the main issues in solutions to problem is the scalability. Due to the nature of the solutions proposed, none can perform well for large scale graphs. Over the past decade, with wide spread usage of internet data collection has been the focus of many big firms. Social networks and online store are gathering data about millions of users everyday. The information about users are stored in graph data structures that sometimes consists of millions (even billions) of nodes and  many more edges. Applying some of the solutions proposed for influence maximization to graphs of these scales are impossible and even on the strongest super computers will take days or even months to see the result. Here, I have identified why the solutions are not scalable and proposed some new or modified solutions to work with graphs of this scale. Several frameworks for processing large scale data have been created over the past couple of years, most notably are Hadoop and Spark. Both of which are designed to run on commodity computers, and are highly scalable. They both have a built in frameworks for processing graphs; Giraph which is on top of Hadoop and Graphx on top of Spark. Methods described in this document, are implemented using these two frameworks. In last section, several experiments on different data sets were performed and the results were presented. \\
