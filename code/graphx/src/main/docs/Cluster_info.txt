@@ -16,4 +16,9 @@ gunzip soc-LiveJournal1.txt.gz
 
 
 Run Driver :
-./spark/bin/spark-submit --class "com.bd.Driver" --master spark://ec2-54-90-2-143.compute-1.amazonaws.com:8080 --deploy-mode cluster spark-graphx-1.0.0-SNAPSHOT.jar /data/livejournal 50000 10 0.01 /data/output degree
+./spark/bin/spark-submit --class "com.bd.Driver" --master spark://ec2-54-90-2-143.compute-1.amazonaws.com:7077 spark-graphx-1.0.0-SNAPSHOT.jar /data/livejournal 50000 10 0.01 /data/output random
+
+To run the simulation : (Total Spread: 299092.5
+                         Total Time : 1032.294)
+
+./spark/bin/spark-submit --class "com.bd.propogation.ic.Simulation" --master spark://ec2-54-90-2-143.compute-1.amazonaws.com:7077 spark-graphx-1.0.0-SNAPSHOT.jar /data/livejournal /data/output-random/50000 10 0.01

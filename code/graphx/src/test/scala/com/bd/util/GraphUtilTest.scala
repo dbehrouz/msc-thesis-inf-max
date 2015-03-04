@@ -29,7 +29,7 @@ class GraphUtilTest extends SparkTestBase {
     val size = 5
     val weight = 1
     val vertices = createVertices(size)
-    var edges: List[Edge[Int]] = List()
+    var edges: List[Edge[Double]] = List()
     edges ::= Edge(1, 2, weight)
     edges ::= Edge(1, 3, weight)
     edges ::= Edge(1, 4, weight)
@@ -48,7 +48,7 @@ class GraphUtilTest extends SparkTestBase {
     val size = 3
     val weight = 1
     val vertices = createVertices(size)
-    var edges: List[Edge[Int]] = List()
+    var edges: List[Edge[Double]] = List()
     edges ::= Edge(1, 2, weight)
     edges ::= Edge(1, 2, weight)
     edges ::= Edge(1, 2, weight)

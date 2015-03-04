@@ -57,7 +57,7 @@ class EdgeSamplingTest extends SparkTestBase {
           , prob: Double, input: String, partitioningMethod: String): String = {
     val start = Calendar.getInstance().getTimeInMillis
     val ps = PartitionStrategy.fromString(partitioningMethod)
-    val graph = GraphUtil.undirected(GraphLoader.edgeListFile(sc, input), prob).persist(StorageLevels.MEMORY_ONLY)
+    val graph = GraphUtil.undirected(GraphUtil.mapTypes(GraphLoader.edgeListFile(sc, input)), prob).persist(StorageLevels.MEMORY_ONLY)
     val result = EdgeSampling.run(graph, seedSize, iterations, sc)
     val end = Calendar.getInstance().getTimeInMillis
     graph.unpersist(blocking = true)

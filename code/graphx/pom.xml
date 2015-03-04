@@ -40,6 +40,11 @@
             <artifactId>scalatest_2.10</artifactId>
             <version>2.2.1</version>
         </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.7</version>
+        </dependency>
     </dependencies>
 
 
@@ -81,10 +86,10 @@
                     </jvmArgs>
                     <!-- TODO this sources element may be redundant -->
                     <!--<sources>-->
-                        <!--<source>src/main/scala</source>-->
-                        <!--<source>src/main/java</source>-->
-                        <!--<source>src/test/scala</source>-->
-                        <!--<source>src/test/java</source>-->
+                    <!--<source>src/main/scala</source>-->
+                    <!--<source>src/main/java</source>-->
+                    <!--<source>src/test/scala</source>-->
+                    <!--<source>src/test/java</source>-->
                     <!--</sources>-->
                 </configuration>
             </plugin>

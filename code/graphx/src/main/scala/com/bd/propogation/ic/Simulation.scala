@@ -110,7 +110,7 @@ object Simulation extends Logging {
       .toList
 
     println("Number of Initial Active Nodes " + activeNodes.length)
-    val graph = GraphUtil.undirected(GraphLoader.edgeListFile(sc, inputGraphFile), prob)
+    val graph = GraphUtil.undirected(GraphUtil.mapTypes(GraphLoader.edgeListFile(sc, inputGraphFile)), prob)
 
     val spread = run(graph, activeNodes, iterations)
     println("Total Spread: " + spread)

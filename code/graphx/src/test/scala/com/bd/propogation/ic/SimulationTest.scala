@@ -10,23 +10,23 @@ import org.junit.Test
  */
 class SimulationTest extends SparkTestBase {
 
-  def fullyConnectedGraph(size: Int): Graph[Int, Int] = {
+  def fullyConnectedGraph(size: Int): Graph[Long, Double] = {
     val vertexArray = createVertices(size)
     val edgeArray = fullyConnected(vertexArray)
-    graph(vertexArray,edgeArray)
+    graph(vertexArray, edgeArray)
   }
 
 
-  def twoCCGraph(size: Int): Graph[Int, Int] = {
+  def twoCCGraph(size: Int): Graph[Long, Double] = {
     nCCGraph(size, 2)
   }
 
 
-  def nCCGraph(size: Int, n: Int): Graph[Int, Int] = {
+  def nCCGraph(size: Int, n: Int): Graph[Long, Double] = {
     val vertexArray = createVertices(size)
     val batchSize = (size / n).toInt
     var start = 0
-    var allEdges: List[Edge[Int]] = List()
+    var allEdges: List[Edge[Double]] = List()
     for (i <- 1 to n) {
       val end = if (start + batchSize >= size) size.toInt else start + batchSize
       allEdges = allEdges ::: fullyConnected(vertexArray.slice(start, end))
@@ -35,14 +35,14 @@ class SimulationTest extends SparkTestBase {
     graph(vertexArray, allEdges)
   }
 
-  def simpleTree(size: Int): Graph[Int, Int] = {
+  def simpleTree(size: Int): Graph[Long, Double] = {
     val vertexArray = createVertices(size)
     val edgeArray = simpleConnected(vertexArray)
     graph(vertexArray, edgeArray)
   }
 
-  def fullyConnected(vertices: List[(Long, Int)]): List[Edge[Int]] = {
-    var edges: List[Edge[Int]] = List()
+  def fullyConnected(vertices: List[(Long, Long)]): List[Edge[Double]] = {
+    var edges: List[Edge[Double]] = List()
     for (v <- vertices) {
       for (u <- vertices) {
         if (v != u) {
@@ -54,8 +54,8 @@ class SimulationTest extends SparkTestBase {
   }
 
 
-  def simpleConnected(vertices: List[(Long, Int)]): List[Edge[Int]] = {
-    var edges: List[Edge[Int]] = List()
+  def simpleConnected(vertices: List[(Long, Long)]): List[Edge[Double]] = {
+    var edges: List[Edge[Double]] = List()
     val sorted = vertices.map(_._1).sorted
     for (v <- sorted) {
       if (v != sorted.length) {
@@ -67,7 +67,7 @@ class SimulationTest extends SparkTestBase {
 
   @Test def runWithFullPropagation() {
     val size = 100
-    val spread = Simulation.run(GraphUtil.mapTypes(fullyConnectedGraph(size)), List(2L), 1)
+    val spread = Simulation.run(fullyConnectedGraph(size), List(2L), 1)
     if (size != spread.toInt) {
       fail("Expected spread = " + size + ", actual = " + spread)
     }
@@ -75,7 +75,7 @@ class SimulationTest extends SparkTestBase {
 
   @Test def runWithTwoConnectedComponents() {
     val size = 100
-    val spread = Simulation.run(GraphUtil.mapTypes(twoCCGraph(size)), List(1L, 51L), 1)
+    val spread = Simulation.run(twoCCGraph(size), List(1L, 51L), 1)
     if (size != spread.toInt) {
       fail("Expected spread = " + size + ", actual = " + spread)
     }
@@ -85,7 +85,7 @@ class SimulationTest extends SparkTestBase {
     val size = 1000
     val cc = 100
     val graph = nCCGraph(size, cc)
-    val spread = Simulation.run(GraphUtil.mapTypes(graph),
+    val spread = Simulation.run(graph,
       graph.connectedComponents().vertices.map(_._2).distinct().collect().toList,
       1)
     if (size != spread.toInt) {
@@ -96,7 +96,7 @@ class SimulationTest extends SparkTestBase {
   @Test def runWithSimpleTree() {
     val size = 10
 
-    val spread = Simulation.run(GraphUtil.mapTypes(simpleTree(size)), List(1L), 1)
+    val spread = Simulation.run(simpleTree(size), List(1L), 1)
     if (size != spread.toInt) {
       fail("Expected spread = " + size + ", actual = " + spread)
     }
