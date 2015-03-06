@@ -16,10 +16,10 @@ import scala.reflect.io.File
  */
 object Driver {
   // List of algorithms that does not require the graph to be pre processed.
-  val ALGORITHMS_WITH_RAW_GRAPH = List("degree", "random")
+  val ALGORITHMS_WITH_RAW_GRAPH = List("degreeweighted", "random")
 
   // List of every method implemented, used in case user does not supply any algorithms
-  val DEFAULT_METHODS = List("degree", "degreediscount", "pagerank", "random", "edgesampling")
+  val DEFAULT_METHODS = List("degreeweighted", "degreediscount", "pagerank", "random", "edgesampling", "degree")
 
   /**
    * If experiment size is set to be a range from 1 to X use : rX (where x is the maximum size)

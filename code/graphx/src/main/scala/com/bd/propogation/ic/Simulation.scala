@@ -53,7 +53,9 @@ object Simulation extends Logging {
     }
 
     def sendMessage(edge: EdgeTriplet[Long, Double]) = {
-      if (edge.srcAttr == ACTIVE) {
+      if (edge.dstAttr == ACTIVE || edge.dstAttr == TRIED) {
+        Iterator.empty
+      } else if (edge.srcAttr == ACTIVE) {
         if (math.random <= edge.attr) {
           Iterator((edge.dstId, ACTIVE))
         } else {

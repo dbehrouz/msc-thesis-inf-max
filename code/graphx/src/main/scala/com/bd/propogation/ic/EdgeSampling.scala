@@ -1,7 +1,7 @@
 package com.bd.propogation.ic
 
 import com.bd.SeedFinder
-import org.apache.spark.SparkContext
+import org.apache.spark.{Partitioner, SparkContext}
 import org.apache.spark.SparkContext._
 import org.apache.spark.graphx.{Graph, VertexId, VertexRDD}
 import org.apache.spark.rdd.RDD
@@ -16,8 +16,15 @@ import org.apache.spark.rdd.RDD
  * @author Behrouz Derakhshan
  */
 object EdgeSampling extends SeedFinder {
+  val DEFAULT_NUMBER_OF_PARTITIONS = 2
+  var partitioner: Partitioner = new org.apache.spark.HashPartitioner(DEFAULT_NUMBER_OF_PARTITIONS)
+
   def run(graph: Graph[Long, Double], seedSize: Int, iterations: Int, sc: SparkContext): RDD[VertexId] = {
-    var vs = graph.mapVertices((v, value) => 0L).vertices
+    val vs = graph.mapVertices((v, value) => 0L).vertices
+    partitioner = new org.apache.spark.HashPartitioner(vs.partitions.size)
+    var vertices = vs.partitionBy(partitioner).cache()
+    vertices.count()
+    vs.unpersist(blocking = false)
     for (i <- 1 to iterations) {
       // sample based on probability
       val sampledGraph = graph.subgraph(epred = e => math.random < e.attr)
@@ -28,31 +35,33 @@ object EdgeSampling extends SeedFinder {
       // TODO : improve by using partitioner
       val vs2 = mapVertices(cc, sc)
 
-      vs = addVertices(vs, vs2)
+      val oldVs = vertices
+
+      vertices = addVertices(vertices, vs2).cache()
+
+      val c = vertices.count()
 
       println("Iteration : " + i)
+      oldVs.unpersist(blocking = false)
       sampledGraph.unpersistVertices(blocking = false)
       sampledGraph.edges.unpersist(blocking = false)
       cc.unpersist(blocking = false)
     }
     graph.unpersist(blocking = false)
-    sc.parallelize(vs.top(seedSize)(Ordering.by(_._2)).map(_._1))
+    sc.parallelize(vertices.top(seedSize)(Ordering.by(_._2)).map(_._1))
   }
 
-  def mapVertices(cc: VertexRDD[VertexId], sc: SparkContext): VertexRDD[Long] = {
-    VertexRDD(cc.groupBy(_._2).flatMap { v =>
+  def mapVertices(cc: RDD[(Long, Long)], sc: SparkContext): RDD[(Long, Long)] = {
+    cc.groupBy(_._2).flatMap { v =>
       var res: List[(Long, Long)] = List()
       for (i <- v._2) {
         res = (i._1, v._2.size.toLong) :: res
       }
       res
-    })
+    }
   }
 
-  def addVertices(vs: VertexRDD[Long], vs2: VertexRDD[Long]): VertexRDD[Long] = {
-    //    vs.join(vs2).map(joined => (joined._1, joined._2._1 + joined._2._2))
-    vs.innerJoin(vs2) {
-      (id, v1, v2) => v1 + v2
-    }
+  def addVertices(vs: RDD[(Long, Long)], vs2: RDD[(Long, Long)]): RDD[(Long, Long)] = {
+    vs.join(vs2, partitioner).map(vertex => (vertex._1, vertex._2._1 + vertex._2._2))
   }
 }
