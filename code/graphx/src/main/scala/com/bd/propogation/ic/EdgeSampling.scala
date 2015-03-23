@@ -5,6 +5,7 @@ import org.apache.spark.{Partitioner, SparkContext}
 import org.apache.spark.SparkContext._
 import org.apache.spark.graphx.{Graph, VertexId, VertexRDD}
 import org.apache.spark.rdd.RDD
+import org.apache.spark._
 
 
 /**
@@ -16,13 +17,13 @@ import org.apache.spark.rdd.RDD
  * @author Behrouz Derakhshan
  */
 object EdgeSampling extends SeedFinder {
-  val DEFAULT_NUMBER_OF_PARTITIONS = 2
-  var partitioner: Partitioner = new org.apache.spark.HashPartitioner(DEFAULT_NUMBER_OF_PARTITIONS)
+  val DEFAULT_NUMBER_OF_PARTITIONS = 20
+  val PARTITIONER = new HashPartitioner(DEFAULT_NUMBER_OF_PARTITIONS)
 
   def run(graph: Graph[Long, Double], seedSize: Int, iterations: Int, sc: SparkContext): RDD[VertexId] = {
     val vs = graph.mapVertices((v, value) => 0L).vertices
-    partitioner = new org.apache.spark.HashPartitioner(vs.partitions.size)
-    var vertices = vs.partitionBy(partitioner).cache()
+
+    var vertices = vs.partitionBy(PARTITIONER).persist()
     vertices.count()
     vs.unpersist(blocking = false)
     for (i <- 1 to iterations) {
@@ -62,6 +63,6 @@ object EdgeSampling extends SeedFinder {
   }
 
   def addVertices(vs: RDD[(Long, Long)], vs2: RDD[(Long, Long)]): RDD[(Long, Long)] = {
-    vs.join(vs2, partitioner).map(vertex => (vertex._1, vertex._2._1 + vertex._2._2))
+    vs.join(vs2, PARTITIONER).map(vertex => (vertex._1, vertex._2._1 + vertex._2._2))
   }
 }

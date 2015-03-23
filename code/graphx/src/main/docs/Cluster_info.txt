@@ -11,9 +11,12 @@ gunzip soc-LiveJournal1.txt.gz
 
 
 Run Driver :
-./spark/bin/spark-submit --class "com.bd.Driver" --master spark://ec2-54-227-78-107.compute-1.amazonaws.com:7077 spark-graphx-1.0.0-SNAPSHOT.jar /data/livejournal 50000 10 0.01 /data/output degree
+./spark/bin/spark-submit --class "com.bd.Driver" --master spark://ec2-54-146-77-161.compute-1.amazonaws.com:7077 spark-graphx-1.0.0-SNAPSHOT.jar /data/livejournal 50000 10 0.01 /data/output random,degree,pagerank,edgesampling
 
 To run the simulation : (Total Spread: 299092.5
                          Total Time : 1032.294)
 
-./spark/bin/spark-submit --class "com.bd.propogation.ic.Simulation" --master spark://ec2-54-227-78-107.compute-1.amazonaws.com:7077 spark-graphx-1.0.0-SNAPSHOT.jar /data/livejournal /data/output-degree/50000 10 0.01
+./spark/bin/spark-submit --class "com.bd.propogation.ic.Simulation" --master spark://ec2-54-146-77-161.compute-1.amazonaws.com:7077 spark-graphx-1.0.0-SNAPSHOT.jar /data/livejournal /data/output-degree/50000 10 0.01
+
+
+./spark/bin/spark-submit --class "com.bd.propogation.ic.Simulation" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/hep.txt data/output-degree/40/ 100 0.01

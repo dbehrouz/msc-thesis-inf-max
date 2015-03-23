@@ -18,19 +18,19 @@ object ConnectedComponents extends SeedFinder {
 
   // similar to connected component algorithm but on a directed graph
   def runCC[VD: ClassTag, ED: ClassTag](graph: Graph[VD, ED]): Graph[VertexId, ED] = {
-    //graph.connectedComponents()
-    val ccGraph = graph.mapVertices { case (vid, _) => vid}
-    def sendMessage(edge: EdgeTriplet[VertexId, ED]) = {
-      if (edge.srcAttr < edge.dstAttr) {
-        Iterator((edge.dstId, edge.srcAttr))
-      } else {
-        Iterator.empty
-      }
-    }
-    val initialMessage = Long.MaxValue
-    Pregel(ccGraph, initialMessage, activeDirection = EdgeDirection.Out)(
-      vprog = (id, attr, msg) => math.min(attr, msg),
-      sendMsg = sendMessage,
-      mergeMsg = (a, b) => math.min(a, b))
+    graph.connectedComponents()
+//    val ccGraph = graph.mapVertices { case (vid, _) => vid}
+//    def sendMessage(edge: EdgeTriplet[VertexId, ED]) = {
+//      if (edge.srcAttr < edge.dstAttr) {
+//        Iterator((edge.dstId, edge.srcAttr))
+//      } else {
+//        Iterator.empty
+//      }
+//    }
+//    val initialMessage = Long.MaxValue
+//    Pregel(ccGraph, initialMessage, activeDirection = EdgeDirection.Out)(
+//      vprog = (id, attr, msg) => math.min(attr, msg),
+//      sendMsg = sendMessage,
+//      mergeMsg = (a, b) => math.min(a, b))
   } // end of connectedComponents
 }
