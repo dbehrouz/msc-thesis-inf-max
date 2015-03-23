@@ -36,7 +36,7 @@ To run Pagerank methods:
 spark-submit --class "com.bd.InfluenceMax" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar pagerank data/hep.txt 40 10 0.01 output-pg
 
 Run Driver :
-spark-submit --class "com.bd.Driver" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/hep.txt 40 10 0.01 data/output degree
+spark-submit --class "com.bd.Driver" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/hep.txt 40 10 0.01 data/output greedyic
 
 Run SimDriver :
 spark-submit --class "com.bd.SimDriver" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/hep.txt 10 0.01

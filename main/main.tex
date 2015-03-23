@@ -32,7 +32,7 @@ I.7.m [Document and text processing]}}
 
 \begin{abstract}
 
-Network influence maximization. Something about graphs, about network influcence, social network, other related areas, big data, hadoop and other technologies, graph processing
+Network influence maximization. Something about graphs, about network influence, social network, other related areas, big data, Hadoop and other technologies, graph processing
 
 \end{abstract}
 
@@ -249,9 +249,10 @@ HDFS is a distributed file system, designed to run on commodity hardware. It pro
 \centering
 \includegraphics[width=130mm]{figures/hdfsarchitecture.png}
 \caption{HDFS Architecture}
+\label{fig:hdfsarch}
 \end{figure}
 
-It is fault tolerant, meaning if a node in a cluster fails, the data is not gone. HDFS employs a feature called \textit{Data Replication}, which indicates the number of type each object is being replicated. NameNode keeps track of where are all the same instances of the data is stored and in case a node fails it knows where to look for it. HDFS emphasizes on moving computation is much cheaper than moving data, it is true since HDFS is designed to store BigData sets, Tera or even PetaBytes of data, hence in conjunction with MapReduce, instead of moving the data around, the computation is done on the node containing the data. It is design for high throughput  rather than low latency so it is not ideal for streaming application, although several improvements are being made to further decrease the latency and making it suitable for real time streaming application. Similar to MapReduce it is design to work across heterogeneous hardware and software platforms. Meaning the nodes in the cluster do not have to be identical and even running the same operating system. Hadoop runs on JVM hence it is OS agnostic. 
+It is fault tolerant, meaning if a node in a cluster fails, the data is not gone. HDFS employs a feature called \textit{Data Replication}, which indicates the number of type each object is being replicated. Figure \ref{fig:hdfsarch} shows the high level architecture of HDFS. NameNode keeps track of where are all the same instances of the data is stored and in case a node fails it knows where to look for it. HDFS emphasizes on moving computation is much cheaper than moving data, it is true since HDFS is designed to store BigData sets, Tera or even PetaBytes of data, hence in conjunction with MapReduce, instead of moving the data around, the computation is done on the node containing the data. It is design for high throughput  rather than low latency so it is not ideal for streaming application, although several improvements are being made to further decrease the latency and making it suitable for real time streaming application. Similar to MapReduce it is design to work across heterogeneous hardware and software platforms. Meaning the nodes in the cluster do not have to be identical and even running the same operating system. Hadoop runs on JVM hence it is OS agnostic. 
 
 
 \subsection{Spark}
@@ -261,16 +262,18 @@ A typical Spark program is consists of a driver program that launches multiple w
 \centering
 \includegraphics[width=130mm]{figures/sparkprogram.png}
 \caption{Spark Program}
+\label{fig:sparkprogram}
 \end{figure}
 
- User's can control RDDs behavior by persisting it, or caching it. Tests performed on Spark showed that it is 100x times faster than MapReduce and it is able to run application that are not even possible to run using MapReduce. Spark is fault tolerant by means of RDDs. Since RDDs track the changes made to them, they can be recreated. So if a node containing some partitions of RDDs are lost they can be recreated using the these information. 
+User's can control RDDs behavior by persisting it, or caching it. Tests performed on Spark showed that it is 100x times faster than MapReduce and it is able to run application that are not even possible to run using MapReduce. Spark is fault tolerant by means of RDDs. Driver always keeps track the changes made to the RDDs, and they can be recreated from previous stages. So if a node containing some partitions of RDDs is lost they can be recreated using the these information. 
  
 \begin{figure}[ht!]
 \centering
 \includegraphics[width=130mm]{figures/rdd.png}
 \caption{Spark stages and RDDs}
+\label{fig:rdd}
 \end{figure}
-Figure above shows how Spark computes job stages. Boxes with solid outlines are RDDs. Partitions are shaded rectangles, in black if they are cached. To run an action on RDD G, the scheduler builds stages at wide dependencies and pipelines narrow transformations inside each stage. In this case, stage 1 does not need to run since B is cached, so we run 2 and then 3. If any of the stages fail, the computation will restart from the last healthy RDD. Also if a node containing some specific partitions of an RDD fails, the RDD will be transferred to another node and the computation will be restarted. 
+Figure \ref{fig:rdd} shows how Spark computes job stages. Boxes with solid outlines are RDDs(A, B, ..., G). Partitions are shaded rectangles, in black if they are cached. To run an action on RDD G, the scheduler builds stages at wide dependencies and pipelines narrow transformations inside each stage. In this case, stage 1 does not need to run since B is cached, so we run 2 and then 3. If any of the stages fail, the computation will restart from the last healthy RDD. Also if a node containing some specific partitions of an RDD fails, the RDD will be transferred to another node and the computation will be restarted. 
 
 Spark contains a Machine learning framework named MLib and graph processing framework named GraphX . 
 Spark works very well with iterative algorithms, it doesn't have MapReduce limitation which is the result of each job has to be written to disk. Spark has in memory computation which will speed up the process. 
