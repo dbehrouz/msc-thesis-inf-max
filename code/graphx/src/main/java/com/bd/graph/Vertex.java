@@ -10,6 +10,19 @@ public class Vertex {
     private final Long id;
     Map<Long, Double> neighbors = new HashMap<Long, Double>();
     private int label = 0;
+    private double spread = 0;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setSpread(double spread) {
+        this.spread = spread;
+    }
+
+    public double getSpread() {
+        return spread;
+    }
 
     public void activate() {
         this.label = 1;
@@ -22,6 +35,7 @@ public class Vertex {
     public Vertex(Long id) {
         this.id = id;
         neighbors = new HashMap<Long, Double>();
+        this.spread = 0;
     }
 
     public void addNeighbor(Long val) {
@@ -31,5 +45,10 @@ public class Vertex {
         } else {
             neighbors.put(val, value + 1);
         }
+    }
+
+    @Override
+    public String toString(){
+        return id + ":" + spread;
     }
 }

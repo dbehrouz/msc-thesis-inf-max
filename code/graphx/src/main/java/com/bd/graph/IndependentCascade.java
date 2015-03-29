@@ -2,6 +2,8 @@ package com.bd.graph;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -63,34 +65,64 @@ public class IndependentCascade {
         Long maxVertex = -1l;
         Double maxSpread = -1d;
         Map<Long, Vertex> vertices = graph.getVertices();
+        List<Vertex> intermediateSpread = initSpread(vertices);
         for (int i = 0; i < seedSize; i++) {
             int counter = 0;
-            for (Map.Entry<Long, Vertex> entry : vertices.entrySet()) {
-                if (!seed.contains(entry.getKey())) {
+            for (int j = 0; j < intermediateSpread.size(); j++) {
+                Vertex v = intermediateSpread.get(j);
+                if (!seed.contains((v.getId()))) {
                     List<Long> seedCopy = new ArrayList<Long>(seed);
-                    seedCopy.add(entry.getKey());
+                    seedCopy.add(v.getId());
                     Double totalSpread = simulate(seedCopy);
-                    if (totalSpread > maxSpread) {
-                        maxVertex = entry.getKey();
-                        maxSpread = totalSpread;
+                    v.setSpread(totalSpread);
+                    if (i > 0) {
+                        if (totalSpread > intermediateSpread.get(j + 1).getSpread() ||
+                                j == intermediateSpread.size()) {
+                            System.out.println("Breaking after " + counter + " steps");
+                            break;
+                        }
                     }
                 }
                 counter++;
                 if (counter % 100 == 0)
                     System.out.print(".");
             }
-            seed.add(maxVertex);
+            Collections.sort(intermediateSpread, comparator());
+            Vertex max = intermediateSpread.get(0);
+            seed.add(max.getId());
             System.out.println();
-            System.out.println("Item " + (i + 1) + ": " + maxVertex);
-
+            System.out.println("Item " + (i + 1) + ": " + max.getId());
+            intermediateSpread.remove(0);
             maxSpread = -1d;
             maxVertex = -1l;
 
-
         }
-
         return seed;
     }
 
+    private List<Vertex> initSpread(Map<Long, Vertex> vertices) {
+        List<Vertex> vertexSpread = new ArrayList<Vertex>();
+        for (Map.Entry<Long, Vertex> entry : vertices.entrySet()) {
+            Vertex v = entry.getValue();
+            v.setSpread(0.0);
+            vertexSpread.add(v);
+        }
 
+        return vertexSpread;
+    }
+
+    public static Comparator<Vertex> comparator() {
+        return new Comparator<Vertex>() {
+            @Override
+            public int compare(Vertex o1, Vertex o2) {
+                if (o1.getSpread() < o2.getSpread()) {
+                    return 1;
+                } else if (o1.getSpread() > o2.getSpread()) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        };
+    }
 }
