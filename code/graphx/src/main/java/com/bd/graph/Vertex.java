@@ -1,4 +1,4 @@
-package com.bd.simple.graph;
+package com.bd.graph;
 
 import java.util.HashMap;
 import java.util.Map;

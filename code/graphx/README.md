@@ -10,7 +10,6 @@ To run Single Cycle method:
 
 spark-submit --class "com.bd.InfluenceMax" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar singlecycle data/hep.txt 40 1 0.01 output-singlecycle
 
-
 To run Edge Sampling Method
 
 spark-submit --class "com.bd.InfluenceMax" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar edgesampling data/hep.txt 40 100 0.01 output-edgesampling
@@ -43,8 +42,3 @@ spark-submit --class "com.bd.SimDriver" --master local[*] target/spark-graphx-1.
 
 GraphUtil profiling :
 spark-submit --class "com.bd.util.GraphUtilProfiling" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/phy.txt 1
-
-
-
-
-
