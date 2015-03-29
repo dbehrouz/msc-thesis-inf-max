@@ -284,7 +284,7 @@ Spark works very well with iterative algorithms, it doesn't have MapReduce limit
 What is it, where does it come from, why is it important to have frameworks capable of processing massive graphs
 
 \subsection{Giraph}
-Apache Giraph is an iterative graph processing framework, built on top of Apache Hadoop. It is the open source version of Pregel by Google \cite{malewicz10} . Its input is a graph consists of vertices and edges. Each vertex and edge contains value as well, hence the input to a \textbf{Giraph} program besides from the structure of the vertices and edges includes their initial values. The project is now being actively developed by several companies. It is being used in many real case scenarios. For example, Facebook is using it to analyze the graphs formed by users and their connection with their friends. Similar to Pregel, the computation model of Giraph is Bulk Synchronous Parallel \cite{valiant90}. A BSP computation model consists of three physical components : 
+Apache Giraph is an iterative graph processing framework, built on top of Apache Hadoop. It is the open source version of Pregel by Google \cite{malewicz10} . Its input is a graph consists of vertices and edges. Each vertex and edge contains value as well, hence the input to a \textbf{Giraph} program besides from the structure of the vertices and edges includes their initial values. The project is now being actively developed by several companies. It is being used in many real case scenarios. For example, Facebook is using it to analyze the graphs formed by users and their connection with their friends. Similar to Pregel, the computation model of Giraph is \textbf{Bulk Synchronous Parallel} (BSP) \cite{valiant90}. A BSP computation model consists of three physical components : 
 \begin{itemize}
 \item
 A component capable of local processing
@@ -294,20 +294,22 @@ A network for transferring messages
 A hardware which synchronizes the components
 \end{itemize}
 BSP programs are run in parallel on each processing components and then the messages are transferred between these nodes. All of the computations are done in steps and after each step is done all the components should wait until every other component have finished its processing and sends messages to other components. \\
-The architecture fits very well with BigGraph computations in a way that vertices will process data individually and send messages along the edges (or directly) to other vertices in each step. The process can be parallelized then so that all or as many vertices as possible will perform computation at the same time and send messages and at the end of each step (which is called a super step in BSP) they will wait to synchronize with other vertices. 
-The computation will continue until all vertices are inactive or no more messages were sent during a step. This figure shows the general process in BSP models : 
+The architecture fits very well with BigGraph computations in a way that vertices will process data individually and send messages along the edges (or directly) to other vertices in each step. The process can be parallelized then so that all or as many vertices as possible will perform computation at the same time and send messages and at the end of each step (which is called a \textit{superstep} in BSP) they will wait to synchronize with other vertices. 
+The computation will continue until all vertices are inactive or no more messages were sent during a step. Figure \ref{fig:bsp} shows how one superstep is executed in BSP model. All of the vertices in parallel perform local computation, once the computation is finished, vertices will send relevant data to other vertices. A barrier is set in place, this will block vertices from starting the next superstep until all of the vertices have finished processing and sending information in the current superstep.
 \begin{figure}[ht!]
 \centering
 \includegraphics[width=130mm]{figures/bsp.png}
 \caption{Bulk Synchronous Parallel}
+\label{fig:bsp}
 \end{figure}
 
 Based on BSP, Giraph first distribute all the vertices to different nodes, users can define the partitioning behavior so it would suite the specific kind of algorithm they are going to run. Generally the idea is to have vertices that are connected on the same node, since most of the communications are done through edges and hence this would minimize the network traffic across the cluster. Computation then begins in a series of super steps, in each one messages from the previous super step are gathered by each vertex, the vertex will do its computation and send new messages to other vertices, at the end of the each superstep, all the vertices are synchronized, counters that keep track of the status of the cluster are updated, users can also define counters and aggregators. For example, finding the vertex with the maximum value in each iteration or etc. Giraph has a series of built in aggregators and users can define their own. At the end of the computation vertices can send a command to master node telling it that they'd like to halt and done computing, their state is changed to in active and it will stay like that unless new messages are sent to those vertices. When all the vertices are in active the computation will halt and the result will be reported.
-Figure below shows how computation is done in Giraph . (TODO, source or create your own graph)
+Figure \ref{fig:giraph} shows how computation is done in Giraph .
 \begin{figure}[ht!]
 \centering
 \includegraphics[width=130mm]{figures/giraphdataflow.png}
 \caption{Giraph Work Flow}
+\label{fig:giraph}
 \end{figure}
 A typical Giraph program is carried out in several steps, each one called a \textit{superstep} . Initially all vertices are in an \textit{active} state, and each iteration an active vertex will call its compute method which is defined by the user and generally carries out the Giraph algorithm. A typical Compute method:
 \begin{itemize}
