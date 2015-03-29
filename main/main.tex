@@ -281,10 +281,7 @@ Spark works very well with iterative algorithms, it doesn't have MapReduce limit
 \newpage
 
 \section{Large Scale Graph Processing Framework}
-What is it, where does it come from, why is it important to have frameworks capable of processing massive graphs
-
-\subsection{Giraph}
-Apache Giraph is an iterative graph processing framework, built on top of Apache Hadoop. It is the open source version of Pregel by Google \cite{malewicz10} . Its input is a graph consists of vertices and edges. Each vertex and edge contains value as well, hence the input to a \textbf{Giraph} program besides from the structure of the vertices and edges includes their initial values. The project is now being actively developed by several companies. It is being used in many real case scenarios. For example, Facebook is using it to analyze the graphs formed by users and their connection with their friends. Similar to Pregel, the computation model of Giraph is \textbf{Bulk Synchronous Parallel} (BSP) \cite{valiant90}. A BSP computation model consists of three physical components : 
+Large data sets come in many different formats. They are not limited to documents, texts, or key value pairs. One of the more common representation of data is \textit{graphs}. Not only they contain information about individual entities, but graphs also store information about the relationship between these entities. They have been used in many different fields of science to represent data. The most prominent example of a graph data set is the \textit{World Wide Web}, which is a collection of digital pages on Internet and each page may have links to several other pages. In this section, two of the widely used graph frameworks are discussed in detail. Both of these frameworks have been used to implement the methods discussed in section \ref{sec:experiments}. Interestingly, one common computation model used in many of these graph frameworks is based on a model introduced by Valiant \cite{valiant90} called \textit{Bulk Synchronous Parallel} (BSP). A BSP computation model consists of three physical components: 
 \begin{itemize}
 \item
 A component capable of local processing
@@ -293,7 +290,13 @@ A network for transferring messages
 \item
 A hardware which synchronizes the components
 \end{itemize}
-BSP programs are run in parallel on each processing components and then the messages are transferred between these nodes. All of the computations are done in steps and after each step is done all the components should wait until every other component have finished its processing and sends messages to other components. \\
+
+BSP programs are run in a series of global steps, called \textit{supersteps} . In each superstep, first all nodes run local tasks, and then send messages over the network to other components. Before the next superstep begins, a barrier is set in place that synchronizes all of the nodes and makes sure all the computation and network transfers of the current superstep are finished. Malewicz et al. \cite{malewicz10} developed a system called \textit{Pregel} at Google, which is based on the BSP model and is designed for implementing graph related algorithms. Pregel works by using vertices of the graphs as computation nodes; in each superstep, all vertices performs a local computations, during this phase they only have access to the data internal to the specific vertex which includes the vertex properties and the messages that were sent to the vertex in the previous superstep. After the computation step is done, all vertices may forward a series of messages to other vertices. The messages are usually send through edges, i.e. only vertices connected by an edge communicate with each other, but that is not necessarily the case all the time. Pregel, also takes care of the synchronization barrier and makes sure a new superstep does not begin until the current superstep is finished on all of the vertices.
+
+
+\subsection{Giraph}
+\textit{Apache Giraph} is an iterative graph processing framework, built on top of Apache Hadoop. It is the open source version of Pregel . Its input is a graph consists of vertices and edges. Each vertex and edge contains value as well, hence the input to a Giraph program besides from the structure of the vertices and edges includes their initial values. The project is now being actively developed by several companies. It is being used in many real case scenarios. For example, Facebook is using it to analyze the graphs formed by users and their connection with their friends. 
+
 The architecture fits very well with BigGraph computations in a way that vertices will process data individually and send messages along the edges (or directly) to other vertices in each step. The process can be parallelized then so that all or as many vertices as possible will perform computation at the same time and send messages and at the end of each step (which is called a \textit{superstep} in BSP) they will wait to synchronize with other vertices. 
 The computation will continue until all vertices are inactive or no more messages were sent during a step. Figure \ref{fig:bsp} shows how one superstep is executed in BSP model. All of the vertices in parallel perform local computation, once the computation is finished, vertices will send relevant data to other vertices. A barrier is set in place, this will block vertices from starting the next superstep until all of the vertices have finished processing and sending information in the current superstep.
 \begin{figure}[ht!]
@@ -517,7 +520,7 @@ TODO , pruning the graph :
 \newpage
 
 
-\section{Experiments}
+\section{Experiments} \label{sec:experiments}
 In this section all the experiments are explained in details. Experiments include the methods and the data sets described in the previous sections. 
 \subsection{Experiment Setup}
 Experiments are run on two different computation platform. For smaller data sets, to test the accuracy and speed of the methods the experiments are run on a single machine. Bigger data sets are run on an EMR cluster. The details are presented below. 

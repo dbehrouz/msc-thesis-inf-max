@@ -63,7 +63,7 @@ public class IndependentCascade {
     public List<Long> greedyMethod(int seedSize) {
         List<Long> seed = new ArrayList<Long>();
         Long maxVertex = -1l;
-        Double maxSpread = -1d;
+        Double previousSpread = 0d;
         Map<Long, Vertex> vertices = graph.getVertices();
         List<Vertex> intermediateSpread = initSpread(vertices);
         for (int i = 0; i < seedSize; i++) {
@@ -74,11 +74,14 @@ public class IndependentCascade {
                     List<Long> seedCopy = new ArrayList<Long>(seed);
                     seedCopy.add(v.getId());
                     Double totalSpread = simulate(seedCopy);
-                    v.setSpread(totalSpread);
+                    v.setSpread(totalSpread - previousSpread);
                     if (i > 0) {
-                        if (totalSpread > intermediateSpread.get(j + 1).getSpread() ||
+                        if (v.getSpread() > intermediateSpread.get(j + 1).getSpread() ||
                                 j == intermediateSpread.size()) {
                             System.out.println("Breaking after " + counter + " steps");
+                            System.out.println("My Spread : " + v.getSpread());
+                            System.out.println("His Spread : " + intermediateSpread.get(j + 1).getSpread());
+                            previousSpread = totalSpread;
                             break;
                         }
                     }
@@ -90,11 +93,12 @@ public class IndependentCascade {
             Collections.sort(intermediateSpread, comparator());
             Vertex max = intermediateSpread.get(0);
             seed.add(max.getId());
+            if (i == 0) {
+                previousSpread = max.getSpread();
+            }
             System.out.println();
             System.out.println("Item " + (i + 1) + ": " + max.getId());
             intermediateSpread.remove(0);
-            maxSpread = -1d;
-            maxVertex = -1l;
 
         }
         return seed;
