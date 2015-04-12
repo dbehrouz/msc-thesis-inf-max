@@ -517,10 +517,6 @@ The data sets in graph formats were made available for public by \cite{chen09}. 
 \subsubsection{LiveJournal Social Network}
 LiveJournal is a free online community with almost 10 million members, with many of them being active . Similar to other types of social networks, users can form friendship with other members. It consists for 4,847,571 vertices and 68,993,773 edges. Considerably larger than a lot of data sets usually used in influence maximization research, but still not at the same scale as current big data sets used in research and industry.  It is also available in \textbf{Edge List Format} format.
 
-\subsubsection{Friendster Social Network}
-Friendster is an online gaming network which used to be a social networking site where users form friendship with each other. The original data set, available at http://snap.stanford.edu/ also consists communities formed by users. For the purpose of influence maximization experiments the raw data set suffices. It is considerably larger than any other data set that has ever been used in influence maximization. It consists of 65,608,366 vertices and 1,806,067,135 edges. It can represent common big data sets that are used in research and industry now a days. Similar to ArXiv data set it is available in \textbf{Edge List Format} format where each line in the file contains the source and destination of an edge.
-
-
 \subsection{Methods \& Implementation details}
 List of influence propagation methods used in the experiments
 \begin{itemize}
@@ -555,6 +551,7 @@ Giraph provides more freedom to run algorithms in pregel framework, as it leaves
 
 \section{Results and Discussions}
 In this section, the results of running the algorithm discussed in section \ref{sec:bigdatanetworkinfluelncemaximization} are shown. The spread and running time of different methods on different real graphs are and reported. In the last part of the section, several random graphs having common characteristics found in real graphs are used to further analyze and explain the advantages and disadvantages of each of these methods.
+
 \subsection{ArXiv collaboration network data set} 
 In this section the result of running different methods on collaboration network data set are explained. To calculate the spread for each method, multiple simulations needed to be run, in these set of experiments number of simulations is set 100. While increasing the number will make the result more accurate, but it will also increase the running time. Experiments have been run with different number of simulations and the results show that the difference between number of simulations is not very significant. 
 \begin{figure}[ht!]
@@ -590,8 +587,8 @@ Figure \ref{hep:heuristicmethods} shows the spread of the heuristics methods on 
 \caption{Running time}
 \label{hep:timetable}
 \end{table}
-Table \ref{hep:timetable} shows the running time all of the methods expect for greedy. As explained in previous chapters, running time of all of the methods specified in the table is independent of seed size, that is the biggest advantage of these methods over the greedy method. Figure \ref{hep:times} shows the running time of the greedy method based on input size, to make the comparison easier, running time of other methods are also shown in the figure.
-\begin{figure}[ht!]
+Table \ref{hep:timetable} shows the running time all of the methods expect for greedy. As explained in previous chapters, running time of all of the methods specified in the table is independent of seed size, that is the biggest advantage of these methods over the greedy method. Figure \ref{hep:times} shows the running time of the greedy method based on input size, to make the comparison easier, running time of other methods are also shown in the figure. To find a seed set of size 100 on the collaboration network data set after applying the celf optimization, it takes almost 2 hours, and this graph is much smaller than a typical big data graph. Being a NP-Hard problem, the algorithm will not scale linearly, this means for data sets that are 100 times bigger than collaboration network, it might take thousands of time more to run the algorithm
+\begin{figure}[H]
 \centering
 \includegraphics[width=130mm]{figures/hep/times.png}
 \caption{Running time of different methods on collaboration network data set}
@@ -606,8 +603,9 @@ Table \ref{hep:timetable} shows the running time all of the methods expect for g
 \caption{Spread of different methods on Live Journal Data set}
 \label{journal:spread}
 \end{figure}
+
 Same as collaboration network data set, the number of simulations is set to 100. Here the seed sizes are much larger, and the results are reported for seed sizes of 10000, 20000, 30000, 40000 and 50000. Due to its size, running the greedy method is impossible, and both the single cycle and multi cycle as specified earlier run into problems because of the massive amount of data they have to store in memory. For this data set, only edge sampling, degree, page rank and random seed selection methods are executed and the results are reported below.
-Figure \ref{journal:spread} shows the spread achieved by running different methods on the live journal data set. From the figure it is clearly obvious that page rank and edge sampling are superior to the other methods. Horizontal axis shows the seed size, and the vertical axis shows the total spread.  
+Figure \ref{journal:spread} shows the spread achieved by running different methods on the live journal data set. Horizontal axis shows the seed size, and the vertical axis shows the total spread. From the figure it is clearly obvious that page rank and edge sampling are superior to the other methods. Random method is just used as a baseline to compare with the other methods. The figure shows that the same algorithms behave differently on different graphs. In the next section this will be studied in more detail.
 
 \begin{table}[ht!]
 \centering
