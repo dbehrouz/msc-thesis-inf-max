@@ -68,7 +68,8 @@ object Driver {
 
     val edgeListGraph = GraphUtil.mapTypes(
       GraphLoader.edgeListFile(sc, input).partitionBy(PartitionStrategy.CanonicalRandomVertexCut)
-    ).cache()
+    )
+    edgeListGraph.edges.count
 
     // First run all the methods that only need the "Raw Graph"
     for (alg <- algorithms.intersect(ALGORITHMS_WITH_RAW_GRAPH)) {
@@ -79,6 +80,8 @@ object Driver {
     // Run the rest of the methods using the pre processed graph
     if (restOfMethods.size > 0) {
       val directedGraph = GraphUtil.undirected(edgeListGraph, edgeProbability).cache()
+      directedGraph.edges.count
+      directedGraph.vertices.count
       for (alg <- restOfMethods) {
         run(directedGraph, alg, seedSizes, numberOfIterations, outputLocation + "-" + alg, sc)
       }

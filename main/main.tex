@@ -291,22 +291,12 @@ A network for transferring messages
 A hardware which synchronizes the components
 \end{itemize}
 
-BSP programs are run in a series of global steps, called \textit{supersteps} . In each superstep, first all nodes run local tasks, and then send messages over the network to other components. Before the next superstep begins, a barrier is set in place that synchronizes all of the nodes and makes sure all the computation and network transfers of the current superstep are finished. Malewicz et al. \cite{malewicz10} developed a system called \textit{Pregel} at Google, which is based on the BSP model and is designed for implementing graph related algorithms. Pregel works by using vertices of the graphs as computation nodes; in each superstep, all vertices performs a local computations, during this phase they only have access to the data internal to the specific vertex which includes the vertex properties and the messages that were sent to the vertex in the previous superstep. After the computation step is done, all vertices may forward a series of messages to other vertices. The messages are usually send through edges, i.e. only vertices connected by an edge communicate with each other, but that is not necessarily the case all the time. Pregel, also takes care of the synchronization barrier and makes sure a new superstep does not begin until the current superstep is finished on all of the vertices.
+BSP programs are run in a series of global steps, called \textit{supersteps}. In each superstep, first all nodes run local tasks, and then send messages over the network to other components. Before the next superstep begins, a barrier is set in place that synchronizes all of the nodes and makes sure all the computation and network transfers of the current superstep are finished. Malewicz et al. \cite{malewicz10} developed a system called \textit{Pregel} at Google, which is based on the BSP model and is designed for implementing graph related algorithms. Pregel works by using vertices of the graphs as computation nodes; in each superstep, all vertices performs a local computations, during this phase they only have access to the data internal to the specific vertex which includes the vertex properties and the messages that were sent to the vertex in the previous superstep. After the computation step is done, all vertices may forward a series of messages to other vertices. The messages are usually send through edges, i.e. only vertices connected by an edge communicate with each other, but that is not necessarily the case all the time. Pregel, also takes care of the synchronization barrier and makes sure a new superstep does not begin until the current superstep is finished on all of the vertices.
 
 
 \subsection{Giraph}
-\textit{Apache Giraph} is an iterative graph processing framework, built on top of Apache Hadoop. It is the open source version of Pregel . Its input is a graph consists of vertices and edges. Each vertex and edge contains value as well, hence the input to a Giraph program besides from the structure of the vertices and edges includes their initial values. The project is now being actively developed by several companies. It is being used in many real case scenarios. For example, Facebook is using it to analyze the graphs formed by users and their connection with their friends. 
-
-The architecture fits very well with BigGraph computations in a way that vertices will process data individually and send messages along the edges (or directly) to other vertices in each step. The process can be parallelized then so that all or as many vertices as possible will perform computation at the same time and send messages and at the end of each step (which is called a \textit{superstep} in BSP) they will wait to synchronize with other vertices. 
-The computation will continue until all vertices are inactive or no more messages were sent during a step. Figure \ref{fig:bsp} shows how one superstep is executed in BSP model. All of the vertices in parallel perform local computation, once the computation is finished, vertices will send relevant data to other vertices. A barrier is set in place, this will block vertices from starting the next superstep until all of the vertices have finished processing and sending information in the current superstep.
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=130mm]{figures/bsp.png}
-\caption{Bulk Synchronous Parallel}
-\label{fig:bsp}
-\end{figure}
-
-Based on BSP, Giraph first distribute all the vertices to different nodes, users can define the partitioning behavior so it would suite the specific kind of algorithm they are going to run. Generally the idea is to have vertices that are connected on the same node, since most of the communications are done through edges and hence this would minimize the network traffic across the cluster. Computation then begins in a series of super steps, in each one messages from the previous super step are gathered by each vertex, the vertex will do its computation and send new messages to other vertices, at the end of the each superstep, all the vertices are synchronized, counters that keep track of the status of the cluster are updated, users can also define counters and aggregators. For example, finding the vertex with the maximum value in each iteration or etc. Giraph has a series of built in aggregators and users can define their own. At the end of the computation vertices can send a command to master node telling it that they'd like to halt and done computing, their state is changed to in active and it will stay like that unless new messages are sent to those vertices. When all the vertices are in active the computation will halt and the result will be reported.
+\textit{Apache Giraph} is an iterative graph processing framework, built on top of Apache Hadoop. It is the open source version of Pregel and is now being actively developed by several companies. It is being used in many real case scenarios. For example, Facebook is using it to analyze the graphs formed by users and their connection with their friends. 
+In a typical Giraph program, input graph is usually stored and read from the HDFS, once the program starts, Giraph will read the graph and partition the vertices across several nodes. Users can decide how the partition the vertices based on the type of problem they are trying to solve. Giraph by default use a \textit{Hash Partitioner} to partition the vertices. Generally it is a good idea to provide a custom partitioner that works best with the specific problem that is being solved, for example in most of the Giraph programs, in the communication phase, messages are sent along the edges of the graph, so if vertices that are connected to each other are partitioned to the same computation node, the network overhead will be reduced significantly.    
 Figure \ref{fig:giraph} shows how computation is done in Giraph .
 \begin{figure}[ht!]
 \centering
@@ -314,39 +304,35 @@ Figure \ref{fig:giraph} shows how computation is done in Giraph .
 \caption{Giraph Work Flow}
 \label{fig:giraph}
 \end{figure}
-A typical Giraph program is carried out in several steps, each one called a \textit{superstep} . Initially all vertices are in an \textit{active} state, and each iteration an active vertex will call its compute method which is defined by the user and generally carries out the Giraph algorithm. A typical Compute method:
-\begin{itemize}
-\item
-receives messages sent to the vertex in the previous superstep
-\item
-computes using the messages, and the vertex and outgoing edge values, which may result in modifications to the values, and
-\item
-may send messages to other vertices.
-\end{itemize}
 
-The figure below shows supersteps involved with computing the single source shortest path for a simple graph.(TODO, make your own proper reference)
+Each Giraph cluster has a master node and one or more worker nodes. Master node coordinates has the responsibility of reading the graph and partitioning it based on the given partitioner, coordinate the job and the supersteps. Master node is responsible for  all the vertices and making sure that a new superstep does not begin until all the vertices have finished their computation. Each worker node contains several vertices and run the actual program, and coordinate with the master and other nodes through a messages send along the edges or directly to other vertices. Vertices in a Giraph program can be in either of the two states; \textit{Active} or \textit{Not Active}, generally the program continues until all the vertices are Not Active. Vertices themselves are responsible for setting their status after they have finished computing. If a vertex receives a message from other vertices, its state will automatically change to Active.
+
+The figure \ref{fig:sssp} shows supersteps involved with computing the single source shortest path for a simple graph.
 \begin{figure}[ht!]
 \centering
 \includegraphics[width=130mm]{figures/giraphsuperstep.jpg}
 \caption{Single Source Shortest Path}
+\label{fig:sssp}
 \end{figure}
 
 The input is a chain graph with three vertices (black) and two edges (green). The values of edges are 1 and 3 respectively. The algorithm computes distances from the leftmost vertex. The initial values of vertices are 0, $\infty$ and $\infty$ (top row). Distance upper bounds are sent as messages (blue), resulting in updates to vertex values (successive rows going down). The execution lasts three supersteps (separated by red lines).
 
-On a cluster level, a graph is distributed into several connected components and each one is stored in one of the computation nodes. Each cluster, has a master node that coordinates the other nodes. It will decide on which components should be stored on each device and it stored reference and tables of information about the vertices and edges and where they resides. It will ensure the supersteps are synchronized, i.e. it makes sure all vertices have finished their computation in the current superstep before starting the next superstep. It will monitor the status of the components and decide when to end the program by checking if there are any active vertices or not. 
-Although it has many advantages over MapReduce, it is still has many limitations, in one Giraph job many iterations can be done, but if graphs should go through several transformation that would require multiple Giraph jobs, which means that the data has be written to HDFS after each job which adds overhead. A lot of the Machine learning and graph algorithms and problems are iterative in nature, which will cause Giraph to have severe performance issues in some of these cases. 
+Although Giraph has many advantages over MapReduce, it is still has some limitations, in one Giraph job many iterations can be done, but if graphs should go through several transformation that would require multiple Giraph jobs, which means that the data has be written to HDFS after each job. This adds a lot of IO . A lot of the Machine learning and graph problems are iterative in nature, which will cause Giraph to have severe performance issues in some of these cases. 
 % Sample code 
 \subsection{GraphX}
-GraphX is a light API written on top of Spark. It uses the powerfull RDD abstractions as the basis of its computation, by storing vertices and edges in separate RDDs. Similar to Spark, it works well for iterative algorithms and it comes packaged with many of the algorithm such as, PageRank, Label Propagation, Connected Components and ... . GraphX, also includes an API for pregel framework.  Several important components of GraphX are :
+\textit{GraphX} is a light API written on top of Spark. It uses the powerfull RDD abstractions as the basis of its computation, by storing vertices and edges in separate RDDs. Similar to Spark, it works well for iterative algorithms and it comes packaged with many of the algorithm such as, PageRank, Label Propagation, Connected Components and ... .  Several important components of GraphX are :
 \begin{itemize}
-\item VertexRDD : an RDD object consist of a vertex id and a customization data type. It carries some features in comparison to the traditional RDD, such ensuring vertex ids are unique, optimized joins among different vertex groups and etc. It offers several methods for mapping values, filtering vertices(while preserving their id) and finding difference of two vertex groups.
-\item EdgeRDD : similar to VertexRDD, it is a subclass of RDD, which organizes the edges into blocks based on some predefined partitioning strategies. It supports three extra methods; \textit{mapValues} which maps the values while preserving the structure, \textit{reverse} which reverse the edge directions while preserving the attributes, and \textit{innerJoin} which joins two EdgeRDD objects, using the source and destination ids as keys. 
+\item VertexRDD: an RDD object consists of a vertex id and a data type. It carries some features in comparison to the traditional RDD, such ensuring vertex ids are unique, optimized joins among different vertex groups. It offers several methods for mapping values, filtering vertices(while preserving their id) and finding difference of two vertex groups.
+\item EdgeRDD: similar to VertexRDD, it is a subclass of RDD, which organizes the edges into blocks based on some predefined partitioning strategies. It supports three extra methods; \textit{mapValues} which maps the values while preserving the structure, \textit{reverse} which reverse the edge directions while preserving the attributes, and \textit{innerJoin} which joins two EdgeRDD objects, using the source and destination ids as keys. 
 \end{itemize}
-The key feature of GraphX comes from the way vertices and edges are stored. GraphX employs different partitioning strategies for storing vertices and edges and while each one have their own advantages and disadvantages, the overall goal is reduce the amount of communication along edges and have all the vertices close to each other in one computation node to avoid network traffics. The details of GraphX and how it behaves under the hood are beyond the scope of this document. Xin et al. \cite{xin13} described GraphX in detail and GraphX website  \footnote{https://spark.apache.org/graphx/} includes more information about the internal architecture of the system.
+The key feature of GraphX comes from the way vertices and edges are stored. GraphX employs different partitioning strategies for storing vertices and edges and while each one have their own advantages and disadvantages, the overall goal is to reduce the amount of communication along edges and have all the vertices close to each other in one computation node to avoid network traffics. The details of GraphX and how it behaves under the hood are beyond the scope of this document. Xin et al. \cite{xin13} described GraphX in detail and GraphX website  \footnote{https://spark.apache.org/graphx/} includes more information about the internal architecture of the system.
+GraphX also provides a Pregel like API, that users should only provide the vertex program and the communication strategy. This is one of main advantages of GraphX over Giraph and other similar graph processing frameworks. A GraphX's graph is like any other object in Spark environment, and all the transformations and action available in Spark package can be applied to vertices and edges of the graph. 
 
+Below 
 \newpage
 
 \section{Big Data and Network Influence Maximization}
+\label{sec:bigdatanetworkinfluelncemaximization}
 The original greedy method proposed by Kempe \cite{kempe03} provided a reliable solution to the problem of maximizing influence in network graphs. Several other researchers have worked on finding solutions that find better solutions in terms of accuracy, but most of the researches done in recent years were involved around improving the efficiency of the original method. Leskovec et al. \cite{leskovec07} \textbf{CELF}, Goyal's \cite{goyal112} \textbf{CELF++} and Zhuo et al. \cite{zhuo13} proposed methods that considerably increases the speed of the original Greedy method. Cheng et al. \cite{cheng13} proposed the \textbf{StaticGreedy} method which combined with \textbf{CELF} further improved the speed of the greedy method.  However, non of the proposed methods are scalable and they can only operate on small to medium sized graphs. The bottleneck for the greedy method lies in the function it is trying to optimize.  As discussed in the previous section, the spread function under the Independent Cascade (and Linear Threshold) model cannot be determined exactly due to the edge probabilities. Hence, Monte Carlo method is being used which consists of running the IC model many times(up to 10000 for accurate result) and then averaging over all the simulations. Currently, there are companies and organizations that have graphs of millions to billions of nodes with even more edges, and non of the optimization methods discussed above can be applied to any of these graphs. Even on most powerful clusters running the random process even for one iteration takes a lot of time, essentially rendering the method completely useless. The other group of methods discussed in the previous sections were heuristic methods. They can range from very simple methods such as finding the nodes with highest in or out degree to more sophisticated ones such as \textbf{Single Discount} and \textbf{Degree Discount} discussed by Chen et al. \cite{chen09} or \textbf{SPM} and \textbf{SP1M} proposed by Saito and Kimura \cite{kimura06}. The advantage of heuristic methods are that they are very fast and they can scale to graphs of any sizes, however the accuracy of the solution is not as good as the greedy method. 
 \\
 In the rest of this section, first the literature on influence maximization for big data and then details of the methods implemented are discussed. Some of methods are fairly simple heuristics and some are based on the methods discussed in previous sections with tweaks that make it possible to implement it on large scale graphs. Changes have to be made to the original algorithms in order to implement the methods using graph frameworks built for processing  large graphs. These frameworks are imposing certain set of restrictions that will make applying some classes of algorithms more difficult. Bulk Synchronous Processing is the base of all the large scale graph frameworks where they are using the method of \textit{Think Like a Vertex}. Although this has many benefits but when it comes to classical IC and LT models, some difficulties will rise. In BSP model, usually algorithms that only need local data are implemented a lot simpler, but in influence maximization we need global access to the network and to find out how many new nodes were affected by adding a node to the initial seed. The whole process is a randomized simulation that should be run hundreds or thousands of time to get a better and more accurate result. Large scale data processing usually suffers in this area, because initializing jobs given huge amount of data whether it is in graph format or others, take up some time and that is something that should be avoided . 
@@ -505,18 +491,6 @@ Compared to other heuristic methods that will be discussed in the next section, 
 \textbf{Single Discount}: Improved version of Degree heuristic. After a vertex is chosen as the seed, it is removed from the graph, that means all of its neighbors' degree are reduced by one. This yields a better result that Degree heuristic, since it lower the chance of neighboring vertices to be selected as the initial seed. \\ 
 \textbf {Page Rank} : Based on the popular Page Rank algorithm \cite{page99}, the algorithm was originally used in Google's search engine, to rank websites based on their importance. 
 
-\subsection{Graph cuts?}
-TODO
-create a graph graph cuts, each components will be transformed into a node, run influence maximization on the new graph, from each connected component chose the best nodes.
-
-\subsection{Preprocessing of the graph}
-Before running any of the algorithms above, several pre processing methods can be applied to the input graph, in order to decrease performance time without noticeably affecting the quality of the result. 
-TODO , pruning the graph : 
-1. Removing all connected components of size 1, this is a must because it absolutely has no effect on the final result, 
-2. maybe pruning CCs that have less than N nodes
-3. pruning CCs that has a collective edge weights of less than a threshold
-4. pruning vertices that their neighbors have very high degree
-
 \newpage
 
 
@@ -537,12 +511,8 @@ They methods are run using Spark 11.0 . (TODO make it better)
 \subsection{Data set}
 Below is an overview of the data sets used in the expermients. All of the data sets are provided an an edge list format. In each line there are two vertices id separated by a tab character. The two vertices are end points of an edge. 
 \subsubsection{ArXiv collaboration network data set}
-Two data sets from the e-print arXiv is chosen for testing. Same two data sets have been used in \cite{kempe03} and \cite{chen09}. The data set contains academic collaboration for scientific research papers. In this data set, vertices represent researchers and edges define a collaboration between two researchers on writing a scientific paper. Two data sets have been chosen, they have been used by several other researchers in the field of influence maximization and can provide a good comparison for the quality of the methods. The data sets are very small comparing two the data sets currently considered as Big Data, but since there aren't many previous research done in Big Data, I have used these two to test the accuracy of the methods on smaller data set and compare them to the state of the art influence maximization algorithm in smaller scale. There are in total two networks : 
-\begin{itemize}
-\item High Energy Physics - Theory : contains papers from 1991 to 2003, with 15,233 nodes and 58,981 edges.
-\item Physics : contains all papers in  physics from the same year range as physics - theory, with 37,154 nodes and 231,584 edges.
-\end{itemize}
-The data sets in graph formats were made available for public by \cite{chen09}. It can be found at http://research.microsoft.com/en-us/people/weic/graphdata.zip. It is in \textbf{Edge List Format} where each line of the file, contains two values which the source and destination of an edge. A sample of the data set is shown in appendix A (TODO add appendix)
+Two data sets from the e-print arXiv is chosen for testing. Same two data sets have been used in \cite{kempe03} and \cite{chen09}. The data set contains academic collaboration for scientific research papers. In this data set, vertices represent researchers and edges define a collaboration between two researchers on writing a scientific paper. Two data sets have been chosen, they have been used by several other researchers in the field of influence maximization and can provide a good comparison for the quality of the methods. The data sets are small comparing to the data sets currently considered as Big Data, but since there aren't many previous research done in Big Data, the \textit{High Energy Physics-Theory} graph, which contains papers from 1991 to 2003, with 15,233 nodes and 58,981 edges is used as a base comparison of the methods proposed in section \ref{sec:bigdatanetworkinfluelncemaximization} and state of the art greedy methods.
+The data sets in graph formats were made available for public by \cite{chen09}. It can be found at http://research.microsoft.com/en-us/people/weic/graphdata.zip. It is in Edge List Format where each line of the file, contains two values the first on is the source and the second one is the destination of an edge.
 
 \subsubsection{LiveJournal Social Network}
 LiveJournal is a free online community with almost 10 million members, with many of them being active . Similar to other types of social networks, users can form friendship with other members. It consists for 4,847,571 vertices and 68,993,773 edges. Considerably larger than a lot of data sets usually used in influence maximization research, but still not at the same scale as current big data sets used in research and industry.  It is also available in \textbf{Edge List Format} format.
@@ -583,45 +553,123 @@ Giraph's pregel API is designed differently. It consists of the following method
 Giraph provides more freedom to run algorithms in pregel framework, as it leaves the responsibility of sending messages to the user rather than enforcing it to be send in every iteration. This makes, Giraph ideal for implementing the first two methods, because the decision to either send or not send a message depends on the content of the message itself.
 
 
-\subsection{Results}
-In this section, both the result and running time of different methods on each data set are provided. Figures below show the result of running the 6 different algorithm on collaboration network data set. In each of graphs, the results are drawn against the random method, to make the comparison easier between each method. In previous sections, it was discussed that the function that computes the spread is not deterministic and it is just an estimation based on several Monte-Carlo simulations. That explains the noise in graph. As it can be observed from the figures, that spread is not always strictly increasing as the seed size increases and that is due to the randomness of the process. Increasing the number of simulations will make the graph smoother. Running several experiments using different number of simulations, has shown that the effect seems to be minimal on the actual result. Specially, when the size of a data set is massive, the changes in the spread function have minimal impact on the final result. Because of this, I have chosen to set the number of simulations in all the experiments to 100 .
-\begin{figure}[ht!]
-
-\centering
-\includegraphics[width=100mm]{figures/hep/degree-degreediscount.png}
-\caption{Degree and Degree-Discount methods}
-\label{hep:degdiscount}
-\end{figure}
-Figure \ref{hep:degdiscount} the final spread for \textit{degree method}(on the left) and \textit{degree-discount method} (on the right). These two methods have produced the best result among all the other methods. Structure of the graph as well as the fact that they do not rely on the simulation process have contributed to their advantage over the other methods.
-
+\section{Results and Discussions}
+In this section, the results of running the algorithm discussed in section \ref{sec:bigdatanetworkinfluelncemaximization} are shown. The spread and running time of different methods on different real graphs are and reported. In the last part of the section, several random graphs having common characteristics found in real graphs are used to further analyze and explain the advantages and disadvantages of each of these methods.
+\subsection{ArXiv collaboration network data set} 
+In this section the result of running different methods on collaboration network data set are explained. To calculate the spread for each method, multiple simulations needed to be run, in these set of experiments number of simulations is set 100. While increasing the number will make the result more accurate, but it will also increase the running time. Experiments have been run with different number of simulations and the results show that the difference between number of simulations is not very significant. 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=100mm]{figures/hep/page-edgesample.png}
-\caption{Pagerank and Edgesampling methods}
-\label{hep:pageedge}
+\includegraphics[width=100mm]{figures/hep/searchmethods.png}
+\caption{Search methods}
+\label{hep:searchmethods}
 \end{figure}
-Figure \ref{hep:pageedge} shows the spread of \textit{Page rank method} (on the left) and \textit{Edge sampling method} (on the right). Similar to degree and degree discount methods, page rank seems to be a good heuristic for the hep data set, as it behaves similarly to both of other two heuristics methods. \textit{Edge sampling} however, although produces a much better result than random seed selection, still does not match with the heuristic methods. There are two reasons why edge sampling does not perform as good as the other methods. First, it heavily depends on the simulation process and number of simulations, to find the seed using edge sampling method only 100 simulations, which although have minimal impact but still can cause the final spread to be smaller than expected. Secondly, it also depends on the graph structure, this method generally performs well, when the graph has fewer connected components of bigger sizes, edge sampling has a better chance of finding influential nodes. In network collaboration data set, sampling edges with a probability of 0.01, in most of the resulted in nearly all of the connected components of having a size of 1. This has produced a biased result as a lot of the more influential nodes after the sampling will end up having no edges attached to them and essentially yielding the same spread as disconnected vertices before the sample. One solution to this problem would be to increase the number of simulation. Edge sampling method is expected to perform better on graphs of massive scale with millions or even billions of edges. 
-
+Figure \ref{hep:searchmethods} shows the result of running search methods on collaboration graph. Clearly the greedy method is much better than all of the other methods. As discussed in previous chapters, the underlying approach of the other three methods are similar and hence their spread is more or the less the same. Both edge sampling's number of iterations and multicycle's number of tokens are set to 100, and their results are a little better than single cycle, but as explained earlier both the noise from calculating the spread and the algorithms themselves make it difficult to clearly distinguish their differences.
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=100mm]{figures/hep/multi-singlecycle.png}
-\caption{Multi-attempt Single Cycle and Single Cycle methods}
-\label{hep:multisingle}
+\includegraphics[width=100mm]{figures/hep/heuristicsmethods.png}
+\caption{Heuristic methods}
+\label{hep:heuristicmethods}
 \end{figure}
-Figure \ref{hep:multisingle} shows \textit{Multi-attempt Single Cycle method} (on the left) and \text{Single Cycle method} (on the right). Similar to Edge sampling, they are expected to perform better on graphs of bigger scale.
+Figure \ref{hep:heuristicmethods} shows the spread of the heuristics methods on collaboration network graph.  All heuristics methods expects random produce similar results. Page rank is slightly better than degree and degree discount method, mostly because when calculating the importance of a vertex, it doesn't just consider its immediate neighbors. Comparing heuristics with search methods shows that greedy methods is the best among all of the methods. Heuristics methods are performing better than edge sampling, single and multi cycle methods. In the last part of this section, several artificial graphs are generated each one having different graph properties such as skewness and sparsity, for each of the graphs, the heuristic methods and edge sampling are run in order to study the effectiveness of each method on different types of graphs.
 
- \begin{figure}[ht!]
+\begin{table}[ht!]
+\centering
+\begin{tabular}{ |c|c| }
+\hline 
+  method & time (s)\\
+  \hline 
+  random & 0.84\\
+  degree & 1.01\\
+  degreediscount&1.156\\
+  pagerank&2.338\\
+  edgesampling&7.73\\
+  singlecycle&45.2\\
+  multicycle&50.34\\
+  \hline 
+\end{tabular}
+\caption{Running time}
+\label{hep:timetable}
+\end{table}
+Table \ref{hep:timetable} shows the running time all of the methods expect for greedy. As explained in previous chapters, running time of all of the methods specified in the table is independent of seed size, that is the biggest advantage of these methods over the greedy method. Figure \ref{hep:times} shows the running time of the greedy method based on input size, to make the comparison easier, running time of other methods are also shown in the figure.
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=130mm]{figures/hep/times.png}
 \caption{Running time of different methods on collaboration network data set}
 \label{hep:times}
 \end{figure}
 
-Figure \ref{hep:times} shows the running time for each of different methods. As expected the running times are constant and do not change as the seed size increases. This is on the contrary to the greedy method, where finding even an extra seed requires an entire scan of the data set and running the simulation process for each individual vertices. This graphs, shows the advantage these methods have over the traditional greedy method and justifies their use despite of the lesser solution quality.
+\subsection{Live Journal}
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/journal/spread.png}
+\caption{Spread of different methods on Live Journal Data set}
+\label{journal:spread}
+\end{figure}
+Same as collaboration network data set, the number of simulations is set to 100. Here the seed sizes are much larger, and the results are reported for seed sizes of 10000, 20000, 30000, 40000 and 50000. Due to its size, running the greedy method is impossible, and both the single cycle and multi cycle as specified earlier run into problems because of the massive amount of data they have to store in memory. For this data set, only edge sampling, degree, page rank and random seed selection methods are executed and the results are reported below.
+Figure \ref{journal:spread} shows the spread achieved by running different methods on the live journal data set. From the figure it is clearly obvious that page rank and edge sampling are superior to the other methods. Horizontal axis shows the seed size, and the vertical axis shows the total spread.  
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{ |c|c| }
+\hline 
+  method & time (s)\\
+  \hline 
+  random & 21\\
+  degree & 49\\
+  pagerank&206\\
+  edgesampling&705\\
+  \hline 
+\end{tabular}
+\caption{Running time}
+\label{journal:time}
+\end{table}
+
+Table \ref{journal:time} shows the running time of different algorithms. Random and degree methods as expected are very fast, page rank and edge sampling both run in acceptable time given the input size. As explained earlier, greedy method cannot scale to graphs of these sizes. 
 
 \pagebreak
+\pagebreak
 
-\section{Discussion}
+
+\subsection{Artificial Graphs}
+In this section the spread of degree, pagerank and edge sampling methods on different types of artificially generated graphs are investigated. As a baseline the spread of random set of seeds are also drawn. Each of the graphs bear some specific properties that distinguished graphs from each other. As observed from the real graph examples in the previous sections, edge sampling method is not always performing better than the heuristics methods such as pagerank and degree. Here it will be shown for which types of graphs edge sampling method is performing better. 
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/artificial/random.png}
+\caption{Random graph of 1000 vertices and 4000 edges}
+\label{art:random}
+\end{figure}
+
+Figure \ref{art:random} shows the spread on a graph with randomly generated edges. The source and destination of edges are sampled randomly from all the vertices available. From the figure, it can be observed that pagerank and degree method are performing better than edge sampling, although the difference in the final result is not significant. 
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/artificial/sparse.png}
+\caption{Sparse graph with 1000 vertices and 1000 edges}
+\label{art:sparse}
+\end{figure}
+
+Figure \ref{art:sparse} shows the spread on a sparse graph. The graph is generated similar to random but with a lot fewer edges. Similar to the random graphs, the spread of the different methods do not differ significantly.
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/artificial/skewed.png}
+\caption{Skewed graph with 1000 vertices and 4000 edges}
+\label{art:skewed}
+\end{figure}
+
+Figure \ref{art:skewed} shows the spread on a skewed graph. Here the difference in the results are more significant. As expected page rank and degree method are performing better than edge sampling. This can be explained by the fact that seeds are picked from the more dense regions of the graph and page rank and degree can are choosing the nodes with highest amount of neighbors. Due to the nature of edge sampling methods, it is possible that some nodes from the less denser area of the graph are chosen as seed which have caused the spread for edge sampling method to be lower.
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=130mm]{figures/artificial/clustered.png}
+\caption{Clustered graph with 1000 vertices and 10000 edges}
+\label{art:clustered}
+\end{figure}
+
+The vertices and edges in the graph of figure \ref{art:clustered} are clustered into two set. The smaller cluster is a fully connected component, which means all of the vertices are connected to each other. Because of this all of the vertices from the smaller cluster have very high degree. This explains the reason why degree method is not performing as well as edge sampling and page rank methods, both of which consider more global information when choosing the seeds.\\
+\subsection{Discussion}
+From these experiments performed in this section, it is obvious that while none of the methods are performing as good as the greedy method, some of them are good candidates for influence maximization on large graphs. Pagerank, Degree and Edge Sampling methods are very fast, and the spread achieved by these methods are acceptable. Different properties of graphs, affect the performance of each of the methods, hence the best way to chose the seed is to run all three methods on the graph and compare the spread for different seed sizes. None of the methods depend on the seed size, and running them once will return the list of vertices in order of how good they are in increasing the spread in the graph. Users then can easily chose the desired number of seeds.
 
 \pagebreak
 \section{Conclusion}

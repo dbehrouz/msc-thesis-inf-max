@@ -17,13 +17,13 @@ import org.apache.spark._
  * @author Behrouz Derakhshan
  */
 object EdgeSampling extends SeedFinder {
-  val DEFAULT_NUMBER_OF_PARTITIONS = 20
+  val DEFAULT_NUMBER_OF_PARTITIONS = 5
   val PARTITIONER = new HashPartitioner(DEFAULT_NUMBER_OF_PARTITIONS)
 
   def run(graph: Graph[Long, Double], seedSize: Int, iterations: Int, sc: SparkContext): RDD[VertexId] = {
     val vs = graph.mapVertices((v, value) => 0L).vertices
 
-    var vertices = vs.partitionBy(PARTITIONER).persist()
+    var vertices = vs.partitionBy(PARTITIONER).persist().setName("Vertices before loop")
     vertices.count()
     vs.unpersist(blocking = false)
     for (i <- 1 to iterations) {
@@ -38,7 +38,7 @@ object EdgeSampling extends SeedFinder {
 
       val oldVs = vertices
 
-      vertices = addVertices(vertices, vs2).cache()
+      vertices = addVertices(vertices, vs2).persist().setName("Vertices iteration: %d ".format(i))
 
       val c = vertices.count()
 
@@ -46,6 +46,7 @@ object EdgeSampling extends SeedFinder {
       oldVs.unpersist(blocking = false)
       sampledGraph.unpersistVertices(blocking = false)
       sampledGraph.edges.unpersist(blocking = false)
+      sampledGraph.unpersist()
       cc.unpersist(blocking = false)
     }
     graph.unpersist(blocking = false)

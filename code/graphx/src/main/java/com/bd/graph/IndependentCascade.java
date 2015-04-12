@@ -1,6 +1,10 @@
 package com.bd.graph;
 
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -60,13 +64,15 @@ public class IndependentCascade {
         return total / (double) simulations;
     }
 
-    public List<Long> greedyMethod(int seedSize) {
+    public List<Long> greedyMethod(int seedSize) throws IOException {
         List<Long> seed = new ArrayList<Long>();
         Long maxVertex = -1l;
         Double previousSpread = 0d;
         Map<Long, Vertex> vertices = graph.getVertices();
         List<Vertex> intermediateSpread = initSpread(vertices);
+        long start = System.currentTimeMillis();
         for (int i = 0; i < seedSize; i++) {
+
             int counter = 0;
             for (int j = 0; j < intermediateSpread.size(); j++) {
                 Vertex v = intermediateSpread.get(j);
@@ -93,6 +99,9 @@ public class IndependentCascade {
             Collections.sort(intermediateSpread, comparator());
             Vertex max = intermediateSpread.get(0);
             seed.add(max.getId());
+            long end = System.currentTimeMillis();
+            Long time = end - start;
+            FileUtils.write(new File("greedytimes.txt"), time.toString() + "\n", true);
             if (i == 0) {
                 previousSpread = max.getSpread();
             }

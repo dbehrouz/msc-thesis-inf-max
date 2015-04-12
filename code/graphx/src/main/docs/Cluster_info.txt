@@ -9,14 +9,18 @@ gunzip soc-LiveJournal1.txt.gz
 ./ephemeral-hdfs/bin/hadoop dfs -copyFromLocal soc-LiveJournal1.txt /data/livejournal/
 
 
+Friendster :
+wget https://snap.stanford.edu/data/bigdata/communities/com-friendster.ungraph.txt.gz
+gunzip com-friendster.ungraph.txt.gz
+./ephemeral-hdfs/bin/hadoop dfs -copyFromLocal com-friendster.ungraph.txt.gz /data/friendster/
 
 Run Driver :
-./spark/bin/spark-submit --class "com.bd.Driver" --master spark://ec2-54-146-77-161.compute-1.amazonaws.com:7077 spark-graphx-1.0.0-SNAPSHOT.jar /data/livejournal 50000 10 0.01 /data/output random,degree,pagerank,edgesampling
+./spark/bin/spark-submit --class "com.bd.Driver" --master spark://ec2-54-159-255-34.compute-1.amazonaws.com:7077 spark-graphx-1.0.0-SNAPSHOT.jar /data/livejournal 50000 10 0.01 /data/output edgesampling,degree,pagerank
 
 To run the simulation : (Total Spread: 299092.5
                          Total Time : 1032.294)
 
-./spark/bin/spark-submit --class "com.bd.propogation.ic.Simulation" --master spark://ec2-54-146-77-161.compute-1.amazonaws.com:7077 spark-graphx-1.0.0-SNAPSHOT.jar /data/livejournal /data/output-degree/50000 10 0.01
+./spark/bin/spark-submit --class "com.bd.propogation.ic.Simulation" --master spark://ec2-184-73-115-147.compute-1.amazonaws.com:7077 spark-graphx-1.0.0-SNAPSHOT.jar /data/livejournal /data/output-edgesampling/50000 10 0.01
 
 
 ./spark/bin/spark-submit --class "com.bd.propogation.ic.Simulation" --master local[*] target/spark-graphx-1.0.0-SNAPSHOT.jar data/hep.txt data/output-degree/40/ 100 0.01

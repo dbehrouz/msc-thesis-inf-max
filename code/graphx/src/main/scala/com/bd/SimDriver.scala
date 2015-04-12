@@ -15,7 +15,7 @@ object SimDriver {
   def main(args: Array[String]) {
     val conf = new SparkConf().setAppName("IC Simulation")
     val sc = new SparkContext(conf)
-    val outputs = List("output-singlecycle/", "output-multicycle/")
+    val outputs = List("data/hep/output-celf/")
 
     for (o <- outputs) {
       run(o, args(0), args(1).toInt, args(2).toDouble, sc)
@@ -26,6 +26,8 @@ object SimDriver {
     println("Number of Simulations: " + iterations)
     println("Propagation Prob : " + prob)
 
+    val graph = GraphUtil.undirected(GraphUtil.mapTypes(GraphLoader.edgeListFile(sc, inputGraphFile)), prob)
+    graph.edges.count()
     for (file <- new File(activeNodesDir).listFiles()) {
       if (!file.isFile) {
         val activeNodes = sc.textFile(file.getAbsolutePath)
@@ -35,7 +37,6 @@ object SimDriver {
           .toList
 
         println("Number of Initial Active Nodes " + activeNodes.length)
-        val graph = GraphUtil.undirected(GraphUtil.mapTypes(GraphLoader.edgeListFile(sc, inputGraphFile)), prob)
 
         val spread = Simulation.run(graph, activeNodes, iterations)
         println("Total Spread: " + spread)
