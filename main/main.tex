@@ -64,7 +64,7 @@ The rest of this document is structured as follows. Section \ref{sec:influencema
 Effective marketing and advertisement methods have been a major application of Knowledge Discovery and Data mining. Prior to Domingo and Richardson \cite{domingo01} the focus has always been on direct marketing. Contrary to traditional mass marketing, where a product was marketed to all the customers, in direct marketing the goal is to find the most potential and profitable costumers. While direct marketing is a great tool for increasing the profit, it only targets individuals and disregards the relationship between users. People's decision in purchasing an item is not only influenced by the product itself, but also by friends, colleagues and acquaintances. With introduction of Internet and social networks, gathering information about users became easier and more feasible. Social networks nowadays contain information about millions of people, they also contain information related to people's relationship with each other. Utilizing these information can make marketing more profitable, by targeting people that are more likely to promote the product to their acquaintances. 
 Domingo and Richardson \cite{domingo01} discussed the use case of influence maximization in marketing, calling it \textit{Viral Marketing}. By modeling a market as a social network consisting of users and products. In such a network, probability of users buying products not only depends on the product itself but also on the neighbors of the user and the set of marketing actions being applied to the network. Hence the market can be formulated as join probability distribution. 
 Through these a function was devised that calculates the global lift in profit given a marketing action was applied to some users. Starting from an initial configuration, using different optimization algorithms a local maxima for the function can be reached. Hence the problem of influence maximization can be formulated as follows. \\ \\
-\textit{Given a size $k$ for the initial seeds, find the set of nodes $A$ that maximizes the function $f$ which is the size of spread through out the network. }\\ \\
+\textit{Given a size $k$ for the initial seeds, find the set of nodes $A$ that maximizes the function $f$ which is the size of spread throughout the network. }\\ \\
 They experimented on a collaborative filtering data set (MovieLens\footnote{https://movielens.org/}) in which users have rated a list of movies. They have first constructed the network with the user ratings, by choosing similar users (calculating the Pearson correlation coefficient of users) as neighbors. They have performed experiments on the data set and compared their method with mass marketing and direct marketing. Their method has increased the profit the most. Due to non-linearity of the model, it did not scale well for bigger size networks, hence they have proposed a new linear model in another paper \cite{domingo02}. Not only the new model decreased the computation time, they simplified equation for calculating the network value of customers, and made it easier to incorporate more complex marketing action. They have experimented with Epinions\footnote{http://www.epinions.com/} data set, which is a website where users can rate items. It also has a feature called trusted users, where each user can select many other users as trusted sources of reviews. Domingo et al.\ \cite{domingo02}, hence, applied their model to the dataset, by considering trusted users of a user as his neighbors. Their experiments showed that a continuous marketing action (a marketing action that can have unlimited values, such as a discount) performs much better than boolean marketing actions (one that can either be true or false, such as whether or not a discount should be given to a user with no regards for the amount of the discount). These two papers, are considered the first works in influence maximization, several other authors have used the concepts here to further improve and propose new methods for calculating the spread of nodes through a network.
 
 \subsection{Information Diffusion Models}
@@ -80,8 +80,16 @@ Consider a directed graph G representing a social network, and individual nodes 
 Based on IC model another diffusion model is commonly used in literature, named \textit{Weighted Cascade (WC)} which is similar to IC with the exception of the activation probability. Where in IC it is defined as a global property, in WC each edge from $u$ to $v$ is assigned the probability $1/d_v$, where $d_v$ is the degree of vertex $v$. The probability for edges in weighted methods can be calculated in different ways, in fact finding the influence of nodes on each other is another research area in influence maximization and it is briefly explained in \ref{subsec:learninginfprob} .
 
 \subsection{Influence Maximization Problem}
-Kempe et al.\ \cite{kempe03} were the first to formulate Influence maximization as an optimization problem and proved that the problem is NP-complete. By studying how influence propagates through networks using the two diffusion models discussed earlier (IC and LT), they have formally expressed Domingos and Richardson's \cite{domingo01} optimization problem in the context of the above models. Both diffusion models involve an initial set of nodes $A$, the influence of a set $\sigma (A)$ is then defined as the number of nodes at the end of the process. Finding the optimal set is NP-hard but they proposed an approximation algorithm for the problem which guarantees the solution to be a factor of $(1 - 1/ \mathrm{e} - \varepsilon)$ of the optimal solution (slightly better that 63\%). 
-Approximate solution for these models is developed based on \textit{submodular functions} \cite{nemhauser78}.
+Kempe et al.\ \cite{kempe03} were the first to formulate Influence maximization as an optimization problem and proved that the problem is NP-complete. By studying how influence propagates through networks using the two diffusion models discussed earlier (IC and LT), they have formally expressed Domingos and Richardson's \cite{domingo01} optimization problem in the context of the above models. Both diffusion models involve an initial set of nodes $A$, the influence of the set $A$ denoted by $\sigma (A)$ is then defined as the number of nodes at the end of the process. Formally, the influence maximization problem can be defined as: \\
+Given a graph $G=(V,E)$, find a subset $A\subseteq V$, that maximizes the function $f(A)$, which is the size of the spread function $\sigma(A)$ under either of the diffusion models subject to $|A| = k$ where $k$ is the budget. Mathematically it is defined as:
+\begin{center}
+\begin{itemize}
+\item $A =  \argmax_{A \in \mathcal P_k(V) } f(A)$
+\item where $f(A) = |\sigma(A)|$ and $\mathcal P_k(V) = \{V':V' \subseteq V, |V'|=k\}$
+\end{itemize}
+\end{center}
+Finding the optimal set is NP-hard but they proposed an approximation algorithm for the problem which guarantees the solution to be a factor of $(1 - 1/ \mathrm{e} - \varepsilon)$ of the optimal solution (slightly better that 63\%). 
+Approximate solution for these models is developed based on \textit{submodular functions} by Nemhauser et al.\ \cite{nemhauser78}.
 A function $f$ is \textit{submodular} if it satisfies a natural ''diminishing returns'' property. It means that the marginal gain of adding a node $v$ to a set $A$ is always greater than or equal to adding $v$ to a super set of $A$ . 
 \begin{center}
 $f(A \cup \{v\}) - f(A) \geq f(S \cup \{v\}) - f(S)$, where $A \subseteq S$
@@ -89,10 +97,11 @@ $f(A \cup \{v\}) - f(A) \geq f(S \cup \{v\}) - f(S)$, where $A \subseteq S$
 The greedy algorithm proposed by Kempe et al.\ \cite{kempe03} is described in Algorithm \ref{alg:KempeInfMax1}. 
 \begin{algorithm}[ht!]
 \floatname{algorithm}{Algorithm}
-\caption{Greedy Algorithm}
+\caption{Influence Maximization: Greed Algorithm}
 \label{alg:KempeInfMax1}
 \begin{algorithmic}
-\Require k,G(V,E)
+\Require G(V,E): Graph G, with Vertex set V and Edge set E
+\Require k: Initial Set Size
 \State S = $\emptyset$
 \For {i = 1 to k}
 	\For {every $v \in V$ and $v \notin S$}
@@ -101,6 +110,7 @@ The greedy algorithm proposed by Kempe et al.\ \cite{kempe03} is described in Al
 	\State $v^* = \argmax_v \{\delta_v\}$
 	\State $S = S \cup v^*$
 \EndFor
+\State Output $S$
 \end{algorithmic}
 \end{algorithm}
 \\
@@ -110,10 +120,10 @@ Leskovec et al.\ \cite{leskovec07}  in their Cost effective outbreak detection i
 Their observation is that, if $A$ is subset of $B$, the marginal gain of adding a node to $B$ is always less than or equal to the marginal gain of the adding the same node to $A$. Hence instead of recomputing the gain for all the node in each iteration, we can go through the nodes in decreasing order of their spread and recompute their values, the change is usually very small and most of the time the value on top of the list stays on top. Algorithm \ref{alg:celf} describes CELF method.
 \begin{algorithm}[ht!]
 \floatname{algorithm}{Algorithm}
-\caption{CELF}
+\caption{CELF Algorithm}
 \label{alg:celf}
 \begin{algorithmic}
-\Require G(V,E) : Graph G, with Vertex set V and Edge set E
+\Require G(V,E): Graph G, with Vertex set V and Edge set E
 \Require k: Initial Set Size
 \State S = $\emptyset$
 \For {i = 1 to k}
@@ -149,10 +159,10 @@ The same set of snapshots are reused in every iteration to estimate the influenc
 They have performed experiment and compared their methods with the normal Greedy methods. None of the other greedy methods are any match with StaticGreedy in terms of speed and scalability.
 \begin{algorithm}[ht!]
 \floatname{algorithm}{Algorithm}
-\caption{UBLF}
+\caption{UBLF Algorithm}
 \label{alg:ublf}
 \begin{algorithmic}
-\Require G(V,E) : Graph G, with Vertex set V and Edge set E
+\Require G(V,E): Graph G, with Vertex set V and Edge set E
 \Require PP : Propagation probability matrix of G
 \Require k: Initial Set Size
 \State S = $\emptyset$ and $\delta = (I - PP)^{-1} .1$ 
