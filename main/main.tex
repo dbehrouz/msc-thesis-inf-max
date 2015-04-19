@@ -63,8 +63,7 @@ The rest of this document is structured as follows. Section \ref{sec:influencema
 \label{sec:influencemax}
 Effective marketing and advertisement methods have been a major application of Knowledge Discovery and Data mining. Prior to Domingo and Richardson \cite{domingo01} the focus has always been on direct marketing. Contrary to traditional mass marketing, where a product was marketed to all the customers, in direct marketing the goal is to find the most potential and profitable costumers. While direct marketing is a great tool for increasing the profit, it only targets individuals and disregards the relationship between users. People's decision in purchasing an item is not only influenced by the product itself, but also by friends, colleagues and acquaintances. With introduction of Internet and social networks, gathering information about users became easier and more feasible. Social networks nowadays contain information about millions of people, they also contain information related to people's relationship with each other. Utilizing these information can make marketing more profitable, by targeting people that are more likely to promote the product to their acquaintances. 
 Domingo and Richardson \cite{domingo01} discussed the use case of influence maximization in marketing, calling it \textit{Viral Marketing}. By modeling a market as a social network consisting of users and products. In such a network, probability of users buying products not only depends on the product itself but also on the neighbors of the user and the set of marketing actions being applied to the network. Hence the market can be formulated as join probability distribution. 
-Through these a function was devised that calculates the global lift in profit given a marketing action was applied to some users. Starting from an initial configuration, using different optimization algorithms a local maxima for the function can be reached. Hence the problem of influence maximization can be formulated as follows. \\ \\
-\textit{Given a size $k$ for the initial seeds, find the set of nodes $A$ that maximizes the function $f$ which is the size of spread throughout the network. }\\ \\
+Through these a function was devised that calculates the global lift in profit given a marketing action was applied to some users. Starting from an initial configuration, using different optimization algorithms a local maxima for the function can be reached. 
 They experimented on a collaborative filtering data set (MovieLens\footnote{https://movielens.org/}) in which users have rated a list of movies. They have first constructed the network with the user ratings, by choosing similar users (calculating the Pearson correlation coefficient of users) as neighbors. They have performed experiments on the data set and compared their method with mass marketing and direct marketing. Their method has increased the profit the most. Due to non-linearity of the model, it did not scale well for bigger size networks, hence they have proposed a new linear model in another paper \cite{domingo02}. Not only the new model decreased the computation time, they simplified equation for calculating the network value of customers, and made it easier to incorporate more complex marketing action. They have experimented with Epinions\footnote{http://www.epinions.com/} data set, which is a website where users can rate items. It also has a feature called trusted users, where each user can select many other users as trusted sources of reviews. Domingo et al.\ \cite{domingo02}, hence, applied their model to the dataset, by considering trusted users of a user as his neighbors. Their experiments showed that a continuous marketing action (a marketing action that can have unlimited values, such as a discount) performs much better than boolean marketing actions (one that can either be true or false, such as whether or not a discount should be given to a user with no regards for the amount of the discount). These two papers, are considered the first works in influence maximization, several other authors have used the concepts here to further improve and propose new methods for calculating the spread of nodes through a network.
 
 \subsection{Information Diffusion Models}
@@ -72,12 +71,12 @@ With introduction of Social Networks, the topic of information diffusion has gai
 
 \begin{itemize}
 \item Linear Threshold Model:\\
-Consider a directed graph G representing a social network, and individual nodes being either active or non-active. Inactive nodes may become active as more of their neighbors become active but the reverse is not possible. In \textit{Linear Threshold Model (LT)}, each node $v$ is influenced by each of their neighbors $u$ according to a weight $b_{u,v}$ such that $\sum \nolimits_{u \, neighbor \, of \, v} b_{u,v} < 1$. The diffusion process hence is as follows; each node $v$ will randomly chose a weight threshold $0 < \theta_v<1 $, this value determines tendency of node $v$ to become active. Starting from the initial seed set, in each iteration for each node if the sum of the weights of its active neighbors is greater than the threshold then the node will become active, i.e.\ $\sum \nolimits_{u \, active neighbor \, of \, v} b_{u,v}  \geq \theta_v $. The process is deterministic however since $\theta_v$ is chosen at random, it shows our lack of knowledge of users' tendencies to become active. This process continues until no new nodes become active.
+Consider a graph $G=(V,E)$, and all nodes being either active or non-active. Inactive nodes may become active as more of their neighbors become active but the reverse is not possible. In \textit{Linear Threshold Model (LT)}, each node $v$ is influenced by each of its neighbor $u$ according to a weight $b_{u,v}$ such that $\sum \nolimits_{u \, neighbor \, of \, v} b_{u,v} \leq 1$. The process starts with an initial set of active nodes and at the beginning of the process each node $v$ will randomly chose a weight threshold $0 < \theta_v<1 $, this value determines the tendency of node $v$ to become active. The diffusion process moves forward deterministically in series of discrete time steps $t$ and continues until no new nodes become active. In each time step $t$, all of the active nodes from step $t-1$ remain active and any non-active node $v$ is activated if $\sum \nolimits_{u \, active neighbor \, of \, v} b_{u,v} \geq \theta_v$. $\theta_v$ is chosen randomly to indicate our lack of knowledge about node's influenceability.  
 
 \item Independent Cascade Model:\\ 
- \textit{Independent Cascade Model (IC)} is a stochastic undeterministic process. Same as linear threshold model, it starts with an initial set of seeds, and in each time step $t$ every active node will try only once to activate all of its neighbors, the probability of a node $v$ activating one of its neighbors $u$ is defined by a system property $p_{v,u}$. The process continues until no more new nodes can become active. Every node will try to activate its neighbors independently of other nodes, and if during one time step, a node $v$ first becomes active by node $u$ the rest of $v$'s neighbors can skip the activation process. In that sense the ordering of which nodes should activate their neighbors first, will not affect the final result.
+ \textit{Independent Cascade Model (IC)} is a stochastic undeterministic process. Same as linear threshold model, it starts with an initial set of active nodes and the process continues in a series of discrete time steps. In each time step $t$, all of the active nodes from step $t-1$ will remain active and any node that was activated in step $t-1$ tries to activate all of its neighbors. The probability of a node $u$ activating one of its neighbors $v$ is defined by a system property $p_{u,v}$. The process continues until no more new nodes can become active. Every node will try to activate its neighbors independently of other nodes, and if during one time step, a node $v$ first becomes active by node $u$ the rest of $v$'s neighbors can skip the activation process. It is important to note that in each time step only nodes that became active in the previous time step will try to activate their neighbors, that means each activated node will only have one chance of activating its neighbors in the entire diffusion process. In classical Independent Cascade, the activation probability $p_{u,v}$ (probability of $u$ activating $v$) is defined as a system property and it either takes one constant value or a value randomly chosen from a small set of values. There are different methods for choosing the activation probability, and some of them are described in section \ref{subsec:learninginfprob}. 
 \end{itemize}
-Based on IC model another diffusion model is commonly used in literature, named \textit{Weighted Cascade (WC)} which is similar to IC with the exception of the activation probability. Where in IC it is defined as a global property, in WC each edge from $u$ to $v$ is assigned the probability $1/d_v$, where $d_v$ is the degree of vertex $v$. The probability for edges in weighted methods can be calculated in different ways, in fact finding the influence of nodes on each other is another research area in influence maximization and it is briefly explained in \ref{subsec:learninginfprob} .
+
 
 \subsection{Influence Maximization Problem}
 Kempe et al.\ \cite{kempe03} were the first to formulate Influence maximization as an optimization problem and proved that the problem is NP-complete. By studying how influence propagates through networks using the two diffusion models discussed earlier (IC and LT), they have formally expressed Domingos and Richardson's \cite{domingo01} optimization problem in the context of the above models. Both diffusion models involve an initial set of nodes $A$, the influence of the set $A$ denoted by $\sigma (A)$ is then defined as the number of nodes at the end of the process. Formally, the influence maximization problem can be defined as: \\
@@ -97,7 +96,7 @@ $f(A \cup \{v\}) - f(A) \geq f(S \cup \{v\}) - f(S)$, where $A \subseteq S$
 The greedy algorithm proposed by Kempe et al.\ \cite{kempe03} is described in Algorithm \ref{alg:KempeInfMax1}. 
 \begin{algorithm}[ht!]
 \floatname{algorithm}{Algorithm}
-\caption{Influence Maximization: Greed Algorithm}
+\caption{Influence Maximization: Greedy Algorithm \cite{kempe03}}
 \label{alg:KempeInfMax1}
 \begin{algorithmic}
 \Require $G(V,E)$: Graph $G$, with Vertex set $V$ and Edge set $E$
@@ -114,13 +113,13 @@ The greedy algorithm proposed by Kempe et al.\ \cite{kempe03} is described in Al
 \end{algorithmic}
 \end{algorithm}
 \\
-They have run experiments on co-authorship in physics theory section of arXiv \footnote{www.arxiv.org} dataset. The results show that their greedy algorithm performs better that other methods such as random selection, high-degree or central nodes .
-Both in estimating the spread and also in the greedy method, $\sigma (S)$ has to be calculated, but both of the propagation models are non-deterministic. To overcome this, the model is run many times (usually 10000) and the spread is the average of all the runs. The nature of the spread function makes the algorithm highly non scalable. Even on medium sized graphs running the simulation will take a lot of time, but on the other hand a good solution is only guaranteed if the simulation is run many times. From Algorithm \ref{alg:KempeInfMax1} it can be observed that $\sigma(v)$ is run for every node in every iteration, this will greatly affect the performance of the greedy method.
+They have run experiments on co-authorship in physics theory section of arXiv \footnote{www.arxiv.org} dataset. The results show that their greedy algorithm performs better than other methods such as random selection, high-degree or central nodes .
+Both in estimating the spread and also in the greedy method, $\sigma(S)$ has to be calculated, but since both of the diffusion processes involve random elements($\theta_v$ in Linear Threshold and activation of new nodes in Independent Cascade) to achieve a better estimate of the total spread, the models have to be run many times and the spread is calculated as the average of all the runs. The nature of the spread function makes the algorithm highly non scalable. Even on medium sized graphs running the simulation will take a lot of time, but on the other hand a good solution is only guaranteed if the simulation is run many times. The value of $\sigma(v)$ does not only depend on $v$ itself, but it also depends on the other active nodes. Hence in each iteration of the algorithm where a new node is added to the active vertices list, the value of $\sigma(v)$ has to be recalculated. This will greatly affect the performance of the greedy method.
 Leskovec et al.\ \cite{leskovec07}  in their Cost effective outbreak detection in networks, took upon the task of optimizing the greedy method used in propagation in graph networks. Although they did not work on solving the problem of maximizing influence, they have proven their method can be adapted to the problem of maximizing the influence using the greedy algorithm. They studied two problems from different domains which share some similarities with influence maximization. The first problem is finding the best placement of sensors in a water network, so that contaminated water can be detected as quickly as possible. The other problem is blog network, which is to find blogs that contains the maximum amount of news that cascades from different sources in shortest possible time. Their advanced greedy method, called \textit{CELF}, utilizes the submodularity of the objective function, which reduces the amount of computation needed to be made in each iteration. Their method is 700 times faster than a simple greedy function. 
 Their observation is that, if $A$ is subset of $B$, the marginal gain of adding a node to $B$ is always less than or equal to the marginal gain of the adding the same node to $A$. Hence instead of recomputing the gain for all the node in each iteration, we can go through the nodes in decreasing order of their spread and recompute their values, the change is usually very small and most of the time the value on top of the list stays on top. Algorithm \ref{alg:celf} describes CELF method.
 \begin{algorithm}[ht!]
 \floatname{algorithm}{Algorithm}
-\caption{CELF Algorithm}
+\caption{CELF Algorithm \cite{leskovec07}}
 \label{alg:celf}
 \begin{algorithmic}
 \Require $G(V,E)$: Graph $G$, with Vertex set $V$ and Edge set $E$
@@ -141,7 +140,7 @@ Their observation is that, if $A$ is subset of $B$, the marginal gain of adding 
 \end{algorithmic}
 \end{algorithm}
 As can be seen from the algorithm description, the difference between CELF and the normal Greedy method, is that in CELF, $delta_v$ is pre-calculated for all the vertices first, then starting from the biggest value, in each iteration $\delta_u$ is recalculated for vertex $u$ if the value is still higher than the next vertex in the list, then node $u$ is added to $S$ otherwise the next vertex is chosen. As in the previous algorithm, $\sigma(v)$ is the expected spread of the node $v$ under the IC model. 
-\\Chen et al.\ \cite{chen09} proposed several different methods for solving the problem of influence maximization. The first group of algorithms, were improvements upon Kempe et al.\ \cite{kempe03} and Leskovec et al.\ \cite{leskovec07} greedy methods. In their greedy method, they have modified the simulation process. Instead of trying to activate nodes based on the edge probability one by one, they have first created a new Graph $G'$ which is sampled from the original graph based on the edge probability. Now the process of estimating the spread of initial set $S$ is just finding the number of reachable nodes in $G'$ from $S$, this process is repeated many times and the result is the average for all of the $G'$ sampled Graphs. Although this method is much faster than the original greedy method, it cannot compete with Leskovec \cite{leskovec07} CELF method, since in their method only in the first iteration the spread for all the nodes are calculated and from the second iteration onward, due to submodularity only the spread for a few of the nodes are recalculated. Hence, they have combined their new Greedy method with CELF, where in the first iteration they use the sample graphs to calculate the spread and in the following iterations CELF is used. The second class of algorithms they have proposed are a set of heuristics for finding the seed set that maximizes the influence. Prior to their work, heuristics have been considered inferior to the Greedy method and while that is true for many of the heuristics, such as degree, random, distance and etc., their proposed heuristic called \textit{DegreeDiscountIC} managed to achieve almost the same spread with the greedy method while outperforming the greedy methods by orders of magnitude. Details of the algorithm DegreeDiscountIC is explained in section \ref{sec:bigdatanetworkinfluelncemaximization}.
+\\Chen et al.\ \cite{chen09} proposed several different methods for solving the problem of influence maximization. The first group of algorithms, were improvements upon Kempe et al.\ \cite{kempe03} and Leskovec et al.\ \cite{leskovec07} greedy methods. In their greedy method, they have modified the simulation process. Instead of trying to activate nodes based on the edge probability one by one, they have first created a new Graph $G'$ which is sampled from the original graph based on the edge probability. Now the process of estimating the spread of initial set $S$ is just finding the number of reachable nodes in $G'$ from $S$, this process is repeated many times and the result is the average for all of the $G'$ sampled Graphs. Although this method is much faster than the original greedy method, it cannot compete with CELF \cite{leskovec07} method, since in their method only in the first iteration the spread for all the nodes are calculated and from the second iteration onward, due to submodularity only the spread for a few of the nodes are recalculated. Hence, they have combined their new Greedy method with CELF, where in the first iteration they use the sample graphs to calculate the spread and in the following iterations CELF is used. The second class of algorithms they have proposed are a set of heuristics for finding the seed set that maximizes the influence. Prior to their work, heuristics have been considered inferior to the Greedy method and while that is true for many of the heuristics, such as degree, random, distance and etc., their proposed heuristic called \textit{DegreeDiscountIC} managed to achieve almost the same spread with the greedy method while outperforming the greedy methods by orders of magnitude. Details of the algorithm DegreeDiscountIC is explained in section \ref{sec:bigdatanetworkinfluelncemaximization}.
 
 Other notable heuristic method is of Saito and Kimura \cite{kimura06}. They have investigated the scalability issue of IC model's simulations. They have argued that currently IC model requires many iterations of simulation and each iteration took a lot of processing time and power. They have proposed two natural special cases of the IC model that provide a good estimate of the spread without the need for running the simulations. They define the Shortest-Path Model(SPM) which is a special case of the IC model in which each node $v$ has the chance to become active only at step = $d(S,v)$, where if $S$ is the initial set, $d(S,v)$ is the distance of $S$ to node $v$. This means that each node is activated only through the shortest paths from the initial active set. The other model they have proposed named SP1M, which is each node v has the chance to become active only at steps $t = d(S,v)$ and $t =d(S,v) + 1$. Through these two models they have proposed methods for calculating the spread of an initial active set $S$. They have proved that the result achieved using this method is also within a bound of the best solution. In their experiments, they have assigned a uniform probably to each edge with two different values $p = 0.1$ and $p =0.01$. The experiments showed that the estimation of the spread for IC model increases as p increases while the processing times for the SPM and SP1M hardly changes. 
 
@@ -159,7 +158,7 @@ The same set of snapshots are reused in every iteration to estimate the influenc
 They have performed experiment and compared their methods with the normal Greedy methods. None of the other greedy methods are any match with StaticGreedy in terms of speed and scalability.
 \begin{algorithm}[ht!]
 \floatname{algorithm}{Algorithm}
-\caption{UBLF Algorithm}
+\caption{UBLF Algorithm  \cite{zhuo13}}
 \label{alg:ublf}
 \begin{algorithmic}
 \Require $G(V,E)$: Graph $G$, with Vertex set $V$ and Edge set $E$
@@ -184,7 +183,7 @@ They have performed experiment and compared their methods with the normal Greedy
 \end{algorithmic}
 \end{algorithm}
 
-Zhuo et al.\ \cite{zhuo13} propsed a new Greedy algorithm called \textit{Upper Bound based Lazy Forward algorithm(UBLF)}. They have tried to bound the number of Monte Carlo simulation calls, similar to Leskovec et al.\ \cite{leskovec07}'s CELF algorithm. CELF increased the speed of the original algorithm by a factor 700 on average case, but still on its first iteration it has to calculate the spread of every vertex, that means Monte Carlo simulations have to be run for all the vertices in the first iteration, and it was argued before, that while that is reasonably fast and will give good result on small networks, it will not perform well on medium sized graphs let alone large scale graphs. To that extent, even running the simulations for all the vertices once is not feasible. Zhuo et al.\ \cite{zhuo13} provided a mathematically proven upper bound for spread function of any initial set. In UBLF, instead of running simulations for each vertex in the first iteration, they find the upper bound which can be found in constant time. Having the initial values for all the nodes, they used the same technique as CELF, and instead of the calculating the expected spread for all the nodes, they started calculating the spread for vertices in order of their initial estimated spread, if the estimated spread was still bigger than the rest of nodes, the node was chosen and added to the seed set. Computation continues until desired number of initial seeds are achieved. Algorithm \ref{alg:ublf} describes UBLF. The matrix $PP$ is constructed from the graph, where each value $(u,v)$ in the matrix corresponds to the edge $e=(u,v)$; value of the edge that connects $u$ to $v$. $S$ consists of the seed set, the output of the algorithm i.e.\ nodes with highest influence propagation and $I$ is the \textit{identity matrix}. Before starting the iterative process, vector $\delta$ is calculated. In each iteration of the algorithm, vertices with the maximum $\delta$ are chosen, if Monte Carlo simulation is not yet run for them, the algorithm will run the simulation, if the value of $\delta_u$ is still greater than the node with second highest $\delta$ then $u$ is added to to the set $S$ . The process continues for $k$ iteration, where $k$ is the desired size of the output. $\sigma(v)$ is the expected spread of $v$ under the \textit{IC} model. Experimental results shows that UBLF manages to reduce more than $95\%$ Monte Carlo simulations needed and is at least 2 to 5 times faster than CELF method.
+Zhuo et al.\ \cite{zhuo13} propsed a new Greedy algorithm called \textit{Upper Bound based Lazy Forward algorithm(UBLF)}. They have tried to bound the number of Monte Carlo simulation calls, similar to CELF algorithm \cite{leskovec07}. CELF increased the speed of the original algorithm by a factor 700 on average case, but still on its first iteration it has to calculate the spread of every vertex, that means Monte Carlo simulations have to be run for all the vertices in the first iteration, and it was argued before, that while that is reasonably fast and will give good result on small networks, it will not perform well on medium sized graphs let alone large scale graphs. To that extent, even running the simulations for all the vertices once is not feasible. Zhuo et al.\ \cite{zhuo13} provided a mathematically proven upper bound for spread function of any initial set. In UBLF, instead of running simulations for each vertex in the first iteration, they find the upper bound which can be found in constant time. Having the initial values for all the nodes, they used the same technique as CELF, and instead of the calculating the expected spread for all the nodes, they started calculating the spread for vertices in order of their initial estimated spread, if the estimated spread was still bigger than the rest of nodes, the node was chosen and added to the seed set. Computation continues until desired number of initial seeds are achieved. Algorithm \ref{alg:ublf} describes UBLF. The matrix $PP$ is constructed from the graph, where each value $(u,v)$ in the matrix corresponds to the edge $e=(u,v)$; value of the edge that connects $u$ to $v$. $S$ consists of the seed set, the output of the algorithm i.e.\ nodes with highest influence propagation and $I$ is the \textit{identity matrix}. Before starting the iterative process, vector $\delta$ is calculated. In each iteration of the algorithm, vertices with the maximum $\delta$ are chosen, if Monte Carlo simulation is not yet run for them, the algorithm will run the simulation, if the value of $\delta_u$ is still greater than the node with second highest $\delta$ then $u$ is added to to the set $S$ . The process continues for $k$ iteration, where $k$ is the desired size of the output. $\sigma(v)$ is the expected spread of $v$ under the \textit{IC} model. Experimental results shows that UBLF manages to reduce more than $95\%$ Monte Carlo simulations needed and is at least 2 to 5 times faster than CELF method.
 
 \subsection{Learning Influence Probabilities}
 \label{subsec:learninginfprob}
@@ -236,7 +235,7 @@ Newer versions of Hadoop and MapReduce employs more sophisticated resource manag
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=130mm]{figures/mapreduce.jpg}
+\includegraphics[width=150mm]{figures/mapreduce.jpg}
 \caption[]{MapReduce paradigm \footnotemark}
 
 \label{fig:mapreducepara}
@@ -246,7 +245,7 @@ Newer versions of Hadoop and MapReduce employs more sophisticated resource manag
 \textit{Hadoop Distributed File System (HDFS)} is a distributed file system, designed to run on commodity hardware. It provides high throughput access to application data and it is fault tolerant. Though initially designed for Hadoop's MapReduce framework, it has been used in many different applications and frameworks.
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=130mm]{figures/hdfsarchitecture.png}
+\includegraphics[width=150mm]{figures/hdfsarchitecture.png}
 \caption[]{HDFS Architecture \protect \footnotemark}
 \label{fig:hdfsarch}
 \end{figure}
@@ -261,7 +260,7 @@ A typical Spark program consists of a driver program that launches multiple work
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=130mm]{figures/sparkprogram.png}
+\includegraphics[width=150mm]{figures/sparkprogram.png}
 \caption[]{Spark Program, Zahaeria et al.\ \cite{zaharia10}}
 \label{fig:sparkprogram}
 \end{figure}
@@ -271,7 +270,7 @@ Users can control RDDs behavior by persisting it to memory or disk. Tests perfor
  
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=130mm]{figures/rdd.png}
+\includegraphics[width=150mm]{figures/rdd.png}
 \caption[]{Spark stages and RDDs  Zahaeria et al.\ \cite{zaharia12} }
 \label{fig:rdd}
 \end{figure}
@@ -300,7 +299,7 @@ In a typical Giraph program, input graph is usually stored and read from the HDF
 Figure \ref{fig:giraph} shows how computation is done in Giraph.
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=130mm]{figures/giraphdataflow.png}
+\includegraphics[width=150mm]{figures/giraphdataflow.png}
 \caption{Giraph Work Flow \protect \footnotemark}
 \label{fig:giraph}
 \end{figure}
@@ -310,7 +309,7 @@ Each Giraph cluster has a master node and one or more worker nodes. Master node 
 The figure \ref{fig:sssp} shows supersteps involved with computing the single source shortest path for a simple graph.
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=130mm]{figures/giraphsuperstep.jpg}
+\includegraphics[width=150mm]{figures/giraphsuperstep.jpg}
 \caption{Single Source Shortest Path  \protect \footnotemark}
 \label{fig:sssp}
 \end{figure}
@@ -333,7 +332,7 @@ GraphX also provides a Pregel like API, that users should only provide the verte
 
 \section{Big Data and Network Influence Maximization}
 \label{sec:bigdatanetworkinfluelncemaximization}
-The original greedy method proposed by Kempe et al.\ \cite{kempe03} provided a reliable solution to the problem of maximizing influence in graphs. Several other researchers have worked on finding algorithms that find better solutions in terms of accuracy, but most of the researches done in recent years were involved around improving the efficiency of the original method. Leskovec et al.\ \cite{leskovec07} CELF, Goyal's \cite{goyal112} CELF++ and Zhuo et al.\ \cite{zhuo13} methods have considerably increased the speed of the original Greedy method. Cheng et al.\ \cite{cheng13} proposed the StaticGreedy method which combined with CELF further improved the speed of the greedy method.  However, none of the proposed methods are scalable and they can only operate on small to medium sized graphs. The bottleneck for the greedy method lies in the function it is trying to optimize.  As discussed in the previous sections, the spread function under the Independent Cascade (and Linear Threshold) model cannot be determined exactly due to the edge probabilities. Hence, Monte Carlo method is being used which consists of running the IC model many times (up to 10000 for accurate result) and then averaging over all the simulations. Currently, there are companies and organizations that have graphs of millions to billions of nodes with even more edges, and non of the optimization methods discussed above can be applied to any of these graphs. Even on most powerful clusters running the random process even for one iteration takes a lot of time, essentially rendering these methods completely useless. The other group of methods discussed in the previous sections were heuristic methods. They can range from very simple methods such as finding the nodes with highest in or out degree to more sophisticated ones such as \textit{Single Discount} and \textit{Degree Discount} discussed by Chen et al.\ \cite{chen09} or SPM and SP1M proposed by Saito and Kimura \cite{kimura06}. The advantages of heuristic methods are that they are very fast and they can scale to graphs of any sizes, however the accuracy of the solution is not as good as the greedy method. 
+The original greedy method proposed by Kempe et al.\ \cite{kempe03} provided a reliable solution to the problem of maximizing influence in graphs. Several other researchers have worked on finding algorithms that find better solutions in terms of accuracy, but most of the researches done in recent years were involved around improving the efficiency of the original method. CELF \cite{leskovec07},  CELF++ by Goyal's \cite{goyal112} and Zhuo et al.\ \cite{zhuo13} methods have considerably increased the speed of the original Greedy method. Cheng et al.\ \cite{cheng13} proposed the StaticGreedy method which combined with CELF further improved the speed of the greedy method.  However, none of the proposed methods are scalable and they can only operate on small to medium sized graphs. The bottleneck for the greedy method lies in the function it is trying to optimize.  As discussed in the previous sections, the spread function under the Independent Cascade (and Linear Threshold) model cannot be determined exactly due to the edge probabilities. Hence, Monte Carlo method is being used which consists of running the IC model many times (up to 10000 for accurate result) and then averaging over all the simulations. Currently, there are companies and organizations that have graphs of millions to billions of nodes with even more edges, and non of the optimization methods discussed above can be applied to any of these graphs. Even on most powerful clusters running the random process even for one iteration takes a lot of time, essentially rendering these methods completely useless. The other group of methods discussed in the previous sections were heuristic methods. They can range from very simple methods such as finding the nodes with highest in or out degree to more sophisticated ones such as \textit{Single Discount} and \textit{Degree Discount} discussed by Chen et al.\ \cite{chen09} or SPM and SP1M proposed by Saito and Kimura \cite{kimura06}. The advantages of heuristic methods are that they are very fast and they can scale to graphs of any sizes, however the accuracy of the solution is not as good as the greedy method. 
 \\
 In the rest of this section, first the literature on influence maximization for big data and then details of the methods implemented are discussed. Some of methods are fairly simple heuristics and some are based on the methods discussed in previous sections with tweaks that make it possible to implement it on large scale graphs. Changes have to be made to the original algorithms in order to implement the methods using graph frameworks built for processing  large graphs. These frameworks are imposing certain set of restrictions that will make applying some classes of algorithms more difficult. Bulk Synchronous Processing is the base of all the large scale graph frameworks where they are using the method of \textit{Think Like a Vertex}, which means each vertex is a virtual computation abstraction. Although this has many benefits but when it comes to classical IC and LT models, some difficulties will rise. In BSP model, usually algorithms that only need local data are implemented a lot simpler, but in influence maximization we need global access to the network and to find out how many new nodes were affected by adding a node to the initial seed. The whole process is a randomized simulation that should be run hundreds or thousands of times to get a better and more accurate result. Large scale data processing usually suffers in this area, because initializing jobs given huge amount of data whether it is in graph format or others, takes some time and that is something that should be avoided. 
 The main challenges when implementing the methods using BSP models are hence, finding ways to avoid the iterative and simulation like implementation and trying to generalize the whole simulation cycle into one BSP job.
@@ -467,7 +466,7 @@ As with other methods, some modifications have to be made to make this method mo
 In previous section, Chen et al.\ \cite{chen09} heuristic for choosing the best vertices for initial seed was discussed. Their method has several advantages that make it easy to implement, and it is very fast and scalable. This method does not require a simulation as it is a simple heuristic based on the degree of each vertex. According to Chen et al.\ \cite{chen09} it yields an extremely good result which is in par with greedy methods.
 \begin{algorithm}[ht!]
 \floatname{algorithm}{Algorithm}
-\caption{Degree Discount}
+\caption{Degree Discount  \cite{chen09}}
 \label{alg:degreedicount}
 \begin{algorithmic}
 \Require $G(V,E)$: Graph $G$, with Vertex set $V$ and Edge set $E$
@@ -492,6 +491,7 @@ In previous section, Chen et al.\ \cite{chen09} heuristic for choosing the best 
 Compared to other heuristic methods that will be discussed in the next section, this method is more difficult to implement in a BSP model. The number of iterations the algorithm runs depends on the seed size. Basically, after initializing all the vertices, in each iteration the best vertex is chosen and added to the seed set. After that, the values for the neighbors of the selected vertex will be changed based on the formula presented in the algorithm \ref{alg:degreedicount}. This means for a seed set of size $k$, the algorithm runs for $k$ iterations. Although this method looks promising, the underlying strategy is not very feasible to implement in BSP, and since it includes the same number of iterations as the seed size, it will not scale to large graphs at least in GraphX and Giraph. In section \ref{sec:experiments}, the result of the method on a smaller graph is reported, but for large scale graphs it is not feasible to run.
 
 \subsection{Other Heuristics}
+Degree Discount heuristic discussed in previous section, is one of the many heuristics methods that have been used in influence maximization. As explained earlier, although heuristic methods are inferior to more complex methods such as the greedy algorithm in terms of quality of the solution, they have one advantage over them. These classes of solutions are highly scalable and can be easily applied to very large graphs. Below is a list of some of the heuristics methods that have been used for finding the initial set of active nodes in influence maximization problem. \\
 \textbf{Random}: $k$ random vertices are selected as the solution. This is used as a baseline for other methods to see if they perform better than just choosing nodes at random. \\
 \textbf{Degree}: Degree of a vertex is defined as the number of edges connected to a vertex. In this method, the vertices with the highest degree are chosen as the initial seed. \\ 
 \textbf{Single Discount}: Improved version of Degree heuristic. After a vertex is chosen as the seed, it is removed from the graph, that means all of its neighbors' degree are reduced by one. This yields a better result than degree heuristic, since it lowers the chance of neighboring vertices to be selected as the initial seed. \\ 
@@ -501,7 +501,13 @@ Compared to other heuristic methods that will be discussed in the next section, 
 
 \section{Experiments}
 \label{sec:experiments}
-In this section all the experiments are explained in detail. Experiments include the methods described in previous sections and a number of real and artificially generated data sets.
+Two important aspects of solutions for influence maximization problem for large scale graphs are:
+\begin{itemize}
+\item \textbf{Quality} which is measured by the spread of the solution found(initial active set of vertices) under Independent Cascade model
+\item \textbf{Scalability} which is measured by the running time of the program. 
+\end{itemize}
+In this section the details of the experiments, including the software and hardware platform, data sets and methods are explained in detail.
+
 \subsection{Experiment Setup}
 Experiments are run on two different computation platform. For the smaller data sets, to test the accuracy and speed of the methods the experiments are run on a single machine. The bigger data set is run on an EMR cluster. The details are below. 
 
@@ -517,10 +523,10 @@ Except for the Greedy CELF method, which is implemented in a single threaded Jav
 \subsection{Data set}
 Below is an overview of the data sets used in the experiments. All of the data sets are provided in an edge list format. In each line there are two vertex ids separated by a tab character. The two vertices are end points of an edge. 
 \subsubsection{ArXiv collaboration network data set}
-A data set from the e-print arXiv\footnote{http://arxiv.org/} is chosen for testing the algorithms on smaller scale graphs. The data set contains academic collaboration for scientific research papers. In this data set, vertices represent researchers and edges define a collaboration between two researchers on writing a scientific paper. The data set has been used by several other researchers in the field of influence maximization and can provide a good comparison for the quality of the methods. The \textit{High Energy Physics-Theory} graph, which contains papers from 1991 to 2003, with 15,233 nodes and 58,981 edges is used as a base comparison of the methods proposed in section \ref{sec:bigdatanetworkinfluelncemaximization} and state of the art greedy method.
+A data set from the e-print arXiv\footnote{http://arxiv.org/} is chosen for testing the algorithms on smaller scale graphs. The data set contains academic collaboration for scientific research papers. In this data set, vertices represent researchers and edges define a collaboration between two researchers on writing a scientific paper. The data set has been used by several other researchers in the field of influence maximization and can provide a good comparison for the quality of the methods. The \textit{High Energy Physics-Theory} graph, which contains papers from 1991 to 2003, with 15,233 nodes and 58,981 edges is used as a base comparison of the methods proposed in section \ref{sec:bigdatanetworkinfluelncemaximization} and state of the art greedy method. The data set in this format was made publicly available by Chen et al.\ \cite{chen09} and can be found here: http://research.microsoft.com/en-us/people/weic/graphdata.zip. 
 
 \subsubsection{LiveJournal Social Network}
-LiveJournal is a free online community with almost 10 million members, with many of them being active. Similar to other types of social networks, users can form friendship with other members. It consists of 4,847,571 vertices and 68,993,773 edges. Considerably larger than a lot of data sets usually used in influence maximization research.
+LiveJournal is a free online community with almost 10 million members, with many of them being active. Similar to other types of social networks, users can form friendship with other members. It consists of 4,847,571 vertices and 68,993,773 edges. Considerably larger than a lot of data sets usually used in influence maximization research. The data set is publicly available at https://snap.stanford.edu/data/soc-LiveJournal1.html. 
 
 \subsection{Methods \& Implementation details}
 List of influence propagation methods used in the experiments
@@ -563,14 +569,14 @@ In this section, the results of running the algorithm discussed in section \ref{
 In this section the result of running different methods on collaboration network data set are explained. To calculate the spread for each method, multiple simulations needed to be run, in these set of experiments number of simulations is set to 100. While increasing the number will make the result more accurate, it will also increase the running time. Experiments have been run with different number of simulations and the results show that the difference between number of simulations is not very significant. 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=100mm]{figures/hep/searchmethods.png}
+\includegraphics[width=150mm]{figures/hep/searchmethods.png}
 \caption{Search methods}
 \label{hep:searchmethods}
 \end{figure}
 Figure \ref{hep:searchmethods} shows the result of running search methods on collaboration graph. Clearly the greedy method is much better than all of the other methods. As discussed in previous chapters, the underlying approach of the other three methods are similar and hence their spread is more or the less the same. Both edge sampling's number of iterations and multicycle's number of tokens are set to 100, and their results are a little better than single cycle, but as explained earlier both the noise from calculating the spread and the algorithms themselves make it difficult to clearly distinguish their differences.
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=100mm]{figures/hep/heuristicsmethods.png}
+\includegraphics[width=150mm]{figures/hep/heuristicsmethods.png}
 \caption{Heuristic methods}
 \label{hep:heuristicmethods}
 \end{figure}
@@ -597,7 +603,7 @@ Figure \ref{hep:heuristicmethods} shows the spread of the heuristics methods on 
 Table \ref{hep:timetable} shows the running time all of the methods except for the greedy method. As explained in previous chapters, running time of all of the methods specified in the table is independent of seed size, that is the biggest advantage of these methods over the greedy method. Figure \ref{hep:times} shows the running time of the greedy method based on seed size, to make the comparison easier, running time of other methods are also shown in the figure. To find a seed set of size 100 on the collaboration network data set after applying the celf optimization, it takes almost 2 hours, and this graph is much smaller than a typical big data graph. Being a NP-Hard problem, the algorithm will not scale linearly, this means for data sets that are 100 times bigger than collaboration network, it might take thousands of time more to run the algorithm
 \begin{figure}[H]
 \centering
-\includegraphics[width=130mm]{figures/hep/times.png}
+\includegraphics[width=150mm]{figures/hep/times.png}
 \caption{Running time of different methods on collaboration network data set}
 \label{hep:times}
 \end{figure}
@@ -606,7 +612,7 @@ Table \ref{hep:timetable} shows the running time all of the methods except for t
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=130mm]{figures/journal/spread.png}
+\includegraphics[width=150mm]{figures/journal/spread.png}
 \caption{Spread of different methods on Live Journal Data set}
 \label{journal:spread}
 \end{figure}
@@ -636,7 +642,7 @@ Table \ref{journal:time} shows the running time of different algorithms. random 
 In this section the spread of degree, pagerank and edge sampling methods on different types of artificially generated graphs are investigated. As a baseline the spread of random set of seeds are also drawn. Each of the graphs carry some specific properties that distinguishes them from each other. As observed from the real graph examples in the previous sections, edge sampling method is not always performing better than the heuristics methods such as pagerank and degree. Here, it will be shown for which types of graphs edge sampling method is performing better. 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=130mm]{figures/artificial/random.png}
+\includegraphics[width=150mm]{figures/artificial/random.png}
 \caption{Random graph of 1000 vertices and 4000 edges}
 \label{art:random}
 \end{figure}
@@ -645,7 +651,7 @@ Figure \ref{art:random} shows the spread on a graph with randomly generated edge
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=130mm]{figures/artificial/sparse.png}
+\includegraphics[width=150mm]{figures/artificial/sparse.png}
 \caption{Sparse graph with 1000 vertices and 1000 edges}
 \label{art:sparse}
 \end{figure}
@@ -654,7 +660,7 @@ Figure \ref{art:sparse} shows the spread on a sparse graph. The graph is generat
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=130mm]{figures/artificial/skewed.png}
+\includegraphics[width=150mm]{figures/artificial/skewed.png}
 \caption{Skewed graph with 1000 vertices and 4000 edges}
 \label{art:skewed}
 \end{figure}
@@ -663,7 +669,7 @@ Figure \ref{art:skewed} shows the spread on a skewed graph. Here the difference 
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=130mm]{figures/artificial/clustered.png}
+\includegraphics[width=150mm]{figures/artificial/clustered.png}
 \caption{Clustered graph with 1000 vertices and 10000 edges}
 \label{art:clustered}
 \end{figure}

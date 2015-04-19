@@ -18,15 +18,15 @@ singlecycle[2]=singlecycle[2]/1000
 greedy=greedy/1000
 greedy = cbind(1:100,greedy)
 
-plot(edgesampling, type="l" ,xlab='Seed Size', ylab='Time (s)', lty=1, ylim=c(0,6000))
-lines(degree, type="l" , lty=2,)
-lines(degreediscount, type="l" , lty=3)
-lines(pagerank, type="l" , lty=4)
-lines(random, type="l" , lty=5)
-lines(multicycle, type="l" , lty=6)
-lines(singlecycle, type="l" , lty="24")
-lines(greedy, lty="26")
+plot(edgesampling, type="l" ,xlab='Seed Size', ylab='Time (s)', lwd = 3,lty=1, ylim=c(0,6000))
+lines(degree, type="l" , lwd = 3,lty=2,)
+lines(degreediscount, type="l" , lwd = 3,lty=3)
+lines(pagerank, type="l" ,lwd = 3, lty=4)
+lines(random, type="l" ,lwd = 3, lty=5)
+lines(multicycle, type="l" ,lwd = 3, lty=6)
+lines(singlecycle, type="l" ,lwd = 3, lty="24")
+lines(greedy, lwd = 3,lty="26")
 
 
-legend('topleft',legend = c("edgesampling","degree","degreediscount","pagerank","random","multicycle","singlecycle","greedy"), lty =c(1,2,3,4,5,6,24,26),cex=0.6,ncol = 2,bty = "n")
+legend('topleft',legend = c("edgesampling","degree","degreediscount","pagerank","random","multicycle","singlecycle","greedy"), lwd = 3,lty =c(1,2,3,4,5,6,24,26),cex=0.9,ncol = 2,bty = "n")
 
