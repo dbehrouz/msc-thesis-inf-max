@@ -100,8 +100,8 @@ The greedy algorithm proposed by Kempe et al.\ \cite{kempe03} is described in Al
 \caption{Influence Maximization: Greed Algorithm}
 \label{alg:KempeInfMax1}
 \begin{algorithmic}
-\Require G(V,E): Graph G, with Vertex set V and Edge set E
-\Require k: Initial Set Size
+\Require $G(V,E)$: Graph $G$, with Vertex set $V$ and Edge set $E$
+\Require $k$: Initial Set Size
 \State S = $\emptyset$
 \For {i = 1 to k}
 	\For {every $v \in V$ and $v \notin S$}
@@ -110,7 +110,7 @@ The greedy algorithm proposed by Kempe et al.\ \cite{kempe03} is described in Al
 	\State $v^* = \argmax_v \{\delta_v\}$
 	\State $S = S \cup v^*$
 \EndFor
-\State Output $S$
+\State Output $S$: Set of initial active vertices
 \end{algorithmic}
 \end{algorithm}
 \\
@@ -123,8 +123,8 @@ Their observation is that, if $A$ is subset of $B$, the marginal gain of adding 
 \caption{CELF Algorithm}
 \label{alg:celf}
 \begin{algorithmic}
-\Require G(V,E): Graph G, with Vertex set V and Edge set E
-\Require k: Initial Set Size
+\Require $G(V,E)$: Graph $G$, with Vertex set $V$ and Edge set $E$
+\Require $k$: Initial Set Size
 \State S = $\emptyset$
 \For {i = 1 to k}
 	\State set $\delta_v = \sigma(v)$ for $v \in V \setminus S$
@@ -137,7 +137,7 @@ Their observation is that, if $A$ is subset of $B$, the marginal gain of adding 
 		\EndIf
 	\EndWhile 
 \EndFor
-\State Output $S$
+\State Output $S$: Set of initial active vertices
 \end{algorithmic}
 \end{algorithm}
 As can be seen from the algorithm description, the difference between CELF and the normal Greedy method, is that in CELF, $delta_v$ is pre-calculated for all the vertices first, then starting from the biggest value, in each iteration $\delta_u$ is recalculated for vertex $u$ if the value is still higher than the next vertex in the list, then node $u$ is added to $S$ otherwise the next vertex is chosen. As in the previous algorithm, $\sigma(v)$ is the expected spread of the node $v$ under the IC model. 
@@ -162,9 +162,9 @@ They have performed experiment and compared their methods with the normal Greedy
 \caption{UBLF Algorithm}
 \label{alg:ublf}
 \begin{algorithmic}
-\Require G(V,E): Graph G, with Vertex set V and Edge set E
-\Require PP : Propagation probability matrix of G
-\Require k: Initial Set Size
+\Require $G(V,E)$: Graph $G$, with Vertex set $V$ and Edge set $E$
+\Require $PP$: Propagation probability matrix of $G$
+\Require $k$: Initial Set Size
 \State S = $\emptyset$ and $\delta = (I - PP)^{-1} .1$ 
 \For {i = 1 to k}
 	\State set $I(v) = 0$ for $v \in V \setminus S$
@@ -180,7 +180,7 @@ They have performed experiment and compared their methods with the normal Greedy
 		\EndIf
 	\EndWhile 
 \EndFor
-\State Output $S$
+\State Output $S$: Set of initial active vertices
 \end{algorithmic}
 \end{algorithm}
 
@@ -341,11 +341,13 @@ The main challenges when implementing the methods using BSP models are hence, fi
 \subsection{Monte Carlo Simulation}
 On the baseline of most of the methods, lies the \textit{Monte Carlo Simulations}. It represent the Independent Cascade propagation process. Given an initial seed, it will calculate the expected spread, by running the process thousands of times and report the average spread for the initial active set. The distributed method differs from the original implementation in the way the propagation is spread through vertices. In single machine computation, for each vertex in the graph, if the vertex is active it will try to influence all of its neighbors only once and the process continues until no new vertices become active. In distributed implementation, all of the vertices will try to activate their neighbors at once. 
 \begin{algorithm}[ht!]
-\caption{Monte Carlo Simulation}
+\caption{Monte Carlo Simulation for Independent Cascade Model}
 \label{alg:simulation}
 \floatname{algorithm}{Algorithm}
 \begin{algorithmic}
-\Require $S$ = initial seed, $R$ = \# of iterations
+\Require $G(V,E)$: Graph $G$, with Vertex set $V$ and Edge set $E$
+\Require $S$: initial active vertices
+\Require $R$: \# of simulation iterations
 \State $s_i=0$ for all $0<i<R$
 \For {$i$ = 1 to $R$}
 	\State $A=S$ 
@@ -362,7 +364,8 @@ On the baseline of most of the methods, lies the \textit{Monte Carlo Simulations
 	\EndFor
 	\State $s_i=|A|$	
 \EndFor
-\State Output $avg(s)$
+\State $sp=avg(s)$
+\State Output $sp$: Spread of the initial set $S$ through out graph $G$
 \end{algorithmic}
 \end{algorithm}
 Each vertex carries information about its state. As can be seen from the algorithm, in each iteration of the simulation, every active vertex will try to activate its neighbors, and then change its state to \textit{tried} so it doesn't try to activate again in the next iterations. If a vertex is activated, its state is changed to \textit{active} and it is added to the active set. The process continues until all of the vertices in active set $A$ have tried activating the neighbors and no new vertex is added. The final result is the average of all the spreads for every simulation iteration. This is a time consuming procedure because of the number of iterations in the simulation. But this algorithm is not being used in any of the main methods for finding the initial seeds and it is rather for estimating the spread of a seed. I am only using the procedure to have a baseline of how good an initial seed is and running it even with few number of iterations should give an acceptable estimate.
@@ -439,8 +442,9 @@ As discussed in Single Cycle Influence Maximization section, one draw back of bl
 \label{alg:edgesampling}
 \floatname{algorithm}{Algorithm}
 \begin{algorithmic}
-\Require $R$ = \# of iterations
-\Require $k$ = seed size
+\Require $G(V,E)$: Graph $G$, with Vertex set V and Edge set $E$
+\Require $R$: \# of iterations
+\Require $k$: Initial Set Size
 \State $v_{total}=0$ for all $v \in G$
 \For {$i$ = 1 to $R$}
 	\State sample $G'$ from $G$ based on edge probabilities
@@ -452,7 +456,8 @@ As discussed in Single Cycle Influence Maximization section, one draw back of bl
 \For {every vertex $v \in G$}
 	\State $v_{spread}=v_{total}/R$
 \EndFor
-\State Output top $k$ vertices based on their spread
+\State $S$ = top $k$ vertices based on $v_{spread}$
+\State Output $S$: Set of initial active vertices
 \end{algorithmic}
 \end{algorithm}
 As with other methods, some modifications have to be made to make this method more suitable in parallel frameworks. The connected components can be efficiently calculated in parallel using BSP model. It is already implemented as part of the GraphX library. To further optimize the algorithm, changes have been made to the connected component algorithm of GraphX. Since for each vertex, we only need the size of its corresponding connected component, we can modify the original algorithm to instead of reporting the connected component id, it will report the size of the connected component. The result of the new connected component algorithm would then be the list of vertices, each vertex carrying its id and corresponding connected components size. In this method, the connected component size is equal to the expected spread for each vertex. The algorithm starts by initializing the list of all the vertices. Every vertex's expected spread is 0 at the beginning. In each iteration of the simulation, the sizes are updated based on the connected component size. The update can be done simply by doing a join. Vertex joins are very efficient in GraphX, and can be done very quickly. Increasing the number of simulations will increase the accuracy, but it also slows down the process. In the next sections, these trade offs will be discussed and the result of the algorithm will be presented.
@@ -465,6 +470,8 @@ In previous section, Chen et al.\ \cite{chen09} heuristic for choosing the best 
 \caption{Degree Discount}
 \label{alg:degreedicount}
 \begin{algorithmic}
+\Require $G(V,E)$: Graph $G$, with Vertex set $V$ and Edge set $E$
+\Require $k$: Initial Set Size
 \State $S=\emptyset$
 \For{each vertex $v$}
 	\State compute its degree $d_v$
@@ -479,7 +486,7 @@ In previous section, Chen et al.\ \cite{chen09} heuristic for choosing the best 
 		\State $dd_v = d_v - 2t_v - (d_v - t_v)t_v p)$
 	\EndFor
 \EndFor
-\State output $S$
+\State Output $S$: Set of initial active vertices
 \end{algorithmic}
 \end{algorithm}
 Compared to other heuristic methods that will be discussed in the next section, this method is more difficult to implement in a BSP model. The number of iterations the algorithm runs depends on the seed size. Basically, after initializing all the vertices, in each iteration the best vertex is chosen and added to the seed set. After that, the values for the neighbors of the selected vertex will be changed based on the formula presented in the algorithm \ref{alg:degreedicount}. This means for a seed set of size $k$, the algorithm runs for $k$ iterations. Although this method looks promising, the underlying strategy is not very feasible to implement in BSP, and since it includes the same number of iterations as the seed size, it will not scale to large graphs at least in GraphX and Giraph. In section \ref{sec:experiments}, the result of the method on a smaller graph is reported, but for large scale graphs it is not feasible to run.
