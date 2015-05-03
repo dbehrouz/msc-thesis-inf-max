@@ -315,6 +315,8 @@ The figure \ref{fig:sssp} shows supersteps involved with computing the single so
 \end{figure}
 \footnotetext{http://giraph.apache.org/intro.html}
 
+The input graph consists of 3 vertices, and 2 edges. The goal of the program is to find the shortest path from every vertex to the left most vertex. Red lines separate supersteps and in the first superstep, the value of all the vertices except for the source is assigned to infinity. At the end of each superstep, distance upper bounds (vertex value + smallest edge value) is send to the destination of the edges and vertices's values are set to the smallest message they have received. The execution stops when all the vertices have the distance from the source vertex. 
+
 The input is a chain graph with three vertices (black) and two edges (green). The values of edges are 1 and 3 respectively. The algorithm computes distances from the leftmost vertex. The initial values of vertices are 0, $\infty$ and $\infty$ (top row). Distance upper bounds are sent as messages (blue), resulting in updates to vertex values (successive rows going down). The execution lasts three supersteps (separated by red lines).
 
 Although Giraph has many advantages over MapReduce, it is still has some limitations, in one Giraph job many iterations can be done, but if graphs should go through several transformations, that would require multiple Giraph jobs, which means that the data has be written to HDFS after each job. This adds a lot of IO overhead. A lot of the Machine learning and graph problems are iterative in nature, which will cause Giraph to have severe performance issues in some of these cases.
