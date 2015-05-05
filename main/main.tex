@@ -47,51 +47,29 @@ Maximizing influence in graphs, typically applied to Social Networks, is the pro
 % define graph separately in chapter two
 % 
 \section{Introduction}
-The term graph, first used by mathematician J. J. Sylvester, is a representation of set of interconnected objects. Typically, in a graph the interconnected components are called vertices, and the links that are connecting them are called edges. Graph theory, is the field of mathematics that studies graphs and since its introduction, it has been used extensively in many branches of science. In computer science, graphs can represents, networks of computers, websites and the communication between them. In Chemistry and Physics, graphs are used to model the atoms and molecules and their interactions. Graph components, can also carry extra information, for example the edges can carry weight which can quantify or qualify the connection between two vertices(nodes). For example in a graph that represent geographical locations, where vertices represent places, the edges represent the distance between the locations. \\
-% graphs have been
-% change the opening statement
-Over the past two decades with the introduction of social networks, graph has been used extensively to model the interactions between people belonging to a social network. 
-% one application that has been studied is the spread of information in social networks
-One application that has been studied in social networks or in graphs in general is the spread of information and how information travels between nodes. 
-% put a period after ampify
-In medicine and biology it has been used to find the spread of a disease either to find the initial person who contracted the disease or to find key vertices that could amplify the spread and by identifying those nodes further spread of the disease can be avoided. 
-% remove , it has direct application, and how individuals can affect each other
-In social networks, it has direct applications, sociologists have applied influence maximization methods to study the spread of information between people in a network, and how individuals can affect each other. 
-%new paragraph here
-% in the marketing domain
-Marketing is another applications of influence maximization.  Domingo and Richardson \cite{domingo01} were the first to study the spread of information in networks of people in marketing domain. 
-%
-Being generally referred to as the \textit{Word Of Mouth} phenomena, it shows how different people influence each others' opinion, even though there might not be a direct relationship between them. 
-% prior to who, rephrase into two sentence, remove and . them and they are not clear
-Prior to them, most of the research in marketing were to maximize the profitability of single customers, and disregarding the effect they have on the whole network. 
-% long sentence
-Domingos and Richardson proposed a method to estimate the value of customers in terms of the network and how much a customer will increase profitability of the whole market if an item is advertised to him/her. 
-% shorter description
-% say why kempe is important
-% solution is good
-% scalabilty and problem
-Kempe et al.\ \cite{kempe03} formally defined the problem of \textit{Influence Maximization}. By studying how influence is propagated under two models; \textit{Independent Cascade} and \textit{Linear Threshold} models, they defined the problem of Influence Maximization as finding an initial set of vertices(called \textit{active set} or \textit{seeds}), that will influence the most number of vertices under either models. 
-% they also proved that the problem ...
-They have also proved that the problem of maximizing influence is a \textbf{NP-hard} problem. The solution they proposed involves a greedy algorithm that approximates a solution which is guaranteed to be within 63\%  of the optimal solution. 
-% put period after has been studied
-% remove and use better words, moreover, despite , ...
-Since its introduction, Influence maximization has been studied extensively, many have tried to optimize and speed up the original greedy method and several others have tried to propose different methods for finding the solution. 
-% and again
-The main issue with the greedy method is in the objective function and how it is calculated. Since there's no exact way of estimating the spread of an active set, several simulations are run using either of the propagation models and the result is the average of all the simulations. 
-% complex sentence
-To guarantee an accurate solution, thousands of simulations are usually run, and due to the nature of the problem, even on small to medium size graphs, this is highly inefficient. 
-% can be removed
-In the next sections, the details of the algorithm and its deficiencies when it comes to speed and scalability are discussed. \\
-% such as facebook and twitter HAVE
-% try to merge with the opening paragraphs
-Over the past couple of years, with introduction of social networks, online web stores and other websites that engage users, massive amount of data and information are being gathered everyday. Social networks such as Facebook and Twitter has hundreds of millions of active users, that are interacting with each other daily. Web stores such as Amazon, sells products to millions of users, most of which have friends and acquaintances buying the same or similar products and are constantly being influenced by their decision on these specific products. Even customers that have never met each other usually have access to each others reviews of these products. These massive amount of information are usually modeled as network of people and analyzing them has been proven to be an extremely difficult task. 
-% new paragraphs
-% too many analyze
-% normal computer to analyze is vague and not good
-A field of computer science has emerged recently that focuses on building systems, methods and algorithms that deal with massive amount of data. Generally referred to as \textbf{Big Data}, it consists of platforms that can analyze data in such amount that are impossible for a normal computer to analyze. Probably the most notable frameworks that are used widely nowadays are \textit{Hadoop} and \textit{Spark}. Hadoop is an open source project that is based on Google's MapReduce framework introduced by Dean and Ghemawat \cite{dean04}. 
-% long sentence, put a period after HDFS
-% available in different languages, redundant
-% remove originaly developed. replace with hadoop
+Over the past two decades with the introduction of social networks, the study of interactions between people have gained a lot of attention.
+Social networks, represented using a graph of relationships between people, carry a lot of information about the individuals. 
+Sociologists have studied social networks to better understand what derives people to form friendship, groups and communities with others. 
+Journalists and public figures have used social networks such as Twitter and Facebook to report the news and communicate with people. 
+And last but not least, marketing experts are using social networks to better understand the market, and increase benefit by targeted advertisement.\\
+
+\textit{Influence maximization} is one of the marketing applications in social networks. 
+It emphasizes on the effect of individuals on each other and how utilizing it can increase a product's popularity. 
+Domingo and Richardson \cite{domingo01} were the first to study the spread of information in markets. 
+They proposed a method to estimate the value of customers in terms of the network. 
+Based on this method, increase in profitability can be easily determined when an item is advertised to a customer. 
+Kempe et al.\ \cite{kempe03} formally defined the problem of Influence Maximization. 
+% too long
+By studying how influence is propagated under two models; \textit{Independent Cascade} and \textit{Linear Threshold} models, they defined the problem of Influence Maximization as finding an initial set of vertices(called \textit{active set} or \textit{seeds}), that will influence the most number of vertices under either models. 
+The problem is proven to a \textbf{NP-hard} problem which can be solved using a greedy algorithm. 
+Kempe's solution however suffers greatly from scalability issues. 
+Even on small graphs, finding the solution takes a long amount of time. \\
+
+In the last decade a new field in computer science has emerged that involves working with massive amount of data. This field, generally referred to as \textbf{Big Data}, focuses on building tools for efficient collection, storage, and processing of data. 
+
+Probably the most notable frameworks that are used widely nowadays are \textit{Hadoop} and \textit{Spark}. Hadoop is an open source project that is based on Google's MapReduce framework introduced by Dean and Ghemawat \cite{dean04}. 
+
+
 Originally developed to include the map reduce framework and a file system capable of catering terabytes or even petabytes of data reliably and efficiently, called \textit{Hadoop Distributed File System(HDFS)}, Hadoop has since improved to include many different frameworks,  tools and systems each capable of analyzing and processing large scale data sets in different formats and it is available in different programming languages. 
 % these two frameworks are discussed in detail remove it
 Spark is another open source framework capable of processing massive amount of data, that approaches the processing of data differently from the traditional map reduce framework. It is more suitable for iterative algorithms. In section \ref{sec:bigdata}, these two frameworks are discussed in details.  \\
