@@ -49,42 +49,62 @@ Maximizing influence in graphs, typically applied to Social Networks, is the pro
 \section{Introduction}
 Over the past two decades with the introduction of social networks, the study of interactions between people have gained a lot of attention.
 Social networks, represented using a graph of relationships between people, carry a lot of information about the individuals. 
-Sociologists have studied social networks to better understand what derives people to form friendship, groups and communities with others. 
+Sociologists have studied social networks to better understand what derives people to form friendships, groups and communities.
 Journalists and public figures have used social networks such as Twitter and Facebook to report the news and communicate with people. 
-And last but not least, marketing experts are using social networks to better understand the market, and increase benefit by targeted advertisement.\\
+And last but not least, marketing experts have used social networks to better understand the market, and increase the benefit by performing targeted advertisement.
 
 \textit{Influence maximization} is one of the marketing applications in social networks. 
 It emphasizes on the effect of individuals on each other and how utilizing it can increase a product's popularity. 
 Domingo and Richardson \cite{domingo01} were the first to study the spread of information in markets. 
-They proposed a method to estimate the value of customers in terms of the network. 
-Based on this method, increase in profitability can be easily determined when an item is advertised to a customer. 
-Kempe et al.\ \cite{kempe03} formally defined the problem of Influence Maximization. 
+They proposed a method to estimate the value of customers in terms of the network.
+Based on this method, increase in profitability can be easily determined when an item is advertised to a customer.
+Kempe et al.\ \cite{kempe03} formally defined the problem of Influence Maximization.
 % too long
-By studying how influence is propagated under two models; \textit{Independent Cascade} and \textit{Linear Threshold} models, they defined the problem of Influence Maximization as finding an initial set of vertices(called \textit{active set} or \textit{seeds}), that will influence the most number of vertices under either models. 
-The problem is proven to a \textbf{NP-hard} problem which can be solved using a greedy algorithm. 
-Kempe's solution however suffers greatly from scalability issues. 
-Even on small graphs, finding the solution takes a long amount of time. \\
+By studying how influence is propagated under two models: \textit{Independent Cascade} and \textit{Linear Threshold}, the problem is defined as finding an initial set of vertices(called \textit{active set} or \textit{seeds}), that will influence the most number of vertices.
+Influence maximization is proven to be a \textbf{NP-hard} problem. 
+Kempe et al.\ provided a greedy algorithm for solving it but this solution suffered from scalability issues. 
+Even on small graphs, finding the initial active set requires a substantial amount of time and resources.
+Following Kempe's work, many attempted to reduce the running time of the algorithm. 
+Leskovec et al.\ \cite{leskovec07} and Chen et al.\ \cite{chen09} proposed methods that reduced the running time greatly. 
+However, the proposed methods only worked well on small graphs and none of them can be applied to large scale graphs that are very common nowadays.
 
-In the last decade a new field in computer science has emerged that involves working with massive amount of data. This field, generally referred to as \textbf{Big Data}, focuses on building tools for efficient collection, storage, and processing of data. 
+In the last decade a new field in computer science called \textbf{Big Data}, has emerged that involves working with massive amount of data. 
+Given the widespread usage of internet, it is no surprise that a large amount of data is being generated daily. 
+Amazon, Facebook and Twitter store information about their users, governments store data of their citizens, infrastructures, health care and economy. 
+These are only a few examples, and many other organizations are collecting data, and storing it to help derive their businesses.
+Storage and processing of data at this scale requires an immense amount of effort. 
+Big data technologies focus on building tools for efficient collection, storage, and processing of the data. 
 
-Probably the most notable frameworks that are used widely nowadays are \textit{Hadoop} and \textit{Spark}. Hadoop is an open source project that is based on Google's MapReduce framework introduced by Dean and Ghemawat \cite{dean04}. 
-
-
-Originally developed to include the map reduce framework and a file system capable of catering terabytes or even petabytes of data reliably and efficiently, called \textit{Hadoop Distributed File System(HDFS)}, Hadoop has since improved to include many different frameworks,  tools and systems each capable of analyzing and processing large scale data sets in different formats and it is available in different programming languages. 
-% these two frameworks are discussed in detail remove it
-Spark is another open source framework capable of processing massive amount of data, that approaches the processing of data differently from the traditional map reduce framework. It is more suitable for iterative algorithms. In section \ref{sec:bigdata}, these two frameworks are discussed in details.  \\
-% maybe remove the paragprah and cut to the chase...
-As explained earlier, graphs are powerful modeling frameworks, capable of storing many different information about objects, but modeling data of high volume cannot be done using conventional graph modeling frameworks. Using big data frameworks, many graph processing tools and applications are built which utilizes the mechanism of the frameworks to process graphs of millions or billion of nodes and edges. \\
-Two notable graph processing framework based on Hadoop's map reduce and Spark are:
+Probably the most notable big data frameworks are \textit{Hadoop} and \textit{Spark}. 
+Hadoop is an open source project that is based on Google's MapReduce framework introduced by Dean and Ghemawat \cite{dean04}. 
+It was originally developed to include the map reduce framework and a file system, called \textit{Hadoop Distributed File System(HDFS)}, capable of catering terabytes or even petabytes of data reliably and efficiently.
+However, Hadoop now includes a wide array of frameworks, each one designed for special purposes. 
+Some examples of these frameworks are Hive that provides a SQL interface to the data and Mahout which is a machine learning framework.
+Spark is another open source project. 
+It approaches data processing differently from the traditional map reduce and tries to address some of the issues in Hadoop.
+Both Hadoop and Spark include a framework for processing data in graph format. 
+They provide efficient storage and implementation of some of the well known graph algorithms, such as connected component and page rank.
+These frameworks are:
 \begin{itemize}
 \item 
-\textit{Giraph}, which is an open source project based on Google's Pregel framework by Malewicz et al.\ \cite{malewicz10}. It is built on top of Hadoop's map reduce
+\textit{Giraph}, an open source project based on Google's Pregel framework by Malewicz et al.\ \cite{malewicz10}. It is built on top of Hadoop's map reduce
 \item 
-\textit{GraphX}, which is an open source project built on top of Spark
+\textit{GraphX}, an open source project on top of Spark
 \end{itemize}
-% put as the second paragraphs
-The aim of this thesis is to study the problem of influence maximization, current state of the art algorithms, advantages and disadvantages of those methods, specially regarding the scalability. Based on the study different methods, using large scale graph processing systems, are proposed to solve the scalability issue of influence maximization. \\
-The rest of this document is structured as follows. Section \ref{sec:influencemax} presents the history of influence maximization problem, different methods that have been proposed so far and their advantages and disadvantages. In section \ref{sec:bigdata} Big Data frameworks, their history and the current states of them are discussed, two of the very common frameworks, i.e.\ Hadoop and Spark are studied in detail. In section \ref{sec:biggraph}, different large scale graph processing frameworks are compared and Hadoop's Giraph and Spark's GraphX are explained in great detail. In section \ref{sec:bigdatanetworkinfluelncemaximization}, scalability issue of influence maximization is studied, and several methods either novel or based on previous methods are proposed and the implementation details are discussed. In section \ref{sec:experiments} and \ref{sec:resanddis} details of experiments and their results are discussed. Section \ref{sec:conclusion} concludes the thesis and future works and problems that were not covered in the document are discussed
+
+The aim of this thesis is to study the problem of influence maximization, current state of the art solutions, as well as their advantages and disadvantages.
+The thesis also includes an investigation of applicability of running influence maximization algorithms on large scale graphs. 
+It highlights why some of the earlier methods are not suitable in big data domain. 
+And finally, it proposes solutions for solving influence maximization in large scale graphs. 
+
+The rest of this document is structured as follows. 
+Section \ref{sec:influencemax} presents the history of influence maximization problem, solutions that have been proposed and their advantages and disadvantages. 
+In section \ref{sec:bigdata} Big Data frameworks, their history and the current states of them are discussed. Two of the very common frameworks, i.e.\ Hadoop and Spark, are studied in detail. 
+In section \ref{sec:biggraph}, an overview of large scale graph processing, followed by Giraph and GraphX details are presented. 
+Section \ref{sec:bigdatanetworkinfluelncemaximization} studies the scalability issue of influence maximization.
+Several methods either novel or based on previous methods are proposed and the implementation details are discussed. 
+In section \ref{sec:experiments} and \ref{sec:resanddis} details of experiments and their results are explained. 
+And finally, section \ref{sec:conclusion} concludes the thesis and mentions future works and open problems related to influence maximization.
 
 
 \newpage
