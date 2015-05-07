@@ -731,17 +731,50 @@ The vertices and edges in the graph of figure \ref{art:clustered} are clustered 
 From the experiments performed in this section, it is obvious that while none of the methods are performing as good as the greedy method, some of them are good candidates for influence maximization on large graphs. Pagerank, Degree and Edge Sampling methods are very fast, and the spread achieved by these methods are acceptable. Different properties of graphs, affect the performance of each of the methods, hence the best way to chose the seed is to run all three methods on the graph and compare the spread for different seed sizes. None of the methods depend on the seed size, and running them once will return the list of vertices in order of how good they are in increasing the spread in the graph. Users then can easily chose the desired number of seeds. Pagerank and edge sampling, generally consider more global information than degree method. Degree method, might perform very good on some types of graphs, even better than edge sampling, but it does not guarantee the solution is good for all types of graphs. \\
 
 
-\pagebreak
+\newpage
 \section{Conclusion}
 \label{sec:conclusion}
-In this document, the problem of influence maximization was discussed. One of the main issues with current solutions is their scalability. Due to the nature of the solutions proposed, none can perform well for large scale graphs. Over the past decade, with wide spread usage of internet, data collection has been the focus of many big firms. Social networks and online stores are gathering data about millions of users everyday. The information about users are stored in graph data structures that sometimes consists of millions (even billions) of nodes and  many more edges. Applying some of the solutions proposed for influence maximization to graphs of these scales are impossible and even on the strongest super computers will take days or even months to see the results. Here, I have identified why the solutions are not scalable and proposed some new or modified solutions to work with graphs of this scale. Several frameworks for processing large scale data have been created over the past couple of years, most notably are Hadoop and Spark, both of which are designed to run on commodity computers, and are highly scalable. They both have a built in frameworks for processing graphs; Giraph which is on top of Hadoop and GraphX on top of Spark. Methods described in this thesis, are implemented using these two frameworks. In section \ref{sec:experiments}, several experiments on different data sets were performed and the results were presented. \\
-Theoretically, it was proven by Kempe et al.\ \cite{kempe03} that the greedy method provides the best solution to the influence maximization problem, but the inefficiency of the method for some types of graphs excels its quality and justifies the sacrifice of quality for performance. Several of the methods discussed here, run very fast and they are not greatly affected by the size of the input graph. In some of the data sets that it was possible to run the greedy methods, some of the scalable methods provided comparable solutions in terms of quality with the greedy algorithm, and results showed that even on small data sets, greedy method will take extremely long amount of time, making it virtually impossible to run the greedy method on large scale graphs that are very common today. \\
-Of the methods described, pagerank and edge sampling are shown to provide good solutions consistently. Degree method, is another good approach, but it does not guarantee a good solution all the time and is very dependent on the structure of the graph.\\ 
-Influence maximization is a very large topic and in this thesis only the basic problem was covered. Several related topics were left out of this thesis, and many other challenges still remains. Finding a more deterministic function or a probabilistic function that does not rely on the Monte Carlo simulation is one of the areas that has been and still is being studied. Topic based influence maximization, i.e.\ users influencing each other differently with regards to different topics is another area that was not covered in the thesis. Influence degradation, is also another interesting topic that involves dynamic influence probabilities that will change with time are some of the other interesting areas that worth exploring.
+Influence maximization gained a lot of attention with introduction of social networks. 
+It is the problem of finding a set of vertices that could maximize the spread of information throughout the network.
+This thesis was set out to study influence maximization, specially its application in marketing, and its current solutions in detail.
+The study has also sought to provide a breakdown of the advantages and disadvantages of the solutions to influence maximization, and whether these solutions can be applied to graphs of massive scale.
+
+Technological advancement in both software and hardware industry have made collection of data very easy.
+Several organizations are now collecting large amount of data everyday, and using it to better understand their customers and their business.
+Social networks such as Facebook and Twitter have millions of users that perform billions of activities everyday. 
+The information about these users and their activities are stored in graph formats. 
+Processing and analyzing these data is not simple and requires specialized methods.
+Several frameworks for processing large scale datasets have been created over the past couple of years.
+Two of the most common big data frameworks are Hadoop and Spark. 
+They both have built in frameworks for processing large graphs; Giraph which is on top of Hadoop and GraphX on top of Spark. 
+Methods described in this thesis, are implemented using these two frameworks.
+
+Both the literature and the empirical findings in this thesis have shown the greedy solution presented by Kempe et al.\ \cite{kempe03} has scalability issues. 
+Although in terms of quality, it is by far the best solution presented so far, but applying it even to small graphs requires a substantial amount of time and resources.
+As shown in this study its inefficiency for large graphs makes it impossible to run.
+Several of the implemented methods, run very fast and they are not greatly affected by the size of the input graph. 
+It was even shown that some of these methods can provide comparable solutions with the greedy method.
+
+In section \ref{sec:experiments}, several experiments on different data sets were performed.
+The three methods presented; pagerank, degree, and edge sampling performed quite well on real datasets.
+But the results were not consistent. 
+On some datasets, one method performed better than the others, but that was not the case in other data sets.
+Experiments on artificial datasets revealed that the shape of the graph, affects the solution provided by each method.
+Pagerank and edge sampling are able to provide more consistent solution across different type of graphs.
+On the other hand, degree method does not guarantee a good solution all the time and it is affected by the shape of the graph.
+
+Influence maximization is a vast topic and in this thesis only the basic problem was covered. 
+Several related topics were left out, and many other challenges still remain. 
+Finding a deterministic function (one that does not rely on the Monte Carlo simulations) for the greedy method is one area that is still being studied. 
+Topic based influence maximization, i.e.\ users influencing each other differently with regards to different topics is another area that was not covered in the thesis. 
+Influence degradation, is also another interesting topic that involves dynamic influence probabilities that will change with time are some of the other interesting areas that worth exploring.
+The field of big data is growing rapidly, and existing processing frameworks are being improved everyday. 
+The edge sampling method introduced here, can still be improved to perform faster by fully utilizing the in memory computation of Spark.
+This 
+
+
 
 \pagebreak
-
-
 
 \bibliographystyle{tktl}
 \bibliography{bibliography}
