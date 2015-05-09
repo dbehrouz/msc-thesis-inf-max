@@ -751,16 +751,16 @@ They both have built in frameworks for processing large graphs; Giraph which is 
 Both the literature and the empirical findings in this thesis have shown the greedy solution presented by Kempe et al.\ \cite{kempe03} has scalability issues. 
 Although in terms of quality, it is by far the best solution presented so far, but applying it even to small graphs requires a substantial amount of time and resources.
 As shown in this study its inefficiency for large graphs makes it impossible to run.
-Several of the implemented methods, run very fast and they are not greatly affected by the size of the input graph. 
+Several of the methods discussed in this work, run very fast and they are not greatly affected by the size of the input graph. 
 It was even shown that some of these methods can provide comparable solutions with the greedy method.
 
 In section \ref{sec:experiments}, several experiments on different data sets were performed.
-The three methods presented; Pagerank, Degree, and Edge Sampling performed quite well on real datasets.
+The three methods presented; Pagerank, Degree, and Edge sampling performed quite well on real datasets.
 But the results were not consistent. 
 On some datasets, one method performed better than the others, which was not the case in other data sets.
 Experiments on artificial datasets revealed that the shape of the graph, affects the solution provided by each method.
-Pagerank and Edge sampling are able to provide a more consistent solution across different type of graphs.
-Whereas, degree method does not guarantee a good solution all the time and it is affected by the shape of the graph.
+Pagerank and Edge sampling are able to provide a more consistent solution across different types of graphs.
+Whereas, Degree method does not guarantee a good solution all the time and it is affected by the shape of the graph.
 
 All of the methods that are applicable to big graphs fall under the heuristics category. 
 This means that, although the experiments in this thesis showed that Pagerank and Edge sampling are performing very well, they do not guarantee to provide the best solution for every dataset. 
