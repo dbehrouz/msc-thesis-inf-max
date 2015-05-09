@@ -736,7 +736,7 @@ From the experiments performed in this section, it is obvious that while none of
 \label{sec:conclusion}
 Influence maximization gained a lot of attention with introduction of social networks. 
 It is the problem of finding a set of vertices that could maximize the spread of information throughout the network.
-This thesis was set out to study influence maximization, specially its application in marketing, and its current solutions in detail.
+This thesis was set out to study the influence maximization, specially its application in marketing, and its current solutions in detail.
 The study has also sought to provide a breakdown of the advantages and disadvantages of the solutions to influence maximization, and whether these solutions can be applied to graphs of massive scale.
 
 Technological advancement in both software and hardware industry have made collection of data very easy.
@@ -747,7 +747,6 @@ Processing and analyzing these data is not simple and requires specialized metho
 Several frameworks for processing large scale datasets have been created over the past couple of years.
 Two of the most common big data frameworks are Hadoop and Spark. 
 They both have built in frameworks for processing large graphs; Giraph which is on top of Hadoop and GraphX on top of Spark. 
-Methods described in this thesis, are implemented using these two frameworks.
 
 Both the literature and the empirical findings in this thesis have shown the greedy solution presented by Kempe et al.\ \cite{kempe03} has scalability issues. 
 Although in terms of quality, it is by far the best solution presented so far, but applying it even to small graphs requires a substantial amount of time and resources.
@@ -756,21 +755,26 @@ Several of the implemented methods, run very fast and they are not greatly affec
 It was even shown that some of these methods can provide comparable solutions with the greedy method.
 
 In section \ref{sec:experiments}, several experiments on different data sets were performed.
-The three methods presented; pagerank, degree, and edge sampling performed quite well on real datasets.
+The three methods presented; Pagerank, Degree, and Edge Sampling performed quite well on real datasets.
 But the results were not consistent. 
-On some datasets, one method performed better than the others, but that was not the case in other data sets.
+On some datasets, one method performed better than the others, which was not the case in other data sets.
 Experiments on artificial datasets revealed that the shape of the graph, affects the solution provided by each method.
-Pagerank and edge sampling are able to provide more consistent solution across different type of graphs.
-On the other hand, degree method does not guarantee a good solution all the time and it is affected by the shape of the graph.
+Pagerank and Edge sampling are able to provide a more consistent solution across different type of graphs.
+Whereas, degree method does not guarantee a good solution all the time and it is affected by the shape of the graph.
+
+All of the methods that are applicable to big graphs fall under the heuristics category. 
+This means that, although the experiments in this thesis showed that Pagerank and Edge sampling are performing very well, they do not guarantee to provide the best solution for every dataset. 
+Given that these methods run reasonably fast on large graphs, my recommendation is to test all the methods on the desired graph, and choose the one that provides the best solution.
 
 Influence maximization is a vast topic and in this thesis only the basic problem was covered. 
 Several related topics were left out, and many other challenges still remain. 
 Finding a deterministic function (one that does not rely on the Monte Carlo simulations) for the greedy method is one area that is still being studied. 
 Topic based influence maximization, i.e.\ users influencing each other differently with regards to different topics is another area that was not covered in the thesis. 
-Influence degradation, is also another interesting topic that involves dynamic influence probabilities that will change with time are some of the other interesting areas that worth exploring.
-The field of big data is growing rapidly, and existing processing frameworks are being improved everyday. 
-The edge sampling method introduced here, can still be improved to perform faster by fully utilizing the in memory computation of Spark.
-This 
+Influence degradation, a research area that involves dynamic influence probabilities that will change over time, was also left out.
+The Edge sampling method presented here, is utilizing some of the advanced features in Spark, such as in memory computation and vertex partitioning.
+However, there is still room for improvement. 
+Better memory usage, faster connected component size computation, and more intelligent ranking of seed nodes are areas that can be improved further.
+
 
 
 
