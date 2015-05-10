@@ -359,15 +359,29 @@ Instead of first learning the edge probabilities and then finding the optimum se
 \newpage
 \section{Big Data}
 \label{sec:bigdata}
-Information and data has always been gathered for analysis, improvements, and predictions in different branches of science. It has helped governments to better govern countries, it has helped companies to better understand their costumers, and it has helped researchers and scientists to solve problems. With introduction of World Wide Web\footnote{http://webfoundation.org/about/vision/history-of-the-web/} exchange and collection of data has become a lot simpler. Big firms and companies started to collect users' information, browsing behavior and etc. Petabytes of data are being stored and exchanged everyday, and these data contain valuable information that is being used for solving a lot of problems using data mining and machine learning methods. 
-Processing this amount of data, has never been an easy tasks and prior to introduction of \textit{Big Data} technologies, this processing and analyzing has been always done using expensive server systems that are able to process millions to billions of bytes of data in a second. 
-Google's revolutionary papers has drastically changed the field. Ghemawat et al.\ \cite{ghemawat03} introduced \textit{The Google's Distributed System}; a file system built for storing terabytes of data. It is scalable, meaning more storage units can be easily added, and it is being deployed on commodity hardware, meaning it does not require any sophisticated and expensive piece of hardware to use. Dean et al.\ \cite{dean04} introduced \textit{MapReduce} a framework for processing large amount of data, again it is scalable and it can be deployed on commodity hardware. 
-Although the source code of either of these two technologies were never released by Google, but based on the publications \textbf{Doug Cutting} created the open source project \textit{Hadoop} which implements both MapReduce (Hadoop's MapReduce) and Google File System (Hadoop Distributed File System or HDFS for short). Since then, Hadoop has become Big Data standard, several new technologies and project have been added to it.
+Information and data has always been gathered for analysis, improvements, and predictions in different branches of science. 
+It has helped governments to better govern countries, it has helped companies to better understand their costumers, and it has helped researchers and scientists to solve problems. 
+With introduction of World Wide Web\footnote{http://webfoundation.org/about/vision/history-of-the-web/} exchange and collection of data has become a lot simpler. 
+Big firms and companies started to collect users' information, browsing behavior and other related data. 
+Petabytes of data are being stored and exchanged everyday, and these data contain valuable information that is being used for solving a lot of problems using data mining and machine learning methods. 
+Processing this amount of data, has never been an easy task and prior to introduction of \textit{Big Data} technologies, this processing and analyzing has been always done using expensive server systems that are able to process millions to billions of bytes of data in a second. 
+Google's revolutionary papers has drastically changed the field. 
+Ghemawat et al.\ \cite{ghemawat03} introduced \textit{The Google's Distributed File System}; a file system built for storing petabytes of data. 
+It is scalable, meaning more storage units can be easily added, and it is being deployed on commodity hardware, meaning it does not require any sophisticated and expensive piece of hardware to use. 
+Dean et al.\ \cite{dean04} introduced \textit{MapReduce}, a framework for processing large amount of data, again it is scalable and it can be deployed on commodity hardware. 
+Although the source code of either of these two technologies were never released by Google, but based on the publications \textbf{Doug Cutting} created the open source project \textit{Hadoop} which implements both MapReduce (Hadoop's MapReduce) and Google File System (Hadoop Distributed File System or HDFS for short). 
+Since then, Hadoop has become Big Data standard and several new technologies and project have been added to it.
 
 \subsection{Hadoop}
 Hadoop consists of two major parts. 
-\textit{MapReduce} which is a parallel programming paradigm. It is designed to run on distributed systems with many commodity computers. It involves three main steps, namely \textit{Map}, \textit{Reduce} and \textit{Shuffle}. The first two are defined by the user. Map operations are run in parallel and they process the data individually, data is divided into different portions and each one is processed by a mapper. The result of the mappers are send to a Reduce task(or several) where the results are combined. A shuffle operation is usually performed on the result of the Map tasks so that similar data are all send to the same nodes. Algorithm \ref{alg:wordcount} is a simple algorithm for counting words in a series of documents. 
-
+\textit{MapReduce} which is a parallel programming paradigm. 
+It is designed to run on distributed systems with many commodity computers. 
+It involves three main steps, namely \textit{Map}, \textit{Reduce} and \textit{Shuffle}. 
+The first two are defined by the user. 
+Map operations are run in parallel and they process the data individually, data is divided into different portions and each one is processed by a mapper. 
+The result of the mappers are send to a Reduce task(or several) where the results are combined. 
+A shuffle operation is usually performed on the result of the Map tasks so that similar data are all send to the same node. 
+Algorithm \ref{alg:wordcount} is a simple algorithm for counting words in a series of documents. 
 \begin{algorithm}
 \caption{Word Count in Hadoop}
 \label{alg:wordcount}
@@ -391,11 +405,19 @@ Hadoop consists of two major parts.
 \EndFunction
 \end{algorithmic}
 \end{algorithm}
+The popularity of Hadoop's MapReduce framework rises from the fact that many complexities of the system is being handled automatically by the framework. 
+In most typical use cases, the user only needs to provide the method for Mappers and Reducers. 
+Framework will take care of compiling and distributing the code to all of the nodes, and running them in parallel. 
+As previously mentioned it is fault tolerant, it means if during the processing a task fails, the framework will restart the task, and if a node encounters a problem Hadoop will move the computation to another node. 
+It is scalable, which means the program will try to utilize as many nodes and resources as possible based on the size of the input data and amount of available resources, and programmers do not need to concern themselves with that while writing the code. 
+There are also many advanced options that users can do to further optimize the program, but they are generally not required for simple tasks. The other great feature of MapReduce and Hadoop is that it is available in many different languages; Java, Python, C++, Scala and many more. 
+Figure \ref{fig:mapreducepara} shows how the word count program will be executed on a cluster.
 
-The popularity of Hadoop's MapReduce framework rises from the fact that many complexities of the system is being handled automatically by the framework. In most typical use cases, the user only needs to provide the method for Mappers and Reducers. Framework will take care of compiling and distributing the code to all of the nodes, and running them in parallel. As previously mentioned it is fault tolerant, it means if during the processing a task fails, the framework will restart the task, and if a node encounters a problem Hadoop will move the computation to another node. It is scalable, which means the program will try to utilize as many nodes and resources as possible based on the size of the input data and amount of available resources, and programmers do not need to concern themselves with that while writing the code. There are also many advanced options that users can do to further optimize the program, but they are generally not required for simple tasks. The other great feature of MapReduce and Hadoop is that it is available in many different languages; Java, Python, C++, Scala and many more. Figure \ref{fig:mapreducepara} shows how the word count program will be executed on a cluster.
-
-Newer versions of Hadoop and MapReduce employs more sophisticated resource manager and scheduler called \textit{YARN} developed by Vavilapalli et al.\ \cite{vavila13}. YARN essentially provides container for running different applications and it is not limited to MapReduce. Spark, Storm and even simple Java programs can be run on YARN. YARN is more or a less cluster manager program and overviews the resource and allocates resources to different jobs being submitted to it. It has become available as part of Hadoop 2.0 technology stack.
-
+Newer versions of Hadoop and MapReduce employs more sophisticated resource manager and scheduler called \textit{YARN} developed by Vavilapalli et al.\ \cite{vavila13}. 
+YARN essentially provides container for running different applications and it is not limited to MapReduce. 
+Spark, Storm and even simple Java programs can be run on YARN. 
+YARN is more or a less cluster manager program and overviews the resource and allocates resources to different jobs being submitted to it. 
+It has become available as part of Hadoop 2.0 technology stack.
 \begin{figure}[ht!]
 \centering
 \includegraphics[width=150mm]{figures/mapreduce.jpg}
@@ -405,7 +427,9 @@ Newer versions of Hadoop and MapReduce employs more sophisticated resource manag
 \end{figure}
 \footnotetext{http://dme.rwth-aachen.de/en/research/projects/mapreduce}
 
-\textit{Hadoop Distributed File System (HDFS)} is a distributed file system, designed to run on commodity hardware. It provides high throughput access to application data and it is fault tolerant. Though initially designed for Hadoop's MapReduce framework, it has been used in many different applications and frameworks.
+\textit{Hadoop Distributed File System (HDFS)} is a distributed file system, designed to run on commodity hardware. 
+It provides high throughput access to application data and it is fault tolerant. 
+Though initially designed for Hadoop's MapReduce framework, it has been used in many different applications and frameworks.
 \begin{figure}[ht!]
 \centering
 \includegraphics[width=150mm]{figures/hdfsarchitecture.png}
@@ -414,12 +438,41 @@ Newer versions of Hadoop and MapReduce employs more sophisticated resource manag
 \end{figure}
 \footnotetext{http://hortonworks.com/hadoop/hdfs/}
 
-It is fault tolerant, meaning if a node in a cluster fails, the data is not destroyed. HDFS employs a feature called \textit{Data Replication}, which indicates the number of times each object is being replicated. Figure \ref{fig:hdfsarch} shows the high level architecture of HDFS. \textit{NameNode} keeps track of where all the same instances of the data is stored and in case a node fails it knows where to look for it. HDFS emphasizes that moving computation is much cheaper than moving data, it is true since HDFS is designed to store big data sets, terabytes or even petabytes of data, hence in conjunction with MapReduce, instead of moving the data around, the computation is done on the node containing the data. It is designed for high throughput  rather than low latency so it is not ideal for streaming applications, although several improvements are being made to further decrease the latency and making it suitable for real time streaming applications. Similar to MapReduce it is design to work across heterogeneous hardware and software platforms. Meaning the nodes in the cluster do not have to be identical and even running the same operating system. Hadoop runs on JVM hence it is OS agnostic. 
-
+It is fault tolerant, meaning if a node in a cluster fails, the data is not destroyed. 
+HDFS employs a feature called \textit{Data Replication}, which indicates the number of times each object is being replicated. 
+Figure \ref{fig:hdfsarch} shows the high level architecture of HDFS. 
+\textit{NameNode} keeps track of where all the same instances of the data is stored and in case a node fails it knows where to look for it. HDFS emphasizes that moving computation is much cheaper than moving data, it is true since HDFS is designed to store big data sets, terabytes or even petabytes of data, hence in conjunction with MapReduce, instead of moving the data around, the computation is done on the node containing the data. 
+It is designed for high throughput rather than low latency so it is not ideal for streaming applications, although several improvements are being made to further decrease the latency and making it suitable for real time streaming applications. 
+Similar to MapReduce it is design to work across heterogeneous hardware and software platforms. 
+This means that nodes in the cluster do not have to be identical and even running the same operating system. 
+Hadoop runs on JVM, as a result of this it is operating system agnostic.
 
 \subsection{Spark}
-Apache Spark  was originally developed by Zaharia et al.\ \cite{zaharia10} in AMPLab at UC Berkeley. The main idea was to solve MapReduce's problems. In contrast to MapReduce's 2 stage program (Map and Reduce), Spark employs an iterative paradigm. It allows users to load data into memory and perform many operations on the data, this is ideal for a lot of Machine learning problems. The underlying frameworks work on entities called Resilient Distributed Datasets (RDDs) introduced by Zaharia et al.\ \cite{zaharia12}. RDD is a read only and partitioned collection of data. It can be created from storage or other RDDs. There are two types operation on RDDs, \textit{transformations} and \textit{actions}. Transformations are operations that will create a new RDD from the existing one, for example \textit{filter} is a transformation operation. The power of RDDs lie in their internal structure, they do not need to be materialized all the time. If a RDD is created using a transformation, it will hold information about how the transformation was made and only apply them to the data once the user requests that through an action or caching of the data set. Actions are operations that will materialize the dataset. Users can also ask the RDD to be stored in memory if they know they are going to use it many times. These characteristics of RDD makes them the perfect tool for performing iterative applications. Many machine learning algorithms require iterative calls to the same dataset. This is one of MapReduce's deficiencies since every algorithm and job has to be written in terms of Map and Reduces. Spark with the help of RDDs allows many of the well known machine learning algorithms to be implemented easily. With success of Spark, it has become part of the Hadoop framework. Recent versions can now run on top of Yarn and they have integration with HDFS and other Hadoop components. 
-A typical Spark program consists of a driver program that launches multiple workers. Worker programs are run on data nodes. Upon execution of a program, Spark will try to send the computation to where the data is, hence minimizing the network traffic. Spark tracks where the RDDs and their partitions are. Figure \ref{fig:sparkprogram} shows a the general overview of how a Spark application is executed.
+Apache Spark  was originally developed by Zaharia et al.\ \cite{zaharia10} in AMPLab at UC Berkeley. 
+The main idea was to solve MapReduce's problems. 
+In contrast to MapReduce's 2 stage program (Map and Reduce), Spark employs an iterative paradigm. 
+It allows users to load data into memory and perform many operations on the data, this is ideal for a lot of Machine learning problems. 
+The underlying frameworks work on entities called Resilient Distributed Datasets (RDDs) introduced by Zaharia et al.\ \cite{zaharia12}. 
+
+RDD is a read only and partitioned collection of data. 
+It can be created from storage or other RDDs. 
+There are two types operation on RDDs, \textit{transformations} and \textit{actions}. 
+Transformations are operations that will create a new RDD from the existing one, for example \textit{filter} is a transformation operation. 
+The power of RDDs lie in their internal structure, they do not need to be materialized all the time. 
+If an RDD is created using a transformation, it will hold information about how the transformation was made and only apply them to the data once the user requests that through an action or caching of the data set. 
+Actions are operations that will materialize the data set. 
+Users can also ask the RDD to be stored in memory if they know they are going to use it many times. 
+These characteristics of RDD makes them the perfect tool for performing iterative applications. 
+Many machine learning algorithms require iterative calls to the same data set. 
+This is one of MapReduce's deficiencies since every algorithm and job has to be written in terms of Map and Reduces. 
+Spark with the help of RDDs allows many of the well known machine learning algorithms to be implemented easily. 
+With success of Spark, it has become part of the Hadoop framework. Recent versions can now run on top of Yarn and they have integration with HDFS and other Hadoop components. 
+
+A typical Spark program consists of a driver program that launches multiple workers. 
+Worker programs are run on data nodes. 
+Upon execution of a program, Spark will try to send the computation to where the data is, hence minimizing the network traffic. 
+Spark tracks where the RDDs and their partitions are. 
+Figure \ref{fig:sparkprogram} shows a the general overview of how a Spark application is executed.
 
 \begin{figure}[ht!]
 \centering
@@ -429,7 +482,11 @@ A typical Spark program consists of a driver program that launches multiple work
 \end{figure}
 \footnotetext{https://spark.apache.org/} 
 
-Users can control RDDs behavior by persisting it to memory or disk. Tests performed on Spark showed that it is 100 times faster than MapReduce and it is able to run applications that are not even possible to run using MapReduce. Spark is fault tolerant by means of RDDs. Driver always keeps track of the changes made to the RDDs, and they can be recreated from previous stages. So if a node containing some partitions of RDDs is lost, the partitions can be recreated using these information. 
+Users can control RDDs behavior by persisting it to memory or disk. 
+Tests performed on Spark showed that it is 100 times faster than MapReduce and it is able to run applications that are not even possible to run using MapReduce. 
+Spark is fault tolerant by means of RDDs. 
+Driver always keeps track of the changes made to the RDDs, and they can be recreated from previous stages. 
+So if a node containing some partitions of RDDs is lost, the partitions can be recreated using these information. 
  
 \begin{figure}[ht!]
 \centering
@@ -438,7 +495,13 @@ Users can control RDDs behavior by persisting it to memory or disk. Tests perfor
 \label{fig:rdd}
 \end{figure}
 
-Figure \ref{fig:rdd} shows how Spark computes job stages. Boxes with solid outlines are RDDs(A, B, ..., G). Partitions are shaded rectangles, in black if they are cached. To run an action on RDD G, the scheduler builds stages at wide dependencies and pipelines narrow transformations inside each stage. In this case, stage 1 does not need to run since B is cached, so we run 2 and then 3. If any of the stages fail, the computation will restart from the last healthy RDD. Also if a node containing some specific partitions of an RDD fails, the RDD will be transferred to another node and the computation will be restarted. 
+Figure \ref{fig:rdd} shows how Spark computes job stages. 
+Boxes with solid outlines are RDDs(A, B, ..., G). 
+Partitions are shaded rectangles, in black if they are cached. 
+To run an action on RDD G, the scheduler builds stages at wide dependencies and pipelines narrow transformations inside each stage. 
+In this case, stage 1 does not need to run since B is cached, so we run 2 and then 3. 
+If any of the stages fail, the computation will restart from the last healthy RDD. 
+Also if a node containing some specific partitions of an RDD fails, the RDD will be transferred to another node and the computation will be restarted. 
 
 \newpage
 
