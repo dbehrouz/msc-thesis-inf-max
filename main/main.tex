@@ -737,33 +737,40 @@ From the experiments performed in this section, it is obvious that while none of
 Influence maximization gained a lot of attention with introduction of social networks. 
 It is the problem of finding a set of vertices that could maximize the spread of information throughout the network.
 This thesis was set out to study the influence maximization, specially its application in marketing, and its current solutions in detail.
-The study has also sought to provide a breakdown of the advantages and disadvantages of the solutions to influence maximization, and whether these solutions can be applied to graphs of massive scale.
-
-Technological advancement in both software and hardware industry have made collection of data very easy.
-Several organizations are now collecting large amount of data everyday, and using it to better understand their customers and their business.
-Social networks such as Facebook and Twitter have millions of users that perform billions of activities everyday. 
-The information about these users and their activities are stored in graph formats. 
-Processing and analyzing these data is not simple and requires specialized methods.
-Several frameworks for processing large scale datasets have been created over the past couple of years.
-Two of the most common big data frameworks are Hadoop and Spark. 
-They both have built in frameworks for processing large graphs; Giraph which is on top of Hadoop and GraphX on top of Spark. 
+The study has also sought to provide a breakdown of the advantages and disadvantages of the solutions to Influence maximization, specifically in terms of scalability. 
+Three main questions were studied in this thesis: 
+\begin{itemize}
+\item Does the traditional greedy solution to Influence maximization apply to large scale graphs?
+\item What are the characteristics of a solution for large scale graphs?
+\item And how do these solutions compare with the greedy method and with each other in terms of quality?
+\end{itemize}
 
 Both the literature and the empirical findings in this thesis have shown the greedy solution presented by Kempe et al.\ \cite{kempe03} has scalability issues. 
-Although in terms of quality, it is by far the best solution presented so far, but applying it even to small graphs requires a substantial amount of time and resources.
-As shown in this study its inefficiency for large graphs makes it impossible to run.
-Several of the methods discussed in this work, run very fast and they are not greatly affected by the size of the input graph. 
-It was even shown that some of these methods can provide comparable solutions with the greedy method.
+Even on small graphs it requires a substantial amount time and resources.
+The greedy solution has two main flaws that attribute to the scalability problem. 
+First of all, it is iterative, which means it requires tens of thousands of iterations in order to achieve a good solution.
+Secondly, it cannot be parallelized due to the way the algorithm is designed.
+At the core of their computation engines, all big data platforms rely heavily on parallelism.
+Platforms such as Hadoop and Spark, take advantage of big clusters of computers, by breaking down the program into several smaller tasks.
+Each of these tasks are then processed by multiple computation units simultaneously.
+As a result, greedy method cannot be implemented on big data platforms.
+Other solutions that were discussed; Pagerank, Degree and Edge sampling are all parallelizable.
+Pagerank and Degree are simple heuristics that only require local information in the graph, hence the program can be run for all the vertices in parallel.
+The Edge sampling method that was introduced in the thesis, is a combination of the greedy and the heuristics.
+Although it requires some iterations to achieve a better solution, it is parallelizable and can be applied to graphs of any size.
 
 In section \ref{sec:experiments}, several experiments on different data sets were performed.
-The three methods presented; Pagerank, Degree, and Edge sampling performed quite well on real datasets.
-But the results were not consistent. 
-On some datasets, one method performed better than the others, which was not the case in other data sets.
-Experiments on artificial datasets revealed that the shape of the graph, affects the solution provided by each method.
+In terms of quality, the greedy method performs best on small graphs. 
+Pagerank, Degree and Edge sampling also performed quite well on the small data set, although none could match the greedy method.
+But on bigger data sets the greedy method could not provide a solution within a reasonable amount of time.
+All other three methods ran very fast and provided comparable solutions.
+However these solutions were not consistent across different graphs.
+On some graphs, one method performed better than the others, which was not the case in other graphs.
+Experiments on artificial data sets revealed that the shape of the graph affects the solution provided by each method.
 Pagerank and Edge sampling are able to provide a more consistent solution across different types of graphs.
-Whereas, Degree method does not guarantee a good solution all the time and it is affected by the shape of the graph.
-
-All of the methods that are applicable to big graphs fall under the heuristics category. 
-This means that, although the experiments in this thesis showed that Pagerank and Edge sampling are performing very well, they do not guarantee to provide the best solution for every dataset. 
+Whereas, Degree method does not guarantee a good solution all the time and it is heavily affected by the shape of the graph.
+All three methods fall under the heuristics category. 
+This means that, although the experiments in this thesis showed that Pagerank and Edge sampling are performing very well, they do not guarantee to provide the best solution for every data set. 
 Given that these methods run reasonably fast on large graphs, my recommendation is to test all the methods on the desired graph, and choose the one that provides the best solution.
 
 Influence maximization is a vast topic and in this thesis only the basic problem was covered. 
