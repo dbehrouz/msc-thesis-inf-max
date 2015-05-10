@@ -507,7 +507,16 @@ Also if a node containing some specific partitions of an RDD fails, the RDD will
 
 \section{Large Scale Graph Processing Framework}
 \label{sec:biggraph}
-Large data sets come in many different formats. They are not limited to documents, texts, or key value pairs. One of the more common representation of data is \textit{graph}. Not only they contain information about individual entities, but graphs also store information about the relationship between these entities. They have been used in many different fields of science to represent data. The most prominent example of a graph data set is the \textit{World Wide Web}, which is a collection of digital pages on Internet and each page may have links to several other pages. In this section, two of the widely used graph frameworks designed specifically for handling large scale graphs, are discussed in detail. Both of these frameworks have been used to implement the methods discussed in section \ref{sec:experiments}. Interestingly, one common computation model used in many of these graph frameworks is based on a model introduced by Valiant \cite{valiant90} in 1990, called \textit{Bulk Synchronous Parallel} (BSP). A BSP computation model consists of three components: 
+Large data sets come in many different formats. 
+They are not limited to documents, texts, or key value pairs. 
+One of the more common representation of data is \textit{graph}. 
+Not only they contain information about individual entities, but graphs also store information about the relationship between these entities. They have been used in many different fields of science to represent data. 
+The most prominent example of a graph data set is the \textit{World Wide Web}, which is a collection of digital pages on Internet and each page may have links to several other pages. 
+
+In this section, two of the widely used graph frameworks designed specifically for handling large scale graphs, are discussed in detail. 
+Both of these frameworks have been used to implement the methods discussed in section \ref{sec:experiments}. 
+Interestingly, one common computation model used in many of these graph frameworks is based on a model introduced by Valiant \cite{valiant90} in 1990, called \textit{Bulk Synchronous Parallel} (BSP). 
+A BSP computation model consists of three components: 
 \begin{itemize}
 \item
 A component capable of local processing
@@ -517,11 +526,28 @@ A network for transferring messages
 A hardware which synchronizes the components
 \end{itemize}
 
-BSP programs are run in a series of global steps, called \textit{supersteps}. In each superstep, first, every node runs the task assigned to them locally, and then they send messages over the network to other components. Before the next superstep begins, a barrier is set in place that synchronizes all of the nodes and makes sure all the computation and network transfers of the current superstep are finished. Malewicz et al.\ \cite{malewicz10} developed a system called \textit{Pregel} at Google, which is based on the BSP model and is designed for implementing graph related algorithms. Pregel works by using vertices of the graphs as computation nodes; in each superstep, all vertices perform local computations, during this phase they only have access to the data internal to the specific vertex which includes the vertex properties and the messages that were sent to the vertex in the previous superstep. After the computation step is done, all vertices may forward a series of messages to other vertices. The messages are usually send through edges, i.e.\ only vertices connected by an edge communicate with each other, but that is not necessarily the case all the time. Pregel also takes care of the synchronization barrier and makes sure a new superstep does not begin until the current superstep is finished on all of the vertices.
+BSP programs are run in a series of global steps, called \textit{supersteps}. 
+In each superstep, first, every node runs the task assigned to them locally, and then they send messages over the network to other components. 
+Before the next superstep begins, a barrier is set in place that synchronizes all of the nodes and makes sure all the computation and network transfers of the current superstep are finished. 
+Malewicz et al.\ \cite{malewicz10} developed a system called \textit{Pregel} at Google, which is based on the BSP model and is designed for implementing graph related algorithms. 
+Pregel works by using vertices of the graphs as computation nodes.
+In each superstep, all vertices perform local computations.
+During this phase they only have access to the data internal to the specific vertex which includes the vertex properties and the messages that were sent to the vertex in the previous superstep. 
+After the computation step is done, all vertices may forward a series of messages to other vertices. 
+The messages are usually send through edges, i.e.\ only vertices connected by an edge communicate with each other, but that is not necessarily the case all the time. 
+Pregel also takes care of the synchronization barrier and makes sure a new superstep does not begin until the current superstep is finished on all of the vertices.
 
 \subsection{Giraph}
-\textit{Apache Giraph} is an iterative graph processing framework, built on top of Apache Hadoop. It is the open source version of Pregel and is now being actively developed by several companies. It is being used in many real case scenarios. For example, Facebook is using it to analyze the graphs formed by users and their connection with their friends\footnote{https://code.facebook.com/posts/274771932683700/large-scale-graph-partitioning-with-apache-giraph/}. 
-In a typical Giraph program, input graph is usually stored and read from the HDFS, once the program starts, Giraph will read the graph and partition the vertices across several nodes. Users can decide how to partition the vertices based on the type of problems they are trying to solve. Giraph by default use a \textit{Hash Partitioner} to partition the vertices. Generally it is a good idea to provide a custom partitioner that works best with the specific problem that is being solved, for example in most of the Giraph programs, in the communication phase, messages are sent along the edges of the graph, so if vertices that are connected to each other are partitioned to the same computation node, the network overhead will be reduced significantly.    
+\textit{Apache Giraph} is an iterative graph processing framework, built on top of Apache Hadoop. 
+It is the open source version of Pregel and is now being actively developed by several companies. 
+It is being used in many real case scenarios. 
+For example, Facebook is using it to analyze the graphs formed by users and their connection with their friends\footnote{https://code.facebook.com/posts/274771932683700/large-scale-graph-partitioning-with-apache-giraph/}. 
+In a typical Giraph program, input graph is usually stored and read from the HDFS.
+Once the program starts, Giraph will read the graph and partition the vertices across several nodes. 
+Users can decide how to partition the vertices based on the type of problems they are trying to solve. 
+Giraph by default uses a \textit{Hash Partitioner} to partition the vertices. 
+Generally it is a good idea to provide a custom partitioner that works best with the specific problem that is being solved. 
+For example in most of the Giraph programs, in the communication phase, messages are sent along the edges of the graph, so if vertices that are connected to each other are partitioned to the same computation node, the network overhead will be reduced significantly.    
 Figure \ref{fig:giraph} shows how computation is done in Giraph.
 \begin{figure}[ht!]
 \centering
@@ -530,8 +556,14 @@ Figure \ref{fig:giraph} shows how computation is done in Giraph.
 \label{fig:giraph}
 \end{figure}
 \footnotetext{http://giraph.apache.org/}
-Each Giraph cluster has a master node and one or more worker nodes. Master node has the responsibility of reading the graph and partitioning it based on the given partitioner, coordinate the job and the supersteps. Master node is also responsible for the synchronization of vertices and making sure that a new superstep does not begin until all the vertices have finished their computation. Each worker node contains several vertices and run the actual program, and coordinate with the master and other nodes through a set of messages send along the edges or directly to other vertices. Vertices in a Giraph program can be in either of the two states; \textit{Active} or \textit{Not Active}, generally the program continues until all the vertices are active. Vertices themselves are responsible for setting their status after they have finished computing. If a vertex receives a message from other vertices, its state will automatically change to Active.
-
+Each Giraph cluster has a master node and one or more worker nodes. 
+Master node has the responsibility of reading the graph and partitioning it based on the given partitioner, coordinate the job and the supersteps. 
+Master node is also responsible for the synchronization of vertices and making sure that a new superstep does not begin until all the vertices have finished their computation. 
+Each worker node contains several vertices and run the actual program, and coordinate with the master and other nodes through a set of messages send along the edges or directly to other vertices. 
+Vertices in a Giraph program can be in either of the two states; \textit{Active} or \textit{Not Active}.
+Generally the program continues while all the vertices are active. 
+Vertices themselves are responsible for setting their status after they have finished computing. 
+If a vertex receives a message from other vertices, its state will automatically change to Active.
 The figure \ref{fig:sssp} shows supersteps involved with computing the single source shortest path for a simple graph.
 \begin{figure}[ht!]
 \centering
@@ -541,20 +573,37 @@ The figure \ref{fig:sssp} shows supersteps involved with computing the single so
 \end{figure}
 \footnotetext{http://giraph.apache.org/intro.html}
 
-The input graph consists of 3 vertices, and 2 edges. The goal of the program is to find the shortest path from every vertex to the left most vertex. Red lines separate supersteps and in the first superstep, the value of all the vertices except for the source is assigned to infinity. At the end of each superstep, distance upper bounds (vertex value + smallest edge value) is send to the destination of the edges and vertices's values are set to the smallest message they have received. The execution stops when all the vertices have the distance from the source vertex. 
+The input graph consists of 3 vertices, and 2 edges. 
+The goal of the program is to find the shortest path from every vertex to the left most vertex. 
+Red lines separate supersteps and in the first superstep, the value of all the vertices except for the source is assigned to infinity. 
+At the end of each superstep, distance upper bounds (vertex value + smallest edge value) is send to the destination of the edges and vertices's values are set to the smallest message they have received. 
+The execution stops when all the vertices have the distance from the source vertex. 
 
-The input is a chain graph with three vertices (black) and two edges (green). The values of edges are 1 and 3 respectively. The algorithm computes distances from the leftmost vertex. The initial values of vertices are 0, $\infty$ and $\infty$ (top row). Distance upper bounds are sent as messages (blue), resulting in updates to vertex values (successive rows going down). The execution lasts three supersteps (separated by red lines).
-
-Although Giraph has many advantages over MapReduce, it is still has some limitations, in one Giraph job many iterations can be done, but if graphs should go through several transformations, that would require multiple Giraph jobs, which means that the data has be written to HDFS after each job. This adds a lot of IO overhead. A lot of the Machine learning and graph problems are iterative in nature, which will cause Giraph to have severe performance issues in some of these cases.
+Although Giraph has many advantages over MapReduce, it is still has some limitations.
+In one Giraph job many iterations can be done, but if graphs should go through several transformations, that would require multiple Giraph jobs, which means that the data has be written to HDFS after each job. 
+This adds a lot of IO overhead. 
+A lot of the Machine learning and graph problems are iterative in nature, which will cause Giraph to have severe performance issues in some of these cases.
 
 \subsection{GraphX}
-\textit{GraphX} is a light API written on top of Spark. It uses the powerfull RDD abstraction as the basis of its computation, by storing vertices and edges in separate RDDs. Similar to Spark, it works well for iterative algorithms and it comes packaged with many of the well known graph algorithms such as, PageRank, Label Propagation, Connected Components and others.  Several important components of GraphX are:
+\textit{GraphX} is a light API written on top of Spark. 
+It uses the powerful RDD abstraction as the basis of its computation, by storing vertices and edges in separate RDDs. 
+Similar to Spark, it works well for iterative algorithms and it comes packaged with many of the well known graph algorithms such as, PageRank, Label Propagation, Connected Components and others. 
+Several important components of GraphX are:
 \begin{itemize}
-\item VertexRDD: an RDD object consists of a vertex id and a data type. It carries some features in comparison to the traditional RDD, such as ensuring vertex ids are unique, optimized joins among different vertex groups. It offers several methods for mapping values, filtering vertices(while preserving their id) and finding difference of two vertex groups.
-\item EdgeRDD: similar to VertexRDD, it is a subclass of RDD, which organizes the edges into blocks based on some predefined partitioning strategies. It supports three extra methods; \textit{mapValues} which maps the values while preserving the structure, \textit{reverse} which reverse the edge directions while preserving the attributes, and \textit{innerJoin} which joins two EdgeRDD objects, using the source and destination ids as keys. 
+\item VertexRDD: an RDD object consists of a vertex id and a data type. 
+It carries some extra features in comparison to the traditional RDDs, such as ensuring vertex ids are unique and optimized joins among different vertex groups. 
+It offers several methods for mapping values, filtering vertices(while preserving their id) and finding difference of two vertex groups.
+\item EdgeRDD: similar to VertexRDD, it is a subclass of RDD, which organizes the edges into blocks based on some predefined partitioning strategies. 
+It supports three extra methods; \textit{mapValues} which maps the values while preserving the structure, \textit{reverse} which reverse the edge directions while preserving the attributes, and \textit{innerJoin} which joins two EdgeRDD objects, using the source and destination ids as keys. 
 \end{itemize}
-The key feature of GraphX comes from the way vertices and edges are stored. GraphX employs different partitioning strategies for storing vertices and edges and while each one have their own advantages and disadvantages, the overall goal is to reduce the amount of communication along edges and have all the vertices close to each other in one computation node to avoid network traffic. The details of GraphX and how it behaves under the hood are beyond the scope of this document. Xin et al. \cite{xin13} described GraphX in detail and GraphX website  \footnote{https://spark.apache.org/graphx/} includes more information about the internal architecture of the system.
-GraphX also provides a Pregel like API, that users should only provide the vertex program and the communication strategy. This is one of main advantages of GraphX over Giraph and other similar graph processing frameworks. A GraphX's graph is like any other object in Spark environment, and all the transformations and actions available in Spark package can be applied to vertices and edges of the graph. 
+The key feature of GraphX comes from the way vertices and edges are stored. 
+GraphX employs different partitioning strategies for storing vertices and edges.
+While each one have their own advantages and disadvantages, the overall goal is to reduce the amount of communications along the edges by having all the vertices close to each other in one computation node to avoid network traffic. 
+The details of GraphX and how it behaves under the hood are beyond the scope of this document. 
+Xin et al. \cite{xin13} described GraphX in detail and GraphX website\footnote{https://spark.apache.org/graphx/} includes more information about the internal architecture of the system.
+GraphX also provides a Pregel like API, that users should only provide the vertex program and the communication strategy. 
+This is one of main advantages of GraphX over Giraph and other similar graph processing frameworks. 
+A GraphX's graph is like any other object in Spark environment, and all the transformations and actions available in Spark package can be applied to vertices and edges of the graph. 
 
 \newpage
 
