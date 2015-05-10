@@ -50,12 +50,6 @@ In this thesis work, some of the current influence maximization algorithms are i
 \end{abstract}
 
 \mytableofcontents
-% get rid of a lot of the and
-% a bit shorter sentences
-% opening statement, first paragraphs is too deep, 
-% second paraghraphs is a better opening statement
-% define graph separately in chapter two
-% 
 \section{Introduction}
 Over the past two decades with the introduction of social networks, the study of interactions between people have gained a lot of attention.
 Social networks, represented using a graph of relationships between people, carry a lot of information about the individuals. 
@@ -116,31 +110,74 @@ Several methods either novel or based on previous methods are proposed and the i
 In section \ref{sec:experiments} and \ref{sec:resanddis} details of experiments and their results are explained. 
 And finally, section \ref{sec:conclusion} concludes the thesis and mentions future works and open problems related to influence maximization.
 
-
 \newpage
 
 \section{Influence Maximization}
 \label{sec:influencemax}
-Effective marketing and advertisement methods have been a major application of Knowledge Discovery and Data mining. Prior to Domingo and Richardson \cite{domingo01} the focus has always been on direct marketing. Contrary to traditional mass marketing, where a product was marketed to all the customers, in direct marketing the goal is to find the most potential and profitable costumers. While direct marketing is a great tool for increasing the profit, it only targets individuals and disregards the relationship between users. People's decision in purchasing an item is not only influenced by the product itself, but also by friends, colleagues and acquaintances. With introduction of Internet and social networks, gathering information about users became easier and more feasible. Social networks nowadays contain information about millions of people, they also contain information related to people's relationship with each other. Utilizing these information can make marketing more profitable, by targeting people that are more likely to promote the product to their acquaintances. 
-Domingo and Richardson \cite{domingo01} discussed the use case of influence maximization in marketing, calling it \textit{Viral Marketing}. By modeling a market as a social network consisting of users and products. In such a network, probability of users buying products not only depends on the product itself but also on the neighbors of the user and the set of marketing actions being applied to the network. Hence the market can be formulated as join probability distribution. 
-Through these a function was devised that calculates the global lift in profit given a marketing action was applied to some users. Starting from an initial configuration, using different optimization algorithms a local maxima for the function can be reached. 
-They experimented on a collaborative filtering data set (MovieLens\footnote{https://movielens.org/}) in which users have rated a list of movies. They have first constructed the network with the user ratings, by choosing similar users (calculating the Pearson correlation coefficient of users) as neighbors. They have performed experiments on the data set and compared their method with mass marketing and direct marketing. Their method has increased the profit the most. Due to non-linearity of the model, it did not scale well for bigger size networks, hence they have proposed a new linear model in another paper \cite{domingo02}. Not only the new model decreased the computation time, they simplified equation for calculating the network value of customers, and made it easier to incorporate more complex marketing action. They have experimented with Epinions\footnote{http://www.epinions.com/} data set, which is a website where users can rate items. It also has a feature called trusted users, where each user can select many other users as trusted sources of reviews. Domingo et al.\ \cite{domingo02}, hence, applied their model to the dataset, by considering trusted users of a user as his neighbors. Their experiments showed that a continuous marketing action (a marketing action that can have unlimited values, such as a discount) performs much better than boolean marketing actions (one that can either be true or false, such as whether or not a discount should be given to a user with no regards for the amount of the discount). These two papers, are considered the first works in influence maximization, several other authors have used the concepts here to further improve and propose new methods for calculating the spread of nodes through a network.
+Effective marketing and advertisement methods have been a major application of Knowledge Discovery and Data mining. 
+Prior to Domingo and Richardson \cite{domingo01} the focus has always been on direct marketing. 
+Contrary to traditional mass marketing, where a product was marketed to all the customers, in direct marketing the goal is to find the most potential and profitable costumers. 
+While direct marketing is a great tool for increasing the profit, it only targets individuals and disregards the relationship between users. People's decision in purchasing an item is not only influenced by the product itself, but also by friends, colleagues and acquaintances. 
+With introduction of Internet and social networks, gathering information about users became easier and more feasible. 
+Social networks nowadays contain information about millions of people.
+They also contain information related to people's relationship with each other. 
+Utilizing these information can make marketing more profitable, by targeting people that are more likely to promote the product to their acquaintances. 
+
+Domingo and Richardson \cite{domingo01} discussed the use case of influence maximization in marketing, calling it \textit{Viral Marketing}. 
+They have modeled a market as a social network consisting of users and products. 
+In such a network, probability of users buying products not only depends on the product itself but also on the neighbors of the user and the set of marketing actions being applied to the network. 
+Hence the market can be formulated as join probability distribution. 
+Through these a function was devised that calculates the global lift in profit given a marketing action was applied to some users. 
+Starting from an initial configuration, using different optimization algorithms a local maxima for the function can be reached. 
+They experimented on a collaborative filtering data set (MovieLens\footnote{https://movielens.org/}) in which users have rated a list of movies. They have first constructed the network with the user ratings, by choosing similar users (calculating the Pearson correlation coefficient of users) as neighbors. 
+They have performed experiments on the data set and compared their method with mass marketing and direct marketing. 
+Their method has increased the profit the most. 
+Due to non-linearity of the model, it did not scale well for bigger size networks, hence they have proposed a new linear model in another paper \cite{domingo02}. 
+Not only the new model decreased the computation time, they simplified the equation for calculating the network value of customers, and made it easier to incorporate more complex marketing action. 
+They have experimented with Epinions\footnote{http://www.epinions.com/} data set, which is a website where users can rate items. 
+It also has a feature called trusted users, where each user can select many other users as trusted sources of reviews. 
+Domingo et al.\ \cite{domingo02}, hence, applied their model to the data set, by considering trusted users of a user as his neighbors. 
+Their experiments showed that a continuous marketing action (a marketing action that can have unlimited values, such as a discount) performs much better than boolean marketing actions (one that can either be true or false, such as whether or not a discount should be given to a user with no regards for the amount of the discount). 
+
+These two papers, are considered the first works in influence maximization. 
+Several other authors have used the concepts here to further improve and propose new methods for calculating the spread of nodes through a network.
 
 \subsection{Information Diffusion Models}
-With introduction of Social Networks, the topic of information diffusion has gain interest in research community. Information diffusion models describe how information and data are being propagated and transferred in social networks. Information diffusion is not only limited to social networks, for many years the topic has been studied to better understand for example how a disease is being spread among people or how contaminated water would affect a water pipe network. In influence maximization, two information diffusion models stand out among others. 
+With introduction of Social Networks, the topic of information diffusion has gain interest in research community. 
+Information diffusion models describe how information and data are being propagated and transferred in social networks. 
+Information diffusion is not only limited to social networks, for many years the topic has been studied to better understand for example how a disease is being spread among people or how contaminated water would affect a water pipe network. 
+In influence maximization, two information diffusion models stand out among others. 
 
 \begin{itemize}
 \item Linear Threshold Model:\\
-Consider a graph $G=(V,E)$, and all nodes being either active or non-active. Inactive nodes may become active as more of their neighbors become active but the reverse is not possible. In \textit{Linear Threshold Model (LT)}, each node $v$ is influenced by each of its neighbor $u$ according to a weight $b_{u,v}$ such that $\sum \nolimits_{u \, neighbor \, of \, v} b_{u,v} \leq 1$. The process starts with an initial set of active nodes and at the beginning of the process each node $v$ will randomly chose a weight threshold $0 < \theta_v<1 $, this value determines the tendency of node $v$ to become active. The diffusion process moves forward deterministically in series of discrete time steps $t$ and continues until no new nodes become active. In each time step $t$, all of the active nodes from step $t-1$ remain active and any non-active node $v$ is activated if $\sum \nolimits_{u \, active neighbor \, of \, v} b_{u,v} \geq \theta_v$. $\theta_v$ is chosen randomly to indicate our lack of knowledge about node's influenceability.  
+Consider a graph $G=(V,E)$, where all the nodes can be either active or non-active. 
+Inactive nodes may become active as more of their neighbors become active but the reverse is not possible. 
+In \textit{Linear Threshold Model (LT)}, each node $v$ is influenced by each of its neighbor $u$ according to a weight $b_{u,v}$ such that $\sum \nolimits_{u \, neighbor \, of \, v} b_{u,v} \leq 1$. 
+The process starts with an initial set of active nodes and at the beginning of the process each node $v$ will randomly chose a weight threshold $0 < \theta_v<1 $, this value determines the tendency of node $v$ to become active. 
+The diffusion process moves forward deterministically in a series of discrete time steps $t$ and continues until no new node becomes active. In each time step $t$, all of the active nodes from step $t-1$ remain active and any non-active node $v$ is activated if $\sum \nolimits_{u \, active neighbor \, of \, v} b_{u,v} \geq \theta_v$. 
+$\theta_v$ is chosen randomly to indicate our lack of knowledge about node's influenceability.  
 
 \item Independent Cascade Model:\\ 
- \textit{Independent Cascade Model (IC)} is a stochastic undeterministic process. Same as linear threshold model, it starts with an initial set of active nodes and the process continues in a series of discrete time steps. In each time step $t$, all of the active nodes from step $t-1$ will remain active and any node that was activated in step $t-1$ tries to activate all of its neighbors. The probability of a node $u$ activating one of its neighbors $v$ is defined by a system property $p_{u,v}$. The process continues until no more new nodes can become active. Every node will try to activate its neighbors independently of other nodes, and if during one time step, a node $v$ first becomes active by node $u$ the rest of $v$'s neighbors can skip the activation process. It is important to note that in each time step only nodes that became active in the previous time step will try to activate their neighbors, that means each activated node will only have one chance of activating its neighbors in the entire diffusion process. In classical Independent Cascade, the activation probability $p_{u,v}$ (probability of $u$ activating $v$) is defined as a system property and it either takes one constant value or a value randomly chosen from a small set of values. There are different methods for choosing the activation probability, and some of them are described in section \ref{subsec:learninginfprob}. 
+\textit{Independent Cascade Model (IC)} is a stochastic undeterministic process. 
+Same as linear threshold model, it starts with an initial set of active nodes and the process continues in a series of discrete time steps. 
+In each time step $t$, all of the active nodes from step $t-1$ will remain active and any node that was activated in step $t-1$ tries to activate all of its neighbors. 
+The probability of a node $u$ activating one of its neighbors $v$ is defined by a system property $p_{u,v}$. 
+The process continues until no more new nodes can become active. 
+Every node will try to activate its neighbors independently of other nodes, and if during one time step, a node $v$ first becomes active by node $u$ the rest of $v$'s neighbors can skip the activation process. 
+It is important to note that in each time step only nodes that became active in the previous time step will try to activate their neighbors.
+This means each activated node will only have one chance of activating its neighbors in the entire diffusion process. 
+In classical Independent Cascade, the activation probability $p_{u,v}$ (probability of $u$ activating $v$) is defined as a system property and it either takes one constant value or a value randomly chosen from a small set of values. 
+There are different methods for choosing the activation probability, and some of them are described in section \ref{subsec:learninginfprob}. 
 \end{itemize}
 
 
 \subsection{Influence Maximization Problem}
-Kempe et al.\ \cite{kempe03} were the first to formulate Influence maximization as an optimization problem and proved that the problem is NP-complete. By studying how influence propagates through networks using the two diffusion models discussed earlier (IC and LT), they have formally expressed Domingos and Richardson's \cite{domingo01} optimization problem in the context of the above models. Both diffusion models involve an initial set of nodes $A$, the influence of the set $A$ denoted by $\sigma (A)$ is then defined as the number of nodes at the end of the process. Formally, the influence maximization problem can be defined as: \\
-Given a graph $G=(V,E)$, find a subset $A\subseteq V$, that maximizes the function $f(A)$, which is the size of the spread function $\sigma(A)$ under either of the diffusion models subject to $|A| = k$ where $k$ is the budget. Mathematically it is defined as:
+Kempe et al.\ \cite{kempe03} were the first to formulate Influence maximization as an optimization problem and proved that the problem is NP-hard. 
+By studying how influence propagates through networks using the two diffusion models discussed earlier (IC and LT), they have formally expressed Domingos and Richardson's \cite{domingo01} optimization problem in the context of the above models. 
+Both diffusion models involve an initial set of nodes $A$, the influence of the set $A$ denoted by $\sigma (A)$ is then defined as the number of nodes at the end of the process. 
+Formally, the influence maximization problem can be defined as: \\
+Given a graph $G=(V,E)$, find a subset $A\subseteq V$, that maximizes the function $f(A)$, which is the size of the spread function $\sigma(A)$ under either of the diffusion models subject to $|A| = k$ where $k$ is the budget. 
+Mathematically it is defined as:
 \begin{center}
 \begin{itemize}
 \item $A =  \argmax_{A \in \mathcal P_k(V) } f(A)$
@@ -149,7 +186,8 @@ Given a graph $G=(V,E)$, find a subset $A\subseteq V$, that maximizes the functi
 \end{center}
 Finding the optimal set is NP-hard but they proposed an approximation algorithm for the problem which guarantees the solution to be a factor of $(1 - 1/ \mathrm{e} - \varepsilon)$ of the optimal solution (slightly better that 63\%). 
 Approximate solution for these models is developed based on \textit{submodular functions} by Nemhauser et al.\ \cite{nemhauser78}.
-A function $f$ is \textit{submodular} if it satisfies a natural ''diminishing returns'' property. It means that the marginal gain of adding a node $v$ to a set $A$ is always greater than or equal to adding $v$ to a super set of $A$ . 
+A function $f$ is \textit{submodular} if it satisfies a natural ''diminishing returns'' property. 
+It means that the marginal gain of adding a node $v$ to a set $A$ is always greater than or equal to adding $v$ to a super set of $A$ . 
 \begin{center}
 $f(A \cup \{v\}) - f(A) \geq f(S \cup \{v\}) - f(S)$, where $A \subseteq S$
 \end{center}
@@ -172,11 +210,26 @@ The greedy algorithm proposed by Kempe et al.\ \cite{kempe03} is described in Al
 \State Output $S$: Set of initial active vertices
 \end{algorithmic}
 \end{algorithm}
-\\
-They have run experiments on co-authorship in physics theory section of arXiv \footnote{www.arxiv.org} dataset. The results show that their greedy algorithm performs better than other methods such as random selection, high-degree or central nodes .
-Both in estimating the spread and also in the greedy method, $\sigma(S)$ has to be calculated, but since both of the diffusion processes involve random elements($\theta_v$ in Linear Threshold and activation of new nodes in Independent Cascade) to achieve a better estimate of the total spread, the models have to be run many times and the spread is calculated as the average of all the runs. The nature of the spread function makes the algorithm highly non scalable. Even on medium sized graphs running the simulation will take a lot of time, but on the other hand a good solution is only guaranteed if the simulation is run many times. The value of $\sigma(v)$ does not only depend on $v$ itself, but it also depends on the other active nodes. Hence in each iteration of the algorithm where a new node is added to the active vertices list, the value of $\sigma(v)$ has to be recalculated. This will greatly affect the performance of the greedy method.
-Leskovec et al.\ \cite{leskovec07}  in their Cost effective outbreak detection in networks, took upon the task of optimizing the greedy method used in propagation in graph networks. Although they did not work on solving the problem of maximizing influence, they have proven their method can be adapted to the problem of maximizing the influence using the greedy algorithm. They studied two problems from different domains which share some similarities with influence maximization. The first problem is finding the best placement of sensors in a water network, so that contaminated water can be detected as quickly as possible. The other problem is blog network, which is to find blogs that contains the maximum amount of news that cascades from different sources in shortest possible time. Their advanced greedy method, called \textit{CELF}, utilizes the submodularity of the objective function, which reduces the amount of computation needed to be made in each iteration. Their method is 700 times faster than a simple greedy function. 
-Their observation is that, if $A$ is subset of $B$, the marginal gain of adding a node to $B$ is always less than or equal to the marginal gain of the adding the same node to $A$. Hence instead of recomputing the gain for all the node in each iteration, we can go through the nodes in decreasing order of their spread and recompute their values, the change is usually very small and most of the time the value on top of the list stays on top. Algorithm \ref{alg:celf} describes CELF method.
+They have run experiments on co-authorship in physics theory section of arXiv \footnote{www.arxiv.org} data set. 
+The results show that their greedy algorithm performs better than other methods such as random selection, high-degree or central nodes.
+Both in estimating the spread and also in the greedy method, $\sigma(S)$ has to be calculated.
+But since both of the diffusion processes involve random elements($\theta_v$ in Linear Threshold and activation of new nodes in Independent Cascade) to achieve a better estimate of the total spread, the models have to be run many times and the spread is calculated as the average of all the runs. 
+The nature of the spread function makes the algorithm highly non scalable. 
+Even on medium sized graphs running the simulation will take a lot of time, but on the other hand a good solution is only guaranteed if the simulation is run many times. 
+The value of $\sigma(v)$ does not only depend on $v$ itself, but it also depends on the other active nodes. 
+Hence in each iteration of the algorithm where a new node is added to the active vertices list, the value of $\sigma(v)$ has to be recalculated. This will greatly affect the performance of the greedy method.
+
+Leskovec et al.\ \cite{leskovec07}  in their Cost effective outbreak detection in networks, took upon the task of optimizing the greedy method. 
+Although they did not work on solving the problem of maximizing influence, they have proven their method can be adapted to the problem of maximizing the influence using the greedy algorithm. 
+They studied two problems from different domains which share some similarities with influence maximization. 
+The first problem is finding the best placement of sensors in a water network, so that contaminated water can be detected as quickly as possible. 
+The other problem is blog network, which is to find blogs that contains the maximum amount of news that cascades from different sources in shortest possible time. 
+Their advanced greedy method, called \textit{CELF}, utilizes the submodularity of the objective function, which reduces the amount of computation needed to be made in each iteration. 
+Their method is 700 times faster than a simple greedy function. 
+Their observation is that, if $A$ is subset of $B$, the marginal gain of adding a node to $B$ is always less than or equal to the marginal gain of adding the same node to $A$. 
+Hence, instead of recomputing the gain for all the node in each iteration, we can go through the nodes in decreasing order of their spread and recompute their values.
+The change is usually very small and most of the times the value on top of the list stays on top. 
+Algorithm \ref{alg:celf} describes CELF method.
 \begin{algorithm}[ht!]
 \floatname{algorithm}{Algorithm}
 \caption{CELF Algorithm \cite{leskovec07}}
@@ -199,23 +252,45 @@ Their observation is that, if $A$ is subset of $B$, the marginal gain of adding 
 \State Output $S$: Set of initial active vertices
 \end{algorithmic}
 \end{algorithm}
-As can be seen from the algorithm description, the difference between CELF and the normal Greedy method, is that in CELF, $delta_v$ is pre-calculated for all the vertices first, then starting from the biggest value, in each iteration $\delta_u$ is recalculated for vertex $u$ if the value is still higher than the next vertex in the list, then node $u$ is added to $S$ otherwise the next vertex is chosen. As in the previous algorithm, $\sigma(v)$ is the expected spread of the node $v$ under the IC model. 
-\\Chen et al.\ \cite{chen09} proposed several different methods for solving the problem of influence maximization. The first group of algorithms, were improvements upon Kempe et al.\ \cite{kempe03} and Leskovec et al.\ \cite{leskovec07} greedy methods. In their greedy method, they have modified the simulation process. Instead of trying to activate nodes based on the edge probability one by one, they have first created a new Graph $G'$ which is sampled from the original graph based on the edge probability. Now the process of estimating the spread of initial set $S$ is just finding the number of reachable nodes in $G'$ from $S$, this process is repeated many times and the result is the average for all of the $G'$ sampled Graphs. Although this method is much faster than the original greedy method, it cannot compete with CELF \cite{leskovec07} method, since in their method only in the first iteration the spread for all the nodes are calculated and from the second iteration onward, due to submodularity only the spread for a few of the nodes are recalculated. Hence, they have combined their new Greedy method with CELF, where in the first iteration they use the sample graphs to calculate the spread and in the following iterations CELF is used. The second class of algorithms they have proposed are a set of heuristics for finding the seed set that maximizes the influence. Prior to their work, heuristics have been considered inferior to the Greedy method and while that is true for many of the heuristics, such as degree, random, distance and etc., their proposed heuristic called \textit{DegreeDiscountIC} managed to achieve almost the same spread with the greedy method while outperforming the greedy methods by orders of magnitude. Details of the algorithm DegreeDiscountIC is explained in section \ref{sec:bigdatanetworkinfluelncemaximization}.
+As can be seen from the algorithm description, the difference between CELF and the normal Greedy method, is that in CELF, $delta_v$ is pre-calculated for all the vertices first, then starting from the biggest value, in each iteration $\delta_u$ is recalculated for vertex $u$ if the value is still higher than the next vertex in the list, then node $u$ is added to $S$ otherwise the next vertex is chosen. 
+As in the previous algorithm, $\sigma(v)$ is the expected spread of the node $v$ under the IC model. 
 
-Other notable heuristic method is of Saito and Kimura \cite{kimura06}. They have investigated the scalability issue of IC model's simulations. They have argued that currently IC model requires many iterations of simulation and each iteration took a lot of processing time and power. They have proposed two natural special cases of the IC model that provide a good estimate of the spread without the need for running the simulations. They define the Shortest-Path Model(SPM) which is a special case of the IC model in which each node $v$ has the chance to become active only at step = $d(S,v)$, where if $S$ is the initial set, $d(S,v)$ is the distance of $S$ to node $v$. This means that each node is activated only through the shortest paths from the initial active set. The other model they have proposed named SP1M, which is each node v has the chance to become active only at steps $t = d(S,v)$ and $t =d(S,v) + 1$. Through these two models they have proposed methods for calculating the spread of an initial active set $S$. They have proved that the result achieved using this method is also within a bound of the best solution. In their experiments, they have assigned a uniform probably to each edge with two different values $p = 0.1$ and $p =0.01$. The experiments showed that the estimation of the spread for IC model increases as p increases while the processing times for the SPM and SP1M hardly changes. 
+Chen et al.\ \cite{chen09} proposed several different methods for solving the problem of influence maximization. 
+The first group of algorithms, were improvements upon Kempe et al.\ \cite{kempe03} and Leskovec et al.\ \cite{leskovec07} greedy methods. In their greedy method, they have modified the simulation process. 
+Instead of trying to activate nodes based on the edge probability one by one, they have first created a new Graph $G'$ which is sampled from the original graph based on the edge probability. 
+Now the process of estimating the spread of initial set $S$ is just finding the number of reachable nodes in $G'$ from $S$, this process is repeated many times and the result is the average for all of the $G'$ sampled Graphs. 
+Although this method is much faster than the original greedy method, it cannot compete with CELF \cite{leskovec07} method, since in their method only in the first iteration the spread for all the nodes are calculated and from the second iteration onward, due to submodularity only the spread for a few of the nodes are recalculated. 
+Hence, they have combined their new Greedy method with CELF, where in the first iteration they use the sample graphs to calculate the spread and in the following iterations CELF is used. 
+The second class of algorithms they have proposed are a set of heuristics for finding the seed set that maximizes the influence. 
+Prior to their work, heuristics have been considered inferior to the Greedy method and while that is true for many of the heuristics, such as degree, random, distance and etc., their proposed heuristic called \textit{DegreeDiscountIC} managed to achieve almost the same spread with the greedy method while outperforming the greedy methods by orders of magnitude. 
+Details of the algorithm DegreeDiscountIC is explained in section \ref{sec:bigdatanetworkinfluelncemaximization}.
 
-Cheng et al.\ \cite{cheng13} have addressed both the accuracy and scalability of the solutions using the greedy methods. They have pointed out the main bottleneck in methods based on Kempe et al.\ \cite{kempe03} are in the Monte Carlo simulation steps. They have proven that the objective function is not entirely sub-modular due to the randomness in the simulations, and hence to compensate for that many Monte Carlo simulations have to be run in each step of the algorithm which greatly reduces the performance.
-They proposed a new method called \textit{StaticGreedy} which computes a series of snapshots at the beginning of the algorithm and reuses those for every step of the greedy algorithm. A snapshot is a Graph $G'=(V,E')$, which is a subgraph of G where an edge $E(u,v)$ is remained with the probability $p(u,v)$ and deleted otherwise. 
+Other notable heuristic method is of Saito and Kimura \cite{kimura06}. 
+They have investigated the scalability issue of IC model's simulations. 
+They have argued that currently IC model requires many iterations of simulation and each iteration took a lot of processing time and power. They have proposed two natural special cases of the IC model that provide a good estimate of the spread without the need for running the simulations. 
+They define the Shortest-Path Model(SPM) which is a special case of the IC model in which each node $v$ has the chance to become active only at step = $d(S,v)$, where if $S$ is the initial set, $d(S,v)$ is the distance of $S$ to node $v$. 
+This means that each node is activated only through the shortest paths from the initial active set. 
+The other model they have proposed named SP1M, which is each node $v$ has the chance to become active only at steps $t = d(S,v)$ and $t =d(S,v) + 1$. 
+Through these two models they have proposed methods for calculating the spread of an initial active set $S$. 
+They have proved that the result achieved using this method is also within a bound of the best solution. 
+In their experiments, they have assigned a uniform probably to each edge with two different values $p = 0.1$ and $p =0.01$. 
+The experiments showed that the estimation of the spread for IC model increases as $p$ increases while the processing times for the SPM and SP1M hardly changes. 
+
+Cheng et al.\ \cite{cheng13} have addressed both the accuracy and scalability of the solutions using the greedy methods. 
+They have pointed out the main bottleneck in methods based on Kempe et al.\ \cite{kempe03} are in the Monte Carlo simulation steps. 
+They have proven that the objective function is not entirely sub-modular due to the randomness in the simulations, and hence to compensate for that many Monte Carlo simulations have to be run in each step of the algorithm which greatly reduces the performance.
+They proposed a new method called \textit{StaticGreedy} which computes a series of snapshots at the beginning of the algorithm and reuses those for every step of the greedy algorithm. 
+A snapshot is a Graph $G'=(V,E')$, which is a subgraph of G where an edge $E(u,v)$ is remained with the probability $p(u,v)$ and deleted otherwise. 
 Before the main steps of the algorithm many snapshots are produced and averaged to estimate the spread function. 
-Two main difference between this method and the previous ones are :
+Two main differences between this method and the previous ones are:
 \begin{itemize}
 \item
 Monte Carlo simulations are conducted on static snapshots, which are sampled before the greedy process of selecting seed nodes
 \item
 The same set of snapshots are reused in every iteration to estimate the influence spread of the active set, which explains the meaning of ''static''
 \end{itemize}
-
-They have performed experiment and compared their methods with the normal Greedy methods. None of the other greedy methods are any match with StaticGreedy in terms of speed and scalability.
+They have performed experiment and compared their methods with the normal Greedy methods. 
+None of the other greedy methods are any match with StaticGreedy in terms of speed and scalability.
 \begin{algorithm}[ht!]
 \floatname{algorithm}{Algorithm}
 \caption{UBLF Algorithm  \cite{zhuo13}}
@@ -243,16 +318,44 @@ They have performed experiment and compared their methods with the normal Greedy
 \end{algorithmic}
 \end{algorithm}
 
-Zhuo et al.\ \cite{zhuo13} propsed a new Greedy algorithm called \textit{Upper Bound based Lazy Forward algorithm(UBLF)}. They have tried to bound the number of Monte Carlo simulation calls, similar to CELF algorithm \cite{leskovec07}. CELF increased the speed of the original algorithm by a factor 700 on average case, but still on its first iteration it has to calculate the spread of every vertex, that means Monte Carlo simulations have to be run for all the vertices in the first iteration, and it was argued before, that while that is reasonably fast and will give good result on small networks, it will not perform well on medium sized graphs let alone large scale graphs. To that extent, even running the simulations for all the vertices once is not feasible. Zhuo et al.\ \cite{zhuo13} provided a mathematically proven upper bound for spread function of any initial set. In UBLF, instead of running simulations for each vertex in the first iteration, they find the upper bound which can be found in constant time. Having the initial values for all the nodes, they used the same technique as CELF, and instead of the calculating the expected spread for all the nodes, they started calculating the spread for vertices in order of their initial estimated spread, if the estimated spread was still bigger than the rest of nodes, the node was chosen and added to the seed set. Computation continues until desired number of initial seeds are achieved. Algorithm \ref{alg:ublf} describes UBLF. The matrix $PP$ is constructed from the graph, where each value $(u,v)$ in the matrix corresponds to the edge $e=(u,v)$; value of the edge that connects $u$ to $v$. $S$ consists of the seed set, the output of the algorithm i.e.\ nodes with highest influence propagation and $I$ is the \textit{identity matrix}. Before starting the iterative process, vector $\delta$ is calculated. In each iteration of the algorithm, vertices with the maximum $\delta$ are chosen, if Monte Carlo simulation is not yet run for them, the algorithm will run the simulation, if the value of $\delta_u$ is still greater than the node with second highest $\delta$ then $u$ is added to to the set $S$ . The process continues for $k$ iteration, where $k$ is the desired size of the output. $\sigma(v)$ is the expected spread of $v$ under the \textit{IC} model. Experimental results shows that UBLF manages to reduce more than $95\%$ Monte Carlo simulations needed and is at least 2 to 5 times faster than CELF method.
+Zhuo et al.\ \cite{zhuo13} propsed a new Greedy algorithm called \textit{Upper Bound based Lazy Forward algorithm(UBLF)}. 
+They have tried to bound the number of Monte Carlo simulation calls, similar to CELF algorithm \cite{leskovec07}. 
+CELF increased the speed of the original algorithm by a factor 700 on average case, but still on its first iteration it has to calculate the spread of every vertex.
+While that is reasonably fast and will give good result on small networks, it will not perform well on medium sized graphs let alone large scale graphs. 
+To that extent, even running the simulations for all the vertices once is not feasible. 
+Zhuo et al.\ \cite{zhuo13} provided a mathematically proven upper bound for spread function of any initial set. 
+In UBLF, instead of running simulations for each vertex in the first iteration, they find the upper bound which can be found in constant time. Having the initial values for all the nodes, they used the same technique as CELF. 
+They started calculating the spread for vertices in order of their initial estimated spread, if the estimated spread was still bigger than the rest of nodes, the node was chosen and added to the seed set. 
+Computation continues until desired number of initial seeds are achieved. 
+Algorithm \ref{alg:ublf} describes UBLF. 
+The matrix $PP$ is constructed from the graph, where each value $(u,v)$ in the matrix corresponds to the edge $e=(u,v)$; value of the edge that connects $u$ to $v$. 
+$S$ consists of the seed set, the output of the algorithm i.e.\ nodes with highest influence propagation and $I$ is the \textit{identity matrix}. Before starting the iterative process, vector $\delta$ is calculated. 
+In each iteration of the algorithm, vertices with the maximum $\delta$ are chosen, if Monte Carlo simulation is not yet run for them, the algorithm will run the simulation, and if the value of $\delta_u$ is still greater than the node with second highest $\delta$ then $u$ is added to to the set $S$ . 
+The process continues for $k$ iteration, where $k$ is the desired size of the output. 
+$\sigma(v)$ is the expected spread of $v$ under the \textit{IC} model. 
+Experimental results shows that UBLF manages to reduce more than $95\%$ Monte Carlo simulations needed and is at least 2 to 5 times faster than CELF method.
 
 \subsection{Learning Influence Probabilities}
 \label{subsec:learninginfprob}
-Another aspect of Influence Maximization problem is the assignment of probabilities to edges, which denotes the probability of a node influencing its neighbor through an edge. In both IC and LT models, different strategies are applied. In one method, fixed probabilities are assigned to all the edges. Other methods, includes assigning probabilities to edges chosen randomly from the set {0.1, 0.01, 0.001}. Another strategy, typically referred to as the \textit{Weighted Cascade} uses the inverse of the in-degree of each vertex as the influence probability. That means, an already activated node $u$ can activate node $v$ with probability of $1/d_v$, provided there is an edge between the nodes. Of all the methods discussed before, none of them truly capture the behavior of the network. It is obvious that in a social network people are affected by their friends differently. Saito et al.\ \cite{saito08} were the first to study how to predict the edge probabilities based on the past behavior of the users. Based on the propagation made in IC model, they introduced a probabilistic model and using \textit{Expectation Maximization} they tried to find the best assignment of probabilities to edges. \\
-Goyal et al.\ \cite{goyal10} have also tackled the problem of forming the social graph whose edges have the probability of a user influencing the other based on a log of actions. Based on the \textit{General Threshold} model that simultaneously 
-generalizes the Linear Threshold and Independent Cascade models and an action log of past behaviors of the users, formatted as $Actions(User,Action, Time)$ where each entry indicates, an action made by a user at a specific time. 
-Graph $G = (V,E,T)$ is constructed based on the relationship of users in the graph, where $T$ indicates the time a specific edge was added to the graph (i.e.\ a relation was formed between two users). Hence, the objective function is defined as $p : E \rightarrow [0,1] * [0,1]$ assigning both directions of each edge $(u,v)$ in $E$ the probabilities : $p_{v,u}$ and $p_{u,v}$.
-Using simple counting methods, they have scanned the data set, and estimated the edge probability $p_{v,u}$ based on the action of node $v$ and the subsequent action made by $u$. If these two actions happened within a predefined time, the probability of $v$ influencing $u$ was increased. They have also proposed more advanced methods of estimating the probability $p_{v,u}$ which is outside of the scope of this thesis.
-In another paper, Goyal et al.\ \cite{goyal11} have also tackled the problem of influence maximization directly. Instead of first learning the edge probabilities and then finding the optimum seed set, they have proposed a method to directly find the optimal seed set based on the action log .
+Another aspect of Influence Maximization problem is the assignment of probabilities to edges, which denotes the probability of a node influencing its neighbor through an edge. 
+In both IC and LT models, different strategies are applied. 
+In one method, fixed probabilities are assigned to all the edges. 
+Other methods, includes assigning probabilities to edges chosen randomly from the set {0.1, 0.01, 0.001}. 
+Another strategy, typically referred to as the \textit{Weighted Cascade} uses the inverse of the in-degree of each vertex as the influence probability. 
+That means, an already activated node $u$ can activate node $v$ with probability of $1/d_v$, provided there is an edge between the nodes. Of all the methods discussed before, none of them truly capture the behavior of the network. 
+It is obvious that in a social network people are affected by their friends differently. 
+Saito et al.\ \cite{saito08} were the first to study how to predict the edge probabilities based on the past behavior of the users. 
+Based on the propagation made in IC model, they introduced a probabilistic model and using \textit{Expectation Maximization} they tried to find the best assignment of probabilities to edges.
+
+Goyal et al.\ \cite{goyal10} have also tackled the problem of forming the social graph whose edges have the probability of a user influencing the others based on a log of actions. 
+Based on the \textit{General Threshold} model that simultaneously generalizes the Linear Threshold and Independent Cascade models and an action log of past behaviors of the users, formatted as $Actions(User,Action, Time)$ where each entry indicates, an action made by a user at a specific time. 
+Graph $G = (V,E,T)$ is constructed based on the relationship of users in the graph, where $T$ indicates the time a specific edge was added to the graph (i.e.\ a relation was formed between two users). 
+Hence, the objective function is defined as $p : E \rightarrow [0,1] * [0,1]$ assigning both directions of each edge $(u,v)$ in $E$ the probabilities : $p_{v,u}$ and $p_{u,v}$.
+Using simple counting methods, they have scanned the data set, and estimated the edge probability $p_{v,u}$ based on the action of node $v$ and the subsequent action made by $u$. 
+If these two actions happened within a predefined time, the probability of $v$ influencing $u$ was increased. 
+They have also proposed more advanced methods of estimating the probability $p_{v,u}$ which is outside of the scope of this thesis.
+In another paper, Goyal et al.\ \cite{goyal11} have also tackled the problem of influence maximization directly. 
+Instead of first learning the edge probabilities and then finding the optimum seed set, they have proposed a method to directly find the optimal seed set based on the action log.
 \newpage
 \section{Big Data}
 \label{sec:bigdata}
